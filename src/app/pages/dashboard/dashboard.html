@@ -1,0 +1,63 @@
+<!-- Loader -->
+<div class="loader" *ngIf="loading">
+  Loading dashboard...
+</div>
+
+<!-- Dashboard -->
+<div class="dashboard" *ngIf="!loading">
+
+  <h2 class="page-title">Admin Dashboard</h2>
+
+  <!-- Summary Cards -->
+  <div class="summary-cards">
+    <div class="card">
+      <h4>Total Products</h4>
+      <p>{{ summary.total_products }}</p>
+    </div>
+
+    <div class="card success">
+      <h4>Active Products</h4>
+      <p>{{ summary.active_products }}</p>
+    </div>
+
+    <div class="card danger">
+      <h4>Inactive Products</h4>
+      <p>{{ summary.inactive_products }}</p>
+    </div>
+
+    <div class="card info">
+      <h4>Total Proposals</h4>
+      <p>{{ summary.total_proposals }}</p>
+    </div>
+  </div>
+
+  <!-- Role Wise Users -->
+  <div class="table-card">
+    <h3>Role Wise Users</h3>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Role</th>
+          <th>Total Users</th>
+          <th>Approved</th>
+          <th>Pending</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let role of roleWiseUsers">
+          <td>{{ role.role_name }}</td>
+          <td>{{ role.total_users }}</td>
+          <td class="approved">{{ role.approved_users }}</td>
+          <td class="pending">{{ role.pending_users }}</td>
+        </tr>
+
+        <tr *ngIf="roleWiseUsers.length === 0">
+          <td colspan="4" class="no-data">No data available</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>

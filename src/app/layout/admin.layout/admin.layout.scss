@@ -1,0 +1,98 @@
+.admin-container {
+  display: flex;
+  height: 100vh;
+  background: #f1f5f9;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 260px;
+  background: #0f172a;
+  color: #fff;
+  transition: width 0.3s ease;
+  overflow: hidden;
+}
+
+.admin-container.collapsed .sidebar {
+  width: 70px;
+}
+
+/* Logo */
+.logo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px;
+}
+
+.sidebar-logo {
+  max-height: 36px;
+}
+
+/* Toggle */
+.toggle-btn {
+  background: none;
+  border: none;
+  font-size: 22px;
+  cursor: pointer;
+  color: #fff;
+}
+
+/* Nav */
+nav {
+  display: flex;
+  flex-direction: column;
+}
+
+nav a,
+.menu-parent {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  cursor: pointer;
+  color: #cbd5f5;
+  text-decoration: none;
+}
+
+nav a:hover,
+.menu-parent:hover {
+  background: #1e293b;
+  color: #fff;
+}
+
+nav a.active {
+  background: #2563eb;
+  color: #fff;
+}
+
+.icon {
+  width: 24px;
+  text-align: center;
+}
+
+.arrow {
+  margin-left: auto;
+}
+
+/* Submenu */
+.submenu {
+  padding-left: 20px;
+}
+
+/* Logout */
+.logout {
+  margin-top: auto;
+  color: #f87171;
+}
+
+.logout:hover {
+  background: rgba(248, 113, 113, 0.15);
+}
+
+/* Content */
+.content {
+  flex: 1;
+  padding: 24px;
+  overflow-y: auto;
+}

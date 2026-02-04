@@ -1,0 +1,209 @@
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.tabs {
+  display: flex;
+  gap: 12px;
+  margin: 20px 0;
+
+  .tab {
+    padding: 8px 18px;
+    border-radius: 20px;
+    border: 1px solid #ddd;
+    background: #f9f9f9;
+    cursor: pointer;
+  }
+
+  .tab.active {
+    background: #4f46e5;
+    color: #fff;
+  }
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: center;
+
+  th, td {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+  }
+
+  th {
+    background: #f5f5f5;
+  }
+
+  &.inactive {
+    opacity: 0.85;
+  }
+}
+
+button {
+  margin-right: 6px;
+  cursor: pointer;
+}
+
+.btn.primary {
+  background: #4f46e5;
+  color: #fff;
+  padding: 8px 14px;
+  border-radius: 6px;
+}
+
+button.danger { color: red; }
+button.success { color: green; }
+
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-box {
+  background: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  width: 700px;
+
+  &.small {
+    width: 400px;
+    text-align: center;
+  }
+}
+
+.modal-footer {
+  margin-top: 20px;
+  text-align: right;
+}
+
+
+.view-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.image-grid {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+
+  img {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+  }
+}
+
+/* ===== COMMON FIELD ===== */
+.form-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-field label {
+  font-size: 13px;
+  margin-bottom: 4px;
+  color: #555;
+}
+
+/* 🔑 Make INPUT and SELECT identical */
+.form-field input,
+.form-field select {
+  width: 100%;
+  height: 40px;                 /* SAME HEIGHT */
+  padding: 8px 12px;
+  font-size: 14px;
+  border-radius: 6px;
+  border: 1px solid #dcdcdc;
+  background-color: #fff;
+  color: #333;
+  box-sizing: border-box;
+}
+
+/* remove native select styling */
+.form-field select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  /* custom arrow */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath fill='%23666' d='M5 7l5 5 5-5z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 12px;
+
+  padding-right: 36px; /* space for arrow */
+}
+
+/* focus state (same for both) */
+.form-field input:focus,
+.form-field select:focus {
+  outline: none;
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 1px rgba(79, 70, 229, 0.25);
+}
+
+
+.image-grid img {
+  cursor: zoom-in;
+}
+
+/* ===== IMAGE PREVIEW ===== */
+.image-preview-box {
+  position: relative;
+  background: transparent;
+}
+
+.image-preview-box img {
+  max-width: 90vw;
+  max-height: 85vh;
+  border-radius: 8px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+}
+
+.image-close {
+  position: absolute;
+  top: -12px;
+  right: -12px;
+  background: #000;
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+}
+
+.image-scroll {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  margin: 10px 0;
+}
+
+.image-scroll img {
+  height: 100px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  cursor: zoom-in;
+}
+
+
+

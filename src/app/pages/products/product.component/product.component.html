@@ -1,0 +1,214 @@
+<div class="page-header">
+    <h2>Products</h2>
+
+    <button type="button" class="btn primary" *ngIf="activeTab === 'ACTIVE'" (click)="openAdd()">
+        ➕ Add Product
+    </button>
+</div>
+
+<!-- ================= TABS ================= -->
+<div class="tabs">
+    <button type="button" class="tab" [class.active]="activeTab === 'ACTIVE'" (click)="switchTab('ACTIVE')">
+        Active Products
+    </button>
+
+    <button type="button" class="tab" [class.active]="activeTab === 'INACTIVE'" (click)="switchTab('INACTIVE')">
+        Inactive Products
+    </button>
+</div>
+
+<!-- ================= ACTIVE ================= -->
+<div *ngIf="activeTab === 'ACTIVE'">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Sr. No.</th>
+                <th>Name</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let p of activeProducts;  let i = index">
+                <td>{{ i + 1 }}</td>
+                <td>{{ p.product_name }}</td>
+                <td>{{ p.category }}</td>
+                <td>₹ {{ p.price }}</td>
+                <td>
+                    <div class="action-group">
+                        <button type="button" class="icon-btn" (click)="viewProduct(p)">👁</button>
+                        <button type="button" class="icon-btn" (click)="editProduct(p)">✏️</button>
+                        <button type="button" class="icon-btn danger"
+                            (click)="openConfirm('DEACTIVATE', p.id)">🚫</button>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- ================= INACTIVE ================= -->
+<div *ngIf="activeTab === 'INACTIVE'">
+    <table class="table inactive">
+        <thead>
+            <tr>
+                <th>Sr. No</th>
+                <th>Name</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let p of inactiveProducts; let i = index">
+                <td>{{i+1}}
+                <td>{{ p.product_name }}</td>
+                <td>{{ p.category }}</td>
+                <td>₹ {{ p.price }}</td>
+                <td>
+                    <button type="button" (click)="viewProduct(p)">👁</button>
+                    <button type="button" class="success" (click)="openConfirm('ACTIVATE', p.id)">✅</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- ================= CONFIRM MODAL ================= -->
+<div class="modal" *ngIf="showConfirm">
+    <div class="modal-box small">
+        <h3>Confirm</h3>
+        <p>{{ confirmMessage }}</p>
+        <div class="modal-footer">
+            <button type="button" class="secondary" (click)="confirmNo()">No</button>
+            <button type="button" class="primary" (click)="confirmYes()">Yes</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================= VIEW PRODUCT MODAL ================= -->
+<div class="modal" *ngIf="showView">
+    <div class="modal-box large">
+
+        <h3>Product Details</h3>
+
+        <!-- READ-ONLY FORM -->
+        <div class="form-grid">
+
+            <div class="form-field">
+                <label>Product Name</label>
+                <input [value]="selectedProduct.product_name" disabled>
+            </div>
+
+            <div class="form-field">
+                <label>Category</label>
+                <input [value]="selectedProduct.category" disabled>
+            </div>
+
+            <div class="form-field">
+                <label>Module Size</label>
+                <input [value]="selectedProduct.mod_size" disabled>
+            </div>
+
+            <div class="form-field">
+                <label>Price</label>
+                <input [value]="'₹ ' + selectedProduct.price" disabled>
+            </div>
+
+            <div class="form-field">
+                <label>Wiring Type</label>
+                <input [value]="getWiringName(selectedProduct.wiring_type_id)" disabled>
+            </div>
+
+            <div class="form-field">
+                <label>Zigbee Type</label>
+                <input [value]="selectedProduct.zigbee_type || '-'" disabled>
+            </div>
+
+        </div>
+
+        <!-- IMAGES -->
+        <h4>Product Images</h4>
+
+        <div class="image-grid">
+            <img *ngFor="let img of selectedProduct.image_urls" [src]="img" alt="product image"
+                (click)="openImagePreview(img)">
+        </div>
+
+        <div class="modal-footer">
+            <button type="button" class="secondary" (click)="close()">Close</button>
+        </div>
+
+    </div>
+</div>
+
+
+<!-- ================= ADD / EDIT PRODUCT MODAL ================= -->
+<div class="modal" *ngIf="showAdd || showEdit">
+    <div class="modal-box large">
+        <h3>{{ showAdd ? 'Add Product' : 'Edit Product' }}</h3>
+
+        <div class="form-grid">
+
+            <div class="form-field">
+                <label>Product Name</label>
+                <input [(ngModel)]="productForm.product_name">
+            </div>
+
+            <div class="form-field">
+                <label>Category</label>
+                <input [(ngModel)]="productForm.category">
+            </div>
+
+            <div class="form-field">
+                <label>Module Size</label>
+                <input type="number" [(ngModel)]="productForm.mod_size">
+            </div>
+
+            <div class="form-field">
+                <label>Price</label>
+                <input [(ngModel)]="productForm.price">
+            </div>
+
+            <div class="form-field">
+                <label>Wiring Type</label>
+                <select [(ngModel)]="productForm.wiring_type_id">
+                    <option [ngValue]="null">Select Wiring Type</option>
+                    <option *ngFor="let w of wiringTypes" [ngValue]="w.id">
+                        {{ w.wiring_name }}
+                    </option>
+                </select>
+            </div>
+
+            <div class="form-field">
+                <label>Zigbee Type</label>
+                <input [(ngModel)]="productForm.zigbee_type">
+            </div>
+
+            <div class="form-field full">
+                <label>Product Images</label>
+                <input type="file" multiple (change)="onFileChange($event)">
+            </div>
+
+        </div>
+
+
+        <div class="modal-footer">
+            <button type="button" class="secondary" (click)="close()">Cancel</button>
+            <button type="button" class="primary" (click)="showAdd ? addProduct() : updateProduct()">
+                {{ showAdd ? 'Save' : 'Update' }}
+            </button>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- ================= IMAGE PREVIEW ================= -->
+<div class="modal" *ngIf="previewImage" (click)="closeImagePreview()">
+    <div class="image-preview-box" (click)="$event.stopPropagation()">
+        <img [src]="previewImage">
+        <button class="image-close" (click)="closeImagePreview()">✕</button>
+    </div>
+</div>

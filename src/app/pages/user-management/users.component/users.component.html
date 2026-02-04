@@ -1,0 +1,199 @@
+<h2>Users</h2>
+
+<table class="table">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Email</th>
+      <th>Mobile</th>
+      <th>Status</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <tr *ngFor="let u of users">
+      <td>{{ u.user_name }}</td>
+      <td>{{ u.email_id }}</td>
+      <td>{{ u.mobile_number }}</td>
+      <td>{{ u.is_admin_approve }}</td>
+      <td>
+        <button (click)="viewUser(u)">👁</button>
+        <button (click)="openPermission(u)">🔑</button>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- ================= VIEW USER MODAL ================= -->
+<div class="modal" *ngIf="showView">
+  <div class="modal-box large">
+
+    <div class="modal-header">
+      <h3>User Details</h3>
+    </div>
+
+    <div class="modal-body">
+
+      <div class="form-grid">
+        <div>
+          <label>User Name</label>
+          <input [(ngModel)]="selectedUser.user_name" disabled>
+        </div>
+
+        <div> <label>First Name</label>
+           <input [(ngModel)]="selectedUser.first_name" disabled> 
+        </div>
+         <div> <label>Last Name</label>
+           <input [(ngModel)]="selectedUser.last_name" disabled>
+         </div>
+
+        <div>
+          <label>Email</label>
+          <input [(ngModel)]="selectedUser.email_id" disabled>
+        </div>
+
+        <div>
+          <label>Mobile</label>
+          <input [(ngModel)]="selectedUser.mobile_number" disabled>
+        </div>
+
+        <div>
+          <label>Status</label>
+          <input [(ngModel)]="selectedUser.is_admin_approve" disabled>
+        </div>
+        <div>
+          <label>address</label>
+          <input [(ngModel)]="selectedUser.address" disabled>
+        </div>
+        <div>
+          <label>pin_code</label>
+          <input [(ngModel)]="selectedUser.pin_code" disabled>
+        </div>
+        <div>
+          <label>country</label>
+          <input [(ngModel)]="selectedUser.country" disabled>
+        </div>
+        <div>
+          <label>state</label>
+          <input [(ngModel)]="selectedUser.state" disabled>
+        </div>
+        <div>
+          <label>district</label>
+          <input [(ngModel)]="selectedUser.district" disabled>
+        </div>
+        <div>
+          <label>taluk</label>
+          <input [(ngModel)]="selectedUser.taluk" disabled>
+        </div>
+        <div>
+          <label>division</label>
+          <input [(ngModel)]="selectedUser.division" disabled>
+        </div>
+        <div>
+          <label>region</label>
+          <input [(ngModel)]="selectedUser.region" disabled>
+        </div>
+        <div>
+          <label>company_name</label>
+          <input [(ngModel)]="selectedUser.company_name" disabled>
+        </div>
+        <div>
+          <label>company_address</label>
+          <input [(ngModel)]="selectedUser.company_address" disabled>
+        </div>
+        <div>
+          <label>gst_name</label>
+          <input [(ngModel)]="selectedUser.gst_name" disabled>
+        </div>
+        <div>
+          <label>role_name</label>
+          <input [(ngModel)]="selectedUser.role_name" disabled>
+        </div>
+        
+      </div>
+
+    </div>
+
+    <div class="modal-footer">
+      <button class="secondary" (click)="close()">Close</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ================= PERMISSION MODAL ================= -->
+<div class="modal" *ngIf="showPermission">
+  <div class="modal-box xlarge">
+
+    <div class="modal-header">
+      <h3>Manage Permissions</h3>
+    </div>
+
+    <div class="modal-body">
+
+      <!-- ROLE -->
+      <div class="role-section">
+        <label>Assign Role</label>
+        <select [(ngModel)]="selectedRoleId">
+          <option [ngValue]="null">Select Role</option>
+          <option *ngFor="let role of roles" [ngValue]="role.id">
+            {{ role.role_name }}
+          </option>
+        </select>
+      </div>
+
+      <!-- MODULE PERMISSIONS -->
+      <div class="permission-grid">
+        <div class="permission-card" *ngFor="let module of modules">
+
+          <div class="card-header">
+            {{ module.module_name | titlecase }}
+          </div>
+
+          <div class="checkbox-group">
+            <label>
+              <input type="checkbox"
+                [(ngModel)]="permissionsMap[module.id].can_create"
+                (change)="onPermissionChange()">
+              Create
+            </label>
+
+            <label>
+              <input type="checkbox"
+                [(ngModel)]="permissionsMap[module.id].can_view"
+                (change)="onPermissionChange()">
+              View
+            </label>
+
+            <label>
+              <input type="checkbox"
+                [(ngModel)]="permissionsMap[module.id].can_update"
+                (change)="onPermissionChange()">
+              Update
+            </label>
+
+            <label>
+              <input type="checkbox"
+                [(ngModel)]="permissionsMap[module.id].can_delete"
+                (change)="onPermissionChange()">
+              Delete
+            </label>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+    <div class="modal-footer">
+      <button class="secondary" (click)="close()">Cancel</button>
+      <button class="primary"
+        [disabled]="!hasPermissionSelected"
+        (click)="saveAllPermissions()">
+        Save Permissions
+      </button>
+    </div>
+
+  </div>
+</div>

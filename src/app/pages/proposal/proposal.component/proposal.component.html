@@ -1,0 +1,157 @@
+<div class="container">
+
+    <!-- ================= LIST ================= -->
+    <div *ngIf="!selectedProposal && !isLoading">
+        <h2>Proposal List</h2>
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>#Sr. No</th>
+                    <th>Proposal ID</th>
+                    <th>User Name</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr *ngFor="let p of proposals; index as i">
+                    <td>{{ i + 1 }}</td>
+                    <td>{{ p.proposal_id }}</td>
+                    <td>{{ p.user_details?.userName }}</td>
+                    <td>
+                        <button class="btn view" (click)="viewProposal(p)">View</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- ================= VIEW ================= -->
+    <div *ngIf="selectedProposal" class="proposal-view">
+
+        <!-- HEADER -->
+        <div class="header">
+            <div>
+                <h2>Proposal Details</h2>
+                <p class="muted">Proposal ID: {{ selectedProposal.proposal_id }}</p>
+            </div>
+
+            <div class="actions">
+                <button class="btn back" (click)="backToList()">← Back</button>
+                <button class="btn pdf" (click)="generatePDF()">Generate PDF</button>
+            </div>
+        </div>
+
+
+        <!-- ================= USER DETAILS ================= -->
+        <div class="card">
+            <h3>User Details</h3>
+
+            <div class="grid">
+                <div><b>Proposal ID:</b> {{ selectedProposal.proposal_id }}</div>
+                <div><b>Name:</b> {{ selectedProposal.user_details?.userName }}</div>
+                <div><b>Email Id:</b> {{ selectedProposal.user_details?.email }}</div>
+                <div><b>Mobile No.:</b> {{ selectedProposal.user_details?.phone }}</div>
+                <div><b>Company Name:</b> {{ selectedProposal.user_details?.company_name }}</div>
+            </div>
+        </div>
+
+        <!-- ================= SUMMARY TABLE (TOP) ================= -->
+        <div class="card">
+            <h3>Proposal Summary</h3>
+
+            <table class="summary-table">
+                <tr>
+                    <th>Installation %</th>
+                    <td>{{ selectedProposal.installation_percentage }}%</td>
+
+                    <th>Commissioning %</th>
+                    <td>{{ selectedProposal.commissioning_percentage }}%</td>
+                </tr>
+
+                <tr>
+                    <th>Discount %</th>
+                    <td>{{ selectedProposal.discount_percentage }}%</td>
+
+                    <th>Products Total</th>
+                    <td>₹{{ selectedProposal.financial_breakdown.grandProductsTotal }} /-</td>
+                </tr>
+
+                <tr>
+                    <th>Installation Amount</th>
+                    <td>₹{{ selectedProposal.financial_breakdown.installationAmount }} /-</td>
+
+                    <th>Commissioning Amount</th>
+                    <td>₹{{ selectedProposal.financial_breakdown.commissioningAmount }} /-</td>
+                </tr>
+
+                <tr>
+                    <th>Discount Amount</th>
+                    <td>₹{{ selectedProposal.financial_breakdown.discountAmount }} /-</td>
+
+                    <th><b>Final Total</b></th>
+                    <td><b>₹{{ selectedProposal.financial_breakdown.finalTotal }} /-</b></td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- ================= FLOORS ================= -->
+        <div *ngFor="let floor of getFloors()" class="floor-card">
+
+            <h3 class="floor-title">🏢 {{ floor.name }}</h3>
+
+            <div *ngFor="let home of getHomes(floor)" class="home-card">
+                <h4>🏠 {{ home.name }}</h4>
+
+                <div *ngFor="let room of getRooms(home)" class="room-card">
+                    <h5>🚪 {{ room.name }}</h5>
+
+                    <div *ngFor="let sb of getSwitchboards(room)" class="switchboard-card">
+
+                        <div class="switchboard-header">
+                            <span><b>Switchboard:</b> {{ sb.name }}</span>
+                            <span class="badge">MOD {{ sb.mod }}</span>
+                        </div>
+
+                        <!-- PRODUCTS TABLE WITH IMAGES -->
+                        <table class="product-table" *ngIf="getProducts(sb).length > 0">
+                            <thead>
+                                <tr>
+                                    <th>Product Name</th>
+                                    <th>Category</th>
+                                    <th>MOD</th>
+                                    <th>Price</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                <tr *ngFor="let pr of getProducts(sb)">
+                                    <td>{{ pr.name }}</td>
+                                    <td>{{ pr.category }}</td>
+                                    <td>{{ pr.modSize }}</td>
+                                    <td>₹{{ pr.price }} /-</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <!-- PRODUCT IMAGES (SEPARATE GRID) -->
+                        <div class="product-images" *ngIf="getProducts(sb).length > 0">
+                            <img *ngFor="let pr of getProducts(sb)" [src]="pr.imagePath" alt="product"
+                                class="product-img" onerror="this.src='assets/no-image.png'" />
+                        </div>
+
+                        <!-- NO PRODUCTS -->
+                        <div class="no-products" *ngIf="getProducts(sb).length === 0">
+                            No products added
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+</div>

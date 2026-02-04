@@ -1,0 +1,80 @@
+<div class="admin-container" [class.collapsed]="!sidebarOpen">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+
+    <!-- LOGO + TOGGLE -->
+    <div class="logo">
+      <img
+        *ngIf="sidebarOpen"
+        src="https://nuos.in/wp-content/uploads/2023/06/logo.png"
+        alt="NUOS Logo"
+        class="sidebar-logo"
+      />
+
+      <button class="toggle-btn" (click)="toggleSidebar()">
+        ☰
+      </button>
+    </div>
+
+    <nav>
+
+      <!-- Dashboard -->
+      <a routerLink="/dashboard" routerLinkActive="active">
+        <span class="icon">📊</span>
+        <span class="text" *ngIf="sidebarOpen">Dashboard</span>
+      </a>
+
+      <!-- User Management -->
+      <div
+        class="menu-parent"
+        (click)="sidebarOpen && toggleUserMgmt()"
+      >
+        <span class="icon">👥</span>
+        <span class="text" *ngIf="sidebarOpen">User Management</span>
+        <span class="arrow" *ngIf="sidebarOpen">
+          {{ userMgmtOpen ? '▾' : '▸' }}
+        </span>
+      </div>
+
+      <!-- Submenu -->
+      <div class="submenu" *ngIf="sidebarOpen && userMgmtOpen">
+        <a routerLink="/users.component" routerLinkActive="active">
+          <span class="icon">👤</span>
+          <span class="text">Users</span>
+        </a>
+      </div>
+
+      <!-- Products -->
+      <a routerLink="/product.component" routerLinkActive="active">
+        <span class="icon">📦</span>
+        <span class="text" *ngIf="sidebarOpen">Products</span>
+      </a>
+
+      <!-- Proposals -->
+      <a routerLink="/proposal.component" routerLinkActive="active">
+        <span class="icon">📑</span>
+        <span class="text" *ngIf="sidebarOpen">Proposals</span>
+      </a>
+
+      <!-- Notifications -->
+      <a routerLink="/notifications" routerLinkActive="active">
+        <span class="icon">🔔</span>
+        <span class="text" *ngIf="sidebarOpen">Notifications</span>
+      </a>
+
+      <!-- LOGOUT (CLICK ACTION, NOT ROUTE) -->
+      <div class="menu-parent logout" (click)="logout()">
+        <span class="icon">🚪</span>
+        <span class="text" *ngIf="sidebarOpen">Logout</span>
+      </div>
+
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="content">
+    <router-outlet></router-outlet>
+  </main>
+
+</div>
