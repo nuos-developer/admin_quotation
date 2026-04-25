@@ -1,13 +1,16 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AdminService } from '../../../core/services/admin.service';
+import { LoaderService } from '../../../core/services/loader.service';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import html2canvas from 'html2canvas';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-proposal',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './proposal.component.html',
   styleUrls: ['./proposal.component.scss']
 })
@@ -15,26 +18,33 @@ export class ProposalComponent implements OnInit {
 
   proposals: any[] = [];
   selectedProposal: any = null;
-  isLoading = false;
+  searchText: string = '';
+filteredProposals: any[] = [];
 
-  constructor(private adminService: AdminService) {}
+  constructor(
+    private adminService: AdminService,
+    private loader: LoaderService   // 🔥 ADD THIS
+  ) {}
 
   ngOnInit(): void {
     this.loadProposals();
   }
 
   /* ================= LOAD LIST ================= */
+loadProposals() {
+  this.loader.show();
 
-  loadProposals() {
-    this.isLoading = true;
-    this.adminService.getProposals().subscribe({
-      next: (res: any) => {
-        this.proposals = this.toArray(res?.data?.data);
-        this.isLoading = false;
-      },
-      error: () => this.isLoading = false
-    });
-  }
+  this.adminService.getProposals().subscribe({
+    next: (res: any) => {
+      this.proposals = this.toArray(res?.data?.data);
+      this.filteredProposals = [...this.proposals]; // ✅ IMPORTANT
+      this.loader.hide();
+    },
+    error: () => {
+      this.loader.hide();
+    }
+  });
+}
 
   viewProposal(proposal: any) {
     this.selectedProposal = proposal;
@@ -91,94 +101,69 @@ export class ProposalComponent implements OnInit {
 
   /* ================= PDF WITH IMAGES ================= */
 
-  async generatePDF() {
-    const doc = new jsPDF();
-    let y = 15;
+//  import html2canvas from 'html2canvas';
 
-    /* ===== HEADER ===== */
-    doc.setFontSize(14);
-    doc.text('Proposal Details', 14, y);
-    y += 10;
+async generatePDF() {
+  this.loader.show();
 
-    doc.setFontSize(10);
-    doc.text(`Proposal ID: ${this.selectedProposal.proposal_id}`, 14, y); y += 6;
-    doc.text(`User: ${this.selectedProposal.user_details.userName}`, 14, y); y += 10;
+  const element = document.getElementById('proposal-pdf');
 
-    /* ===== SUMMARY ===== */
-    autoTable(doc, {
-      startY: y,
-      head: [['Field', 'Value']],
-      body: [
-        ['Installation %', `${this.selectedProposal.installation_percentage}%`],
-        ['Commissioning %', `${this.selectedProposal.commissioning_percentage}%`],
-        ['Discount %', `${this.selectedProposal.discount_percentage}%`],
-        ['Final Total', `${this.selectedProposal.financial_breakdown.finalTotal}`]
-      ]
+  if (!element) {
+    this.loader.hide();
+    return;
+  }
+
+  try {
+    const canvas = await html2canvas(element, {
+      scale: 2,           // better quality
+      useCORS: true       // allow images
     });
 
-    y = (doc as any).lastAutoTable.finalY + 10;
+    const imgData = canvas.toDataURL('image/png');
 
-    /* ===== FLOORS / HOMES / ROOMS ===== */
-    for (const floor of this.getFloors()) {
-      doc.setFontSize(12);
-      doc.text(`Floor: ${floor.name}`, 14, y);
-      y += 6;
+    const pdf = new jsPDF('p', 'mm', 'a4');
 
-      for (const home of this.getHomes(floor)) {
-        doc.setFontSize(11);
-        doc.text(`Home: ${home.name}`, 18, y);
-        y += 5;
+    const imgWidth = 210; // A4 width
+    const pageHeight = 295;
+    const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
-        for (const room of this.getRooms(home)) {
-          doc.text(`Room: ${room.name}`, 22, y);
-          y += 4;
+    let heightLeft = imgHeight;
+    let position = 0;
 
-          for (const sb of this.getSwitchboards(room)) {
+    // FIRST PAGE
+    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+    heightLeft -= pageHeight;
 
-            const products = this.getProducts(sb);
-            if (!products.length) continue;
-
-            /* ===== PRODUCT TABLE ===== */
-            autoTable(doc, {
-              startY: y,
-              head: [['Product', 'Category', 'MOD', 'Price']],
-              body: products.map(p => [
-                p.name,
-                p.category,
-                p.modSize,
-                `${p.price}`
-              ]),
-              margin: { left: 22 },
-              styles: { fontSize: 8 }
-            });
-
-            y = (doc as any).lastAutoTable.finalY + 6;
-
-            /* ===== PRODUCT IMAGES ===== */
-            let x = 22;
-            const imgSize = 30;
-
-            for (const p of products) {
-              if (!p.imagePath) continue;
-
-              const imgBase64 = await this.loadImageAsBase64(p.imagePath);
-              if (!imgBase64) continue;
-
-              if (x + imgSize > 180) {
-                x = 22;
-                y += imgSize + 4;
-              }
-
-              doc.addImage(imgBase64, 'PNG', x, y, imgSize, imgSize);
-              x += imgSize + 4;
-            }
-
-            y += imgSize + 10;
-          }
-        }
-      }
+    // MULTIPLE PAGES
+    while (heightLeft > 0) {
+      position = heightLeft - imgHeight;
+      pdf.addPage();
+      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
     }
 
-    doc.save(`proposal-${this.selectedProposal.proposal_id}.pdf`);
+    pdf.save(`proposal-${this.selectedProposal.proposal_id}.pdf`);
+
+  } catch (err) {
+    console.error(err);
   }
+
+  this.loader.hide();
+}
+
+filterProposals() {
+  const search = this.searchText.toLowerCase();
+
+  this.filteredProposals = this.proposals.filter(p => {
+    const first = p.client_details?.first_name?.toLowerCase() || '';
+    const last = p.client_details?.last_name?.toLowerCase() || '';
+    const fullName = `${first} ${last}`;
+
+    return (
+      first.includes(search) ||
+      last.includes(search) ||
+      fullName.includes(search)
+    );
+  });
+}
 }

@@ -16,6 +16,14 @@
         Inactive Products
     </button>
 </div>
+<div class="search-box">
+  <input
+    type="text"
+    placeholder="🔍 Search product..."
+    [(ngModel)]="searchText"
+    (input)="filterProducts()"
+  />
+</div>
 
 <!-- ================= ACTIVE ================= -->
 <div *ngIf="activeTab === 'ACTIVE'">
@@ -30,7 +38,7 @@
             </tr>
         </thead>
         <tbody>
-            <tr *ngFor="let p of activeProducts;  let i = index">
+           <tr *ngFor="let p of filteredActiveProducts; let i = index">
                 <td>{{ i + 1 }}</td>
                 <td>{{ p.product_name }}</td>
                 <td>{{ p.category }}</td>
@@ -172,7 +180,7 @@
             </div>
 
             <div class="form-field">
-                <label>Wiring Type</label>
+                <label>Wiring Type</label>{{productForm | json}}
                 <select [(ngModel)]="productForm.wiring_type_id">
                     <option [ngValue]="null">Select Wiring Type</option>
                     <option *ngFor="let w of wiringTypes" [ngValue]="w.id">

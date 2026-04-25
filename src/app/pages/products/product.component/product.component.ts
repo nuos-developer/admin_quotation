@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdminService } from '../../../core/services/admin.service';
+import { LoaderService } from '../../../core/services/loader.service';
 
 @Component({
   selector: 'app-product',
@@ -12,15 +13,15 @@ import { AdminService } from '../../../core/services/admin.service';
 })
 export class ProductComponent implements OnInit {
 
-  /* ================= STATE ================= */
   activeTab: 'ACTIVE' | 'INACTIVE' = 'ACTIVE';
 
   activeProducts: any[] = [];
   inactiveProducts: any[] = [];
+  wiringTypes: any[] = [];
+searchText: string = '';
 
-  wiringTypes: any[] = [];   // 🔑 wiring dropdown data
-
-  /* ================= MODALS ================= */
+filteredActiveProducts: any[] = [];
+filteredInactiveProducts: any[] = [];
   showAdd = false;
   showEdit = false;
   showView = false;
@@ -42,49 +43,57 @@ export class ProductComponent implements OnInit {
     images: []
   };
 
-  constructor(private admin: AdminService) {}
+  constructor(
+    private admin: AdminService,
+    private loader: LoaderService   // 🔥 add this
+  ) {}
 
-  /* ================= INIT ================= */
   ngOnInit(): void {
     this.activeTab = 'ACTIVE';
     this.loadAllProducts();
-    this.loadWiringTypes(); // 👈 load wiring list once
+    this.loadWiringTypes();
   }
 
-  /* ================= API ================= */
+  /* ================= LOAD PRODUCTS ================= */
   loadAllProducts(): void {
-    this.admin.getActiveProduct().subscribe((res: any) => {
-      this.activeProducts = res.resp?.data || [];
-    });
+    this.loader.show();   // 🔥 START
 
-    this.admin.getInactiveProduct().subscribe((res: any) => {
-      this.inactiveProducts = res.resp?.data || [];
+    this.admin.getActiveProduct().subscribe({
+      next: (res: any) => {
+       this.activeProducts = res.resp?.data || [];
+this.filteredActiveProducts = [...this.activeProducts]; // ✅
+
+        this.admin.getInactiveProduct().subscribe({
+          next: (res2: any) => {
+         this.inactiveProducts = res2.resp?.data || [];
+this.filteredInactiveProducts = [...this.inactiveProducts]; // ✅
+            this.loader.hide();   // 🔥 END
+          },
+          error: () => this.loader.hide()
+        });
+      },
+      error: () => this.loader.hide()
     });
   }
 
+  /* ================= LOAD WIRING ================= */
   loadWiringTypes(): void {
-    this.admin.getWire().subscribe((res: any) => {
-      this.wiringTypes = res.data || res.resp?.data || [];
-    });
-  }
+    this.loader.show();
 
-  /* ================= TABS ================= */
-  switchTab(tab: 'ACTIVE' | 'INACTIVE'): void {
-    this.activeTab = tab;
+    this.admin.getWire().subscribe({
+      next: (res: any) => {
+        this.wiringTypes = res.data || res.resp?.data || [];
+        this.loader.hide();
+      },
+      error: () => this.loader.hide()
+    });
   }
 
   /* ================= ADD ================= */
-  openAdd(): void {
-    this.resetForm();
-    this.showAdd = true;
-  }
-
-  onFileChange(event: any): void {
-    this.productForm.images = Array.from(event.target.files);
-  }
-
   addProduct(): void {
     const fd = new FormData();
+
+    console.log('WIRING TYPE ID:', this.productForm.wiring_type_id);
 
     Object.keys(this.productForm).forEach(key => {
       if (key !== 'images') {
@@ -96,42 +105,20 @@ export class ProductComponent implements OnInit {
       fd.append('images', f);
     });
 
-    this.admin.addProduct(fd).subscribe(() => {
-      alert('Product added successfully');
-      this.close();
-      this.loadAllProducts();
+    this.loader.show();
+
+    this.admin.addProduct(fd).subscribe({
+      next: () => {
+        alert('Product added successfully');
+        this.close();
+        this.loadAllProducts();
+        this.loader.hide();
+      },
+      error: () => this.loader.hide()
     });
   }
 
-  /* ================= VIEW ================= */
-  viewProduct(p: any): void {
-    this.selectedProduct = p;
-    this.showView = true;
-  }
-
-  getWiringName(id: number): string {
-    const wiring = this.wiringTypes.find(w => w.id === id);
-    return wiring ? wiring.wiring_name : '-';
-  }
-
-  /* ================= EDIT ================= */
-  editProduct(p: any): void {
-
-    console.log('">>>>>>>>',p);
-    
-    this.productForm = {
-      id: p.id,
-      product_name: p.product_name,
-      category: p.category,
-      mod_size: p.mod_size,
-      price: p.price,
-      wiring_type_id: p.wiring_type_id, // 👈 preselect
-      zigbee_type: p.zigbee_type,
-      images: []
-    };
-    this.showEdit = true;
-  }
-
+  /* ================= UPDATE ================= */
   updateProduct(): void {
     const fd = new FormData();
 
@@ -145,17 +132,83 @@ export class ProductComponent implements OnInit {
       fd.append('images', f);
     });
 
-    console.log(fd);
-    
+    this.loader.show();
 
-    this.admin.UpdateProduct(this.productForm.id, fd).subscribe(() => {
-      alert('Product updated successfully');
-      this.close();
-      this.loadAllProducts();
+    this.admin.UpdateProduct(this.productForm.id, fd).subscribe({
+      next: () => {
+        alert('Product updated successfully');
+        this.close();
+        this.loadAllProducts();
+        this.loader.hide();
+      },
+      error: () => this.loader.hide()
     });
   }
 
-  /* ================= CONFIRM ================= */
+  /* ================= ACTIVATE / DEACTIVATE ================= */
+  confirmYes(): void {
+    if (!this.confirmProductId || !this.confirmAction) return;
+
+    const id = this.confirmProductId;
+    const action = this.confirmAction;
+
+    this.resetConfirm();
+    this.loader.show();   // 🔥 START
+
+    if (action === 'DEACTIVATE') {
+      this.admin.inactiveProduct(id).subscribe({
+        next: () => this.loadAllProducts(),
+        error: () => this.loader.hide()
+      });
+    }
+
+    if (action === 'ACTIVATE') {
+      this.admin.activeProduct(id).subscribe({
+        next: () => this.loadAllProducts(),
+        error: () => this.loader.hide()
+      });
+    }
+  }
+
+  /* ================= REMAINING (NO CHANGE) ================= */
+
+  switchTab(tab: 'ACTIVE' | 'INACTIVE'): void {
+    this.activeTab = tab;
+  }
+
+  openAdd(): void {
+    this.resetForm();
+    this.showAdd = true;
+  }
+
+  onFileChange(event: any): void {
+    this.productForm.images = Array.from(event.target.files);
+  }
+
+  viewProduct(p: any): void {
+    this.selectedProduct = p;
+    this.showView = true;
+  }
+
+  getWiringName(id: number): string {
+    const wiring = this.wiringTypes.find(w => w.id === id);
+    return wiring ? wiring.wiring_name : '-';
+  }
+
+  editProduct(p: any): void {
+    this.productForm = {
+      id: p.id,
+      product_name: p.product_name,
+      category: p.category,
+      mod_size: p.mod_size,
+      price: p.price,
+      wiring_type_id: p.wiring_type_id,
+      zigbee_type: p.zigbee_type,
+      images: []
+    };
+    this.showEdit = true;
+  }
+
   openConfirm(action: 'ACTIVATE' | 'DEACTIVATE', id: number): void {
     this.confirmAction = action;
     this.confirmProductId = id;
@@ -165,35 +218,6 @@ export class ProductComponent implements OnInit {
         : 'Are you sure you want to activate this product?';
 
     this.showConfirm = true;
-  }
-
-  confirmYes(): void {
-    if (!this.confirmProductId || !this.confirmAction) return;
-
-    const id = this.confirmProductId;
-    const action = this.confirmAction;
-
-    this.resetConfirm();
-
-    if (action === 'DEACTIVATE') {
-      const product = this.activeProducts.find(p => p.id === id);
-      this.activeProducts = this.activeProducts.filter(p => p.id !== id);
-      if (product) this.inactiveProducts.unshift(product);
-
-      this.admin.inactiveProduct(id).subscribe({
-        error: () => this.loadAllProducts()
-      });
-    }
-
-    if (action === 'ACTIVATE') {
-      const product = this.inactiveProducts.find(p => p.id === id);
-      this.inactiveProducts = this.inactiveProducts.filter(p => p.id !== id);
-      if (product) this.activeProducts.unshift(product);
-
-      this.admin.activeProduct(id).subscribe({
-        error: () => this.loadAllProducts()
-      });
-    }
   }
 
   confirmNo(): void {
@@ -207,7 +231,6 @@ export class ProductComponent implements OnInit {
     this.confirmMessage = '';
   }
 
-  /* ================= UTILS ================= */
   resetForm(): void {
     this.productForm = {
       product_name: '',
@@ -227,14 +250,27 @@ export class ProductComponent implements OnInit {
     this.selectedProduct = null;
   }
 
- previewImage: string | null = null;
+  previewImage: string | null = null;
 
-openImagePreview(img: string): void {
-  this.previewImage = img;
+  openImagePreview(img: string): void {
+    this.previewImage = img;
+  }
+
+  closeImagePreview(): void {
+    this.previewImage = null;
+  }
+
+  filterProducts() {
+  const search = this.searchText.toLowerCase();
+
+  this.filteredActiveProducts = this.activeProducts.filter(p =>
+    p.product_name?.toLowerCase().includes(search) ||
+    p.category?.toLowerCase().includes(search)
+  );
+
+  this.filteredInactiveProducts = this.inactiveProducts.filter(p =>
+    p.product_name?.toLowerCase().includes(search) ||
+    p.category?.toLowerCase().includes(search)
+  );
 }
-
-closeImagePreview(): void {
-  this.previewImage = null;
-}
-
 }

@@ -56,12 +56,16 @@
         <span class="icon">📑</span>
         <span class="text" *ngIf="sidebarOpen">Proposals</span>
       </a>
+      <a routerLink="/client" routerLinkActive="active">
+        <span class="icon">📑</span>
+        <span class="text" *ngIf="sidebarOpen">Client</span>
+      </a>
 
       <!-- Notifications -->
-      <a routerLink="/notifications" routerLinkActive="active">
+      <!-- <a routerLink="/notifications" routerLinkActive="active">
         <span class="icon">🔔</span>
         <span class="text" *ngIf="sidebarOpen">Notifications</span>
-      </a>
+      </a> -->
 
       <!-- LOGOUT (CLICK ACTION, NOT ROUTE) -->
       <div class="menu-parent logout" (click)="logout()">
@@ -77,4 +81,9 @@
     <router-outlet></router-outlet>
   </main>
 
+</div>
+
+<!-- 🔄 GLOBAL LOADER -->
+<div *ngIf="loader.loading$ | async" class="loader-container">
+  <div class="spinner"></div>
 </div>

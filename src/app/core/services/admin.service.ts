@@ -19,6 +19,12 @@ export class AdminService {
         );
     }
 
+    getClient() {
+        return this.http.get<ApiResponse<any[]>>(
+            `${environment.apiUrl}/admin/get_client_data`
+        );
+    }
+
     getRoles() {
         return this.http.get<ApiResponse<any[]>>(
             `${environment.apiUrl}/admin/roles`

@@ -2,6 +2,7 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdminService } from '../../../core/services/admin.service';
+import { LoaderService } from '../../../core/services/loader.service';
 
 interface PermissionFlags {
   can_create: boolean;
@@ -22,6 +23,8 @@ export class UsersComponent implements OnInit {
   users: any[] = [];
   roles: any[] = [];
   modules: any[] = [];
+  searchText: string = '';
+filteredUsers: any[] = [];
 
   selectedUser: any;
   selectedRoleId: number | null = null;
@@ -34,6 +37,7 @@ export class UsersComponent implements OnInit {
 
   constructor(
     private admin: AdminService,
+    private loader: LoaderService,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -41,9 +45,19 @@ export class UsersComponent implements OnInit {
     this.loadUsers();
   }
 
+  /* 🔹 LOAD USERS */
   loadUsers(): void {
-    this.admin.getUsers().subscribe((res: any) => {
-      this.users = res.data;
+    this.loader.show();   // 🔥 START LOADER
+
+    this.admin.getUsers().subscribe({
+      next: (res: any) => {
+  this.users = res.data || [];
+this.filteredUsers = [...this.users]; // ✅ important
+        this.loader.hide();   // 🔥 STOP
+      },
+      error: () => {
+        this.loader.hide();
+      }
     });
   }
 
@@ -53,7 +67,7 @@ export class UsersComponent implements OnInit {
     this.showView = true;
   }
 
-  /* OPEN PERMISSION MODAL */
+  /* 🔹 OPEN PERMISSION MODAL */
   openPermission(user: any): void {
     this.selectedUser = user;
     this.showPermission = true;
@@ -62,11 +76,13 @@ export class UsersComponent implements OnInit {
     this.selectedRoleId = null;
     this.hasPermissionSelected = false;
 
+    this.loader.show();   // 🔥 START LOADER
+
     this.admin.getRoles().subscribe(roleRes => {
-      this.roles = roleRes.data;
+      this.roles = roleRes.data || [];
 
       this.admin.getModules().subscribe(modRes => {
-        this.modules = modRes.data;
+        this.modules = modRes.data || [];
 
         this.modules.forEach(m => {
           this.permissionsMap[m.id] = {
@@ -82,24 +98,32 @@ export class UsersComponent implements OnInit {
     });
   }
 
+  /* 🔹 LOAD USER PERMISSIONS */
   loadUserPermissions(userId: number): void {
-    this.admin.getUserPermissions(userId).subscribe(res => {
-      const perms = res.data || [];
-      if (!perms.length) return;
+    this.admin.getUserPermissions(userId).subscribe({
+      next: (res: any) => {
+        const perms = res.data || [];
 
-      this.selectedRoleId = Number(perms[0].role_id);
+        if (perms.length) {
+          this.selectedRoleId = Number(perms[0].role_id);
 
-      perms.forEach(p => {
-        this.permissionsMap[p.module_id] = {
-          can_create: p.can_create,
-          can_view: p.can_view,
-          can_update: p.can_update,
-          can_delete: p.can_delete
-        };
-      });
+          perms.forEach((p: any) => {
+            this.permissionsMap[p.module_id] = {
+              can_create: p.can_create,
+              can_view: p.can_view,
+              can_update: p.can_update,
+              can_delete: p.can_delete
+            };
+          });
+        }
 
-      this.onPermissionChange();
-      this.cdr.detectChanges();
+        this.onPermissionChange();
+        this.loader.hide();   // 🔥 FINAL STOP
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.loader.hide();
+      }
     });
   }
 
@@ -109,11 +133,14 @@ export class UsersComponent implements OnInit {
     );
   }
 
+  /* 🔹 SAVE PERMISSIONS */
   saveAllPermissions(): void {
     if (!this.selectedRoleId) {
       alert('Please select role');
       return;
     }
+
+    this.loader.show();   // 🔥 START
 
     const permissionsPayload = this.modules
       .filter(m => {
@@ -132,9 +159,15 @@ export class UsersComponent implements OnInit {
       permissions: permissionsPayload
     };
 
-    this.admin.assignPermission(payload).subscribe(() => {
-      alert('Permissions saved successfully');
-      this.close();
+    this.admin.assignPermission(payload).subscribe({
+      next: () => {
+        alert('Permissions saved successfully');
+        this.loader.hide();   // 🔥 STOP
+        this.close();
+      },
+      error: () => {
+        this.loader.hide();
+      }
     });
   }
 
@@ -143,4 +176,17 @@ export class UsersComponent implements OnInit {
     this.showPermission = false;
     this.selectedUser = null;
   }
+
+  filterUsers() {
+  const search = this.searchText.toLowerCase();
+
+  this.filteredUsers = this.users.filter(u => {
+    return (
+      u.user_name?.toLowerCase().includes(search) ||
+      u.email_id?.toLowerCase().includes(search) ||
+      u.mobile_number?.includes(search)
+    );
+  });
+}
+
 }

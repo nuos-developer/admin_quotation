@@ -212,3 +212,46 @@ button:hover {
     grid-template-columns: 1fr;
   }
 }
+
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+  font-size: 16px;
+}
+
+.table th {
+  background: #f4f6f9;
+  padding: 10px;
+  text-align: left;
+  font-weight: 800;
+}
+
+.table td {
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+}
+
+/* Hover */
+.table tr:hover {
+  background: #fafafa;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.search-input {
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  width: 250px;
+}
+
+.search-input:focus {
+  border-color: #1976d2;
+  outline: none;
+}

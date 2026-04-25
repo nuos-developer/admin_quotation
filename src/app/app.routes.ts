@@ -5,48 +5,46 @@ export const routes: Routes = [
   {
     path: 'login',
     loadComponent: () =>
-      import('./pages/login/login')
-        .then(m => m.Login)
+      import('./pages/login/login').then(m => m.Login)
   },
-
   {
     path: '',
     canActivate: [authGuard],
     loadComponent: () =>
-      import('./layout/admin.layout/admin.layout')
-        .then(m => m.AdminLayout),
+      import('./layout/admin.layout/admin.layout').then(m => m.AdminLayout),
     children: [
-      {
-        path: '',
-        redirectTo: 'dashboard',
-        pathMatch: 'full'
-      },
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+
       {
         path: 'dashboard',
         loadComponent: () =>
-          import('./pages/dashboard/dashboard') 
-            .then(m => m.Dashboard)
+          import('./pages/dashboard/dashboard').then(m => m.Dashboard)
       },
       {
-        path: 'users',
+        path: 'users.component',
         loadComponent: () =>
           import('./pages/user-management/users.component/users.component')
             .then(m => m.UsersComponent)
       },
       {
-        path: 'product',
+        path: 'product.component',
         loadComponent: () =>
           import('./pages/products/product.component/product.component')
             .then(m => m.ProductComponent)
       },
       {
-        path: 'proposal',
+        path: 'proposal.component',
         loadComponent: () =>
           import('./pages/proposal/proposal.component/proposal.component')
             .then(m => m.ProposalComponent)
+      },
+      {
+        path: 'client',
+        loadComponent: () =>
+          import('./pages/client.componant/client.componant')
+            .then(m => m.ClientComponant)
       }
     ]
   },
-
   { path: '**', redirectTo: 'login' }
 ];

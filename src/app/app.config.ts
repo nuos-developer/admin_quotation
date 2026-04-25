@@ -1,8 +1,10 @@
 import { ApplicationConfig } from '@angular/core';
 import {
   provideRouter,
-  withEnabledBlockingInitialNavigation
+  withEnabledBlockingInitialNavigation,
+  withRouterConfig
 } from '@angular/router';
+
 import {
   provideHttpClient,
   withInterceptors
@@ -15,7 +17,10 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideRouter(
       routes,
-      withEnabledBlockingInitialNavigation()
+      withEnabledBlockingInitialNavigation(),
+      withRouterConfig({
+        onSameUrlNavigation: 'reload'   // 🔥 IMPORTANT FIX
+      })
     ),
     provideHttpClient(
       withInterceptors([authInterceptor])

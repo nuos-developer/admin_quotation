@@ -1,0 +1,204 @@
+<div class="client-page">
+
+    <div class="header">
+        <h2>Clients</h2>
+    </div>
+
+
+    <!-- 🔄 LOADING -->
+    <div *ngIf="loading" class="loader-container">
+        <div class="spinner"></div>
+    </div>
+
+    <div class="search-box">
+  <input
+    type="text"
+    placeholder="🔍 Search client by name..."
+    [(ngModel)]="searchText"
+    (input)="filterClients()"
+  />
+</div>
+    <!-- ✅ TABLE -->
+    <div class="table-wrapper" *ngIf="clients && clients.length > 0; else noData">
+
+        <table class="client-table">
+            <thead>
+                <tr>
+                    <th>Sr. No.</th>
+                    <th>Client Id</th>
+                    <th>Client Name</th>
+                    <th>Email</th>
+                    <th>Mobile</th>
+                    <th>Created By</th>
+                    <th>Role Name</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+
+            <tbody>
+               <tr *ngFor="let client of filteredClients; let i = index">
+                    <td>{{ i + 1 }}</td>
+                    <td>{{ client.client_id }}</td>
+                    <td>{{ client.first_name }} {{ client.last_name }}</td>
+                    <td>{{ client.email_id }}</td>
+                    <td>{{ client.mobile_number }}</td>
+                    <td>{{ client.user_name }}</td>
+                    <td>{{ client.role_name }}</td>
+                    <td>
+                        <button (click)="viewClient(client)">👁</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+    </div>
+
+    <!-- ❌ NO DATA -->
+    <ng-template #noData>
+        <div *ngIf="!loading" class="no-data">
+            No clients available
+        </div>
+    </ng-template>
+
+</div>
+
+
+<!-- 🔹 MODAL -->
+<div class="modal-backdrop" *ngIf="showModal">
+    <div class="modal-box">
+
+        <!-- Header -->
+        <div class="modal-header">
+            <h3>Client Details</h3>
+            <button class="close-btn" (click)="closeModal()">×</button>
+        </div>
+
+        <!-- Body -->
+        <div class="modal-body" *ngIf="selectedClient">
+
+            <div class="form-grid">
+
+                <div class="form-group">
+                    <label>Client ID</label>
+                    <input type="text" [value]="selectedClient.client_id" readonly />
+                </div>
+
+
+                <div class="form-group">
+                    <label>Client Name</label>
+                    <input type="text" [value]="selectedClient.first_name + ' ' + selectedClient.last_name" readonly />
+                </div>
+
+
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="text" [value]="selectedClient.email_id" readonly />
+                </div>
+
+                <div class="form-group">
+                    <label>Mobile</label>
+                    <input type="text" [value]="selectedClient.mobile_number" readonly />
+                </div>
+
+                <div class="form-group">
+                    <label>Address Line One</label>
+                    <input type="text" [value]="selectedClient.address_line_one" readonly />
+                </div>
+                <div class="form-group">
+                    <label>Address Line Two</label>
+                    <input type="text" [value]="selectedClient.address_line_two" readonly />
+                </div>
+                <div class="form-group">
+                    <label>Country</label>
+                    <input type="text" [value]="selectedClient.country" readonly />
+                </div>
+
+                <div class="form-group">
+                    <label>Pin Code</label>
+                    <input type="text" [value]="selectedClient.pin_code" readonly />
+                </div>
+
+
+                <div class="form-group">
+                    <label>State</label>
+                    <input type="text" [value]="selectedClient.state" readonly />
+                </div>
+
+                <div class="form-group">
+                    <label>District</label>
+                    <input type="text" [value]="selectedClient.district" readonly />
+                </div>
+
+                <div class="form-group">
+                    <label>Company Name</label>
+                    <input type="text" [value]="selectedClient.company_name" readonly />
+                </div>
+
+                <div class="form-group">
+                    <label>Company Address</label>
+                    <input type="text" [value]="selectedClient.company_address" readonly />
+                </div>
+
+
+                <div class="form-group">
+                    <label>GST No.</label>
+                    <input type="text" [value]="selectedClient.gst" readonly />
+                </div>
+                <div class="form-group">
+                    <label>Sales rep incharge</label>
+                    <input type="text" [value]="selectedClient.salesrepincharge" readonly />
+                </div>
+
+                <div class="form-group">
+                    <label>Installation rep incharge</label>
+                    <input type="text" [value]="selectedClient.installation_rep_in_charge" readonly />
+                </div>
+                <div class="form-group">
+                    <label>Date of Installation</label>
+                    <input type="text" [value]="selectedClient.date_of_installation | date:'yyyy-MM-dd'" readonly />
+                </div>
+
+                <div class="form-group">
+                    <label>Lead source</label>
+                    <input type="text" [value]="selectedClient.lead_source" readonly />
+                </div>
+                <div class="form-group">
+                    <label>Site contractor name</label>
+                    <input type="text" [value]="selectedClient.site_contractor_name" readonly />
+                </div>
+                <div class="form-group">
+                    <label>Site contractor phone</label>
+                    <input type="text" [value]="selectedClient.site_contractor_phone" readonly />
+                </div>
+                <div class="form-group">
+                    <label>Architect name</label>
+                    <input type="text" [value]="selectedClient.architect_name" readonly />
+                </div>
+                <div class="form-group">
+                    <label>Architect phone</label>
+                    <input type="text" [value]="selectedClient.architect_phone" readonly />
+                </div>
+
+                <div class="form-group">
+                    <label>Created By</label>
+                    <input type="text" [value]="selectedClient.user_name" readonly />
+                </div>
+
+                <div class="form-group">
+                    <label>Role Name</label>
+                    <input type="text" [value]="selectedClient.role_name" readonly />
+                </div>
+
+
+
+            </div>
+
+        </div>
+
+        <!-- Footer -->
+        <div class="modal-footer">
+            <button class="btn-cancel" (click)="closeModal()">Close</button>
+        </div>
+
+    </div>
+</div>

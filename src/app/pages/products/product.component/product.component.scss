@@ -205,5 +205,19 @@ button.success { color: green; }
   cursor: zoom-in;
 }
 
+.search-box {
+  margin: 15px 0;
+}
 
+.search-box input {
+  width: 300px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+}
+
+.search-box input:focus {
+  border-color: #1976d2;
+  outline: none;
+}
 

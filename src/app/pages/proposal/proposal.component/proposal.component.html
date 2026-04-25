@@ -1,157 +1,271 @@
 <div class="container">
 
     <!-- ================= LIST ================= -->
-    <div *ngIf="!selectedProposal && !isLoading">
+    <div *ngIf="!selectedProposal">
         <h2>Proposal List</h2>
+        <div class="search-box">
+  <input
+    type="text"
+    placeholder="🔍 Search by client name..."
+    [(ngModel)]="searchText"
+    (input)="filterProposals()"
+  />
+</div>
 
         <table class="table">
             <thead>
                 <tr>
-                    <th>#Sr. No</th>
+                    <th>#</th>
                     <th>Proposal ID</th>
-                    <th>User Name</th>
+                    <th>Proposal Type</th>
+                    <th>Client Name</th>
+                    <th>Created By</th>
                     <th>Action</th>
                 </tr>
             </thead>
 
             <tbody>
-                <tr *ngFor="let p of proposals; index as i">
+                <tr *ngFor="let p of filteredProposals; index as i">
                     <td>{{ i + 1 }}</td>
-                    <td>{{ p.proposal_id }}</td>
-                    <td>{{ p.user_details?.userName }}</td>
+                    <td>{{ p.id || '-' }}</td>
+                    <td>{{ p.proposal_type || '-' }}</td>
+                    <td>{{ p.client_details?.first_name }} {{ p.client_details?.last_name }}</td>
+                    <td>{{ p.created_by?.user_name }}</td>
                     <td>
-                        <button class="btn view" (click)="viewProposal(p)">View</button>
+                        <button (click)="viewProposal(p)">👁</button>
                     </td>
                 </tr>
             </tbody>
         </table>
     </div>
+    
 
     <!-- ================= VIEW ================= -->
+     <div id="proposal-pdf">
     <div *ngIf="selectedProposal" class="proposal-view">
 
         <!-- HEADER -->
         <div class="header">
             <div>
-                <h2>Proposal Details</h2>
-                <p class="muted">Proposal ID: {{ selectedProposal.proposal_id }}</p>
+                <h2>📄 Proposal</h2>
+                <p class="muted">ID: {{ selectedProposal.proposal_id || selectedProposal.id }}</p>
             </div>
 
             <div class="actions">
                 <button class="btn back" (click)="backToList()">← Back</button>
-                <button class="btn pdf" (click)="generatePDF()">Generate PDF</button>
+                <button class="btn pdf" (click)="generatePDF()">Download PDF</button>
             </div>
         </div>
 
+        <!-- CLIENT + USER -->
+        <div class="top-grid">
 
-        <!-- ================= USER DETAILS ================= -->
-        <div class="card">
-            <h3>User Details</h3>
+  <!-- CLIENT CARD -->
+  <div class="card info-card">
+    <div class="card-header">
+      <span>👤 Client Details</span>
+    </div>
 
-            <div class="grid">
-                <div><b>Proposal ID:</b> {{ selectedProposal.proposal_id }}</div>
-                <div><b>Name:</b> {{ selectedProposal.user_details?.userName }}</div>
-                <div><b>Email Id:</b> {{ selectedProposal.user_details?.email }}</div>
-                <div><b>Mobile No.:</b> {{ selectedProposal.user_details?.phone }}</div>
-                <div><b>Company Name:</b> {{ selectedProposal.user_details?.company_name }}</div>
+    <div class="card-body">
+      <h3>
+        {{ selectedProposal.client_details?.first_name }}
+        {{ selectedProposal.client_details?.last_name }}
+      </h3>
+
+      <div class="info-row">
+        <span>📧</span>
+        <p>{{ selectedProposal.client_details?.email || '-' }}</p>
+      </div>
+
+      <div class="info-row">
+        <span>📞</span>
+        <p>{{ selectedProposal.client_details?.mobile || '-' }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- USER CARD -->
+  <div class="card info-card">
+    <div class="card-header">
+      <span>👨‍💼 Created By</span>
+    </div>
+
+    <div class="card-body">
+      <h3>{{ selectedProposal.created_by?.user_name }}</h3>
+
+      <div class="info-row">
+        <span>🏷️</span>
+        <p>{{ selectedProposal.created_by?.role?.role_name }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- QUICK SUMMARY CARD -->
+  <div class="card summary-card">
+    <h4>Total Payable</h4>
+    <h1>₹{{ selectedProposal.financial_breakdown?.finalTotal | number }}</h1>
+
+    <div class="summary-mini">
+      <div>
+        <span>Discount</span>
+        <b>{{ selectedProposal.discount_percentage }}%</b>
+      </div>
+
+      <div>
+        <span>Install</span>
+        <b>{{ selectedProposal.installation_percentage }}%</b>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+        <!-- SUMMARY -->
+       <div class="card finance-pro">
+  <div class="finance-header">
+    <h3>Financial Breakdown</h3>
+    <!-- <span class="chip">INR</span> -->
+  </div>
+
+  <div class="finance-grid">
+
+    <!-- LEFT: amounts -->
+    <div class="finance-left">
+
+      <div class="line">
+        <span>Products Total</span>
+        <strong>₹{{ selectedProposal.financial_breakdown?.grandProductsTotal | number }}</strong>
+      </div>
+
+      <div class="line">
+        <span>Non Nuos Products</span>
+        <strong>₹{{ selectedProposal.financial_breakdown?.nonNuosProductsTotal | number }}</strong>
+      </div>
+
+      <div class="line discount">
+        <span>Discount ({{ selectedProposal.discount_percentage }}%)</span>
+        <strong>- ₹{{ selectedProposal.financial_breakdown?.discountAmount | number }}</strong>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="line highlight">
+        <span>After Discount</span>
+        <strong>₹{{ selectedProposal.financial_breakdown?.afterDiscount | number }}</strong>
+      </div>
+
+      <div class="line">
+        <span>Installation ({{ selectedProposal.installation_percentage }}%)</span>
+        <strong>₹{{ selectedProposal.financial_breakdown?.installationAmount | number }}</strong>
+      </div>
+
+      <div class="line">
+        <span>Commissioning ({{ selectedProposal.commissioning_percentage }}%)</span>
+        <strong>₹{{ selectedProposal.financial_breakdown?.commissioningAmount | number }}</strong>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="line total">
+        <span>Final Total</span>
+        <strong>₹{{ selectedProposal.financial_breakdown?.finalTotal | number }}</strong>
+      </div>
+
+    </div>
+
+    <!-- RIGHT: summary card -->
+    <!-- <div class="finance-right">
+      <div class="summary-box">
+        <p class="label">Payable Amount</p>
+        <h1>₹{{ selectedProposal.financial_breakdown?.finalTotal | number }}</h1>
+        <p class="note">Inclusive of all charges</p>
+      </div>
+    </div> -->
+
+  </div>
+</div>
+
+        <!-- ================= PRODUCTS ================= -->
+        <div *ngIf="selectedProposal.proposal_type === 'productsWise'" class="card">
+            <h3>Products</h3>
+
+            <div class="product-grid">
+                <div class="product-card" *ngFor="let p of selectedProposal.products_wise_items">
+
+                    <div class="img-box">
+                        <img *ngIf="p.images?.length" [src]="p.images[0]" />
+
+                        <div *ngIf="!p.images?.length" class="no-img">
+                            No Image
+                        </div>
+                    </div>
+
+                    <div class="info">
+                        <h4>{{ p.name }}</h4>
+                        <p class="muted">{{ p.category }}</p>
+
+                        <div class="meta">
+                            <span>Qty: {{ p.quantity }}</span>
+                            <span>₹{{ p.price }}</span>
+                        </div>
+
+                        <div class="tag">{{ p.wiring_type }}</div>
+                    </div>
+
+                </div>
             </div>
         </div>
 
-        <!-- ================= SUMMARY TABLE (TOP) ================= -->
-        <div class="card">
-            <h3>Proposal Summary</h3>
+        <!-- ================= STRUCTURE ================= -->
+        <div *ngIf="selectedProposal.proposal_type === 'structureWise'">
 
-            <table class="summary-table">
-                <tr>
-                    <th>Installation %</th>
-                    <td>{{ selectedProposal.installation_percentage }}%</td>
+            <div *ngFor="let floor of getFloors()" class="floor-box">
+                <h2>🏢 {{ floor.name }}</h2>
 
-                    <th>Commissioning %</th>
-                    <td>{{ selectedProposal.commissioning_percentage }}%</td>
-                </tr>
+                <div *ngFor="let home of getHomes(floor)" class="home-box">
+                    <h3>🏠 {{ home.name }}</h3>
 
-                <tr>
-                    <th>Discount %</th>
-                    <td>{{ selectedProposal.discount_percentage }}%</td>
+                    <div *ngFor="let room of getRooms(home)" class="room-box">
+                        <h4>🚪 {{ room.name }}</h4>
 
-                    <th>Products Total</th>
-                    <td>₹{{ selectedProposal.financial_breakdown.grandProductsTotal }} /-</td>
-                </tr>
+                        <div class="switchboard-grid">
 
-                <tr>
-                    <th>Installation Amount</th>
-                    <td>₹{{ selectedProposal.financial_breakdown.installationAmount }} /-</td>
+                            <div *ngFor="let sb of getSwitchboards(room)" class="switchboard-box">
 
-                    <th>Commissioning Amount</th>
-                    <td>₹{{ selectedProposal.financial_breakdown.commissioningAmount }} /-</td>
-                </tr>
+                                <!-- HEADER -->
+                                <div class="sb-header">
+                                    <span>{{ sb.name }}</span>
+                                    <span class="badge">MOD {{ sb.mod }}</span>
+                                </div>
 
-                <tr>
-                    <th>Discount Amount</th>
-                    <td>₹{{ selectedProposal.financial_breakdown.discountAmount }} /-</td>
+                                <!-- PRODUCTS -->
+                                <div class="sb-products">
+                                    <div *ngFor="let p of getProducts(sb)" class="sb-product">
 
-                    <th><b>Final Total</b></th>
-                    <td><b>₹{{ selectedProposal.financial_breakdown.finalTotal }} /-</b></td>
-                </tr>
-            </table>
-        </div>
+                                        <div class="img-box small">
 
-        <!-- ================= FLOORS ================= -->
-        <div *ngFor="let floor of getFloors()" class="floor-card">
+                                            <img *ngIf="p.images?.length" [src]="p.images[0]" />
 
-            <h3 class="floor-title">🏢 {{ floor.name }}</h3>
+                                            <div *ngIf="!p.images?.length" class="no-img">
+                                                No Image
+                                            </div>
 
-            <div *ngFor="let home of getHomes(floor)" class="home-card">
-                <h4>🏠 {{ home.name }}</h4>
+                                        </div>
 
-                <div *ngFor="let room of getRooms(home)" class="room-card">
-                    <h5>🚪 {{ room.name }}</h5>
+                                        <div class="p-name">{{ p.name }}</div>
 
-                    <div *ngFor="let sb of getSwitchboards(room)" class="switchboard-card">
+                                    </div>
+                                </div>
 
-                        <div class="switchboard-header">
-                            <span><b>Switchboard:</b> {{ sb.name }}</span>
-                            <span class="badge">MOD {{ sb.mod }}</span>
-                        </div>
+                            </div>
 
-                        <!-- PRODUCTS TABLE WITH IMAGES -->
-                        <table class="product-table" *ngIf="getProducts(sb).length > 0">
-                            <thead>
-                                <tr>
-                                    <th>Product Name</th>
-                                    <th>Category</th>
-                                    <th>MOD</th>
-                                    <th>Price</th>
-                                </tr>
-                            </thead>
-
-                            <tbody>
-                                <tr *ngFor="let pr of getProducts(sb)">
-                                    <td>{{ pr.name }}</td>
-                                    <td>{{ pr.category }}</td>
-                                    <td>{{ pr.modSize }}</td>
-                                    <td>₹{{ pr.price }} /-</td>
-                                </tr>
-                            </tbody>
-                        </table>
-
-                        <!-- PRODUCT IMAGES (SEPARATE GRID) -->
-                        <div class="product-images" *ngIf="getProducts(sb).length > 0">
-                            <img *ngFor="let pr of getProducts(sb)" [src]="pr.imagePath" alt="product"
-                                class="product-img" onerror="this.src='assets/no-image.png'" />
-                        </div>
-
-                        <!-- NO PRODUCTS -->
-                        <div class="no-products" *ngIf="getProducts(sb).length === 0">
-                            No products added
                         </div>
 
                     </div>
                 </div>
             </div>
+
         </div>
 
     </div>
-
-
 </div>

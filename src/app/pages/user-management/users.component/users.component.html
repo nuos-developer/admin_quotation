@@ -1,4 +1,9 @@
 <h2>Users</h2>
+<div class="page-header">
+
+  <input type="text" placeholder="🔍 Search user..." [(ngModel)]="searchText" (input)="filterUsers()"
+    class="search-input" />
+</div>
 
 <table class="table">
   <thead>
@@ -12,7 +17,7 @@
   </thead>
 
   <tbody>
-    <tr *ngFor="let u of users">
+    <tr *ngFor="let u of filteredUsers">
       <td>{{ u.user_name }}</td>
       <td>{{ u.email_id }}</td>
       <td>{{ u.mobile_number }}</td>
@@ -42,11 +47,11 @@
         </div>
 
         <div> <label>First Name</label>
-           <input [(ngModel)]="selectedUser.first_name" disabled> 
+          <input [(ngModel)]="selectedUser.first_name" disabled>
         </div>
-         <div> <label>Last Name</label>
-           <input [(ngModel)]="selectedUser.last_name" disabled>
-         </div>
+        <div> <label>Last Name</label>
+          <input [(ngModel)]="selectedUser.last_name" disabled>
+        </div>
 
         <div>
           <label>Email</label>
@@ -110,7 +115,7 @@
           <label>role_name</label>
           <input [(ngModel)]="selectedUser.role_name" disabled>
         </div>
-        
+
       </div>
 
     </div>
@@ -153,30 +158,22 @@
 
           <div class="checkbox-group">
             <label>
-              <input type="checkbox"
-                [(ngModel)]="permissionsMap[module.id].can_create"
-                (change)="onPermissionChange()">
+              <input type="checkbox" [(ngModel)]="permissionsMap[module.id].can_create" (change)="onPermissionChange()">
               Create
             </label>
 
             <label>
-              <input type="checkbox"
-                [(ngModel)]="permissionsMap[module.id].can_view"
-                (change)="onPermissionChange()">
+              <input type="checkbox" [(ngModel)]="permissionsMap[module.id].can_view" (change)="onPermissionChange()">
               View
             </label>
 
             <label>
-              <input type="checkbox"
-                [(ngModel)]="permissionsMap[module.id].can_update"
-                (change)="onPermissionChange()">
+              <input type="checkbox" [(ngModel)]="permissionsMap[module.id].can_update" (change)="onPermissionChange()">
               Update
             </label>
 
             <label>
-              <input type="checkbox"
-                [(ngModel)]="permissionsMap[module.id].can_delete"
-                (change)="onPermissionChange()">
+              <input type="checkbox" [(ngModel)]="permissionsMap[module.id].can_delete" (change)="onPermissionChange()">
               Delete
             </label>
           </div>
@@ -188,9 +185,7 @@
 
     <div class="modal-footer">
       <button class="secondary" (click)="close()">Cancel</button>
-      <button class="primary"
-        [disabled]="!hasPermissionSelected"
-        (click)="saveAllPermissions()">
+      <button class="primary" [disabled]="!hasPermissionSelected" (click)="saveAllPermissions()">
         Save Permissions
       </button>
     </div>
