@@ -1,271 +1,424 @@
 <div class="container">
 
-    <!-- ================= LIST ================= -->
-    <div *ngIf="!selectedProposal">
-        <h2>Proposal List</h2>
-        <div class="search-box">
-  <input
-    type="text"
-    placeholder="🔍 Search by client name..."
-    [(ngModel)]="searchText"
-    (input)="filterProposals()"
-  />
-</div>
-
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Proposal ID</th>
-                    <th>Proposal Type</th>
-                    <th>Client Name</th>
-                    <th>Created By</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-
-            <tbody>
-                <tr *ngFor="let p of filteredProposals; index as i">
-                    <td>{{ i + 1 }}</td>
-                    <td>{{ p.id || '-' }}</td>
-                    <td>{{ p.proposal_type || '-' }}</td>
-                    <td>{{ p.client_details?.first_name }} {{ p.client_details?.last_name }}</td>
-                    <td>{{ p.created_by?.user_name }}</td>
-                    <td>
-                        <button (click)="viewProposal(p)">👁</button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+  <!-- ================= LIST ================= -->
+  <div *ngIf="!selectedProposal">
+    <h2>Proposal List</h2>
+    <div class="search-box">
+      <input type="text" placeholder="🔍 Search by client name..." [(ngModel)]="searchText"
+        (input)="filterProposals()" />
     </div>
-    
 
-    <!-- ================= VIEW ================= -->
-     <div id="proposal-pdf">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Proposal ID</th>
+          <th>Proposal Type</th>
+          <th>Client Name</th>
+          <th>Created By</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let p of filteredProposals; index as i">
+          <td>{{ i + 1 }}</td>
+          <td>{{ p.id || '-' }}</td>
+          <td>{{ p.proposal_type || '-' }}</td>
+          <td>{{ p.client_details?.first_name }} {{ p.client_details?.last_name }}</td>
+          <td>{{ p.created_by?.user_name }}</td>
+          <td>
+            <button (click)="viewProposal(p)">👁</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+
+  <!-- ================= VIEW ================= -->
+  <div id="proposal-pdf">
     <div *ngIf="selectedProposal" class="proposal-view">
 
-        <!-- HEADER -->
-        <div class="header">
-            <div>
-                <h2>📄 Proposal</h2>
-                <p class="muted">ID: {{ selectedProposal.proposal_id || selectedProposal.id }}</p>
-            </div>
-
-            <div class="actions">
-                <button class="btn back" (click)="backToList()">← Back</button>
-                <button class="btn pdf" (click)="generatePDF()">Download PDF</button>
-            </div>
+      <!-- HEADER -->
+      <div class="header">
+        <div>
+          <h2>📄 Proposal</h2>
+          <!-- <p class="muted">ID: {{ selectedProposal.proposal_id || selectedProposal.id }}</p> -->
         </div>
 
-        <!-- CLIENT + USER -->
-        <div class="top-grid">
-
-  <!-- CLIENT CARD -->
-  <div class="card info-card">
-    <div class="card-header">
-      <span>👤 Client Details</span>
-    </div>
-
-    <div class="card-body">
-      <h3>
-        {{ selectedProposal.client_details?.first_name }}
-        {{ selectedProposal.client_details?.last_name }}
-      </h3>
-
-      <div class="info-row">
-        <span>📧</span>
-        <p>{{ selectedProposal.client_details?.email || '-' }}</p>
+        <div class="actions">
+          <button class="btn back" (click)="backToList()">← Back</button>
+          <button class="btn pdf" (click)="generatePDF()">Download PDF</button>
+        </div>
       </div>
 
-      <div class="info-row">
-        <span>📞</span>
-        <p>{{ selectedProposal.client_details?.mobile || '-' }}</p>
+      <!-- CLIENT + USER -->
+      <div class="top-grid">
+
+        <!-- ================= CLIENT BASIC ================= -->
+        <div class="card info-card">
+          <div class="card-header">Client Information</div>
+
+          <div class="card-body grid-2">
+
+            <div class="info-block">
+              <label>Client Name</label>
+              <p>
+                {{ selectedProposal.client_details?.first_name }}
+                {{ selectedProposal.client_details?.last_name }}
+              </p>
+            </div>
+
+            <div class="info-block">
+              <label>Client ID</label>
+              <p>{{ selectedProposal.client_details?.client_id }}</p>
+            </div>
+
+            <div class="info-block">
+              <label>Email</label>
+              <p>{{ selectedProposal.client_details?.email || '-' }}</p>
+            </div>
+
+            <div class="info-block">
+              <label>Mobile</label>
+              <p>{{ selectedProposal.client_details?.mobile || '-' }}</p>
+            </div>
+
+            <div class="info-block">
+              <label>GST</label>
+              <p>{{ selectedProposal.client_details?.gst || '-' }}</p>
+            </div>
+
+            <div class="info-block">
+              <label>Lead Source</label>
+              <p>{{ selectedProposal.client_details?.lead_source || '-' }}</p>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- ================= ADDRESS ================= -->
+        <div class="card info-card">
+          <div class="card-header">Address Details</div>
+
+          <div class="card-body grid-2">
+
+            <div class="info-block">
+              <label>Address Line 1</label>
+              <p>{{ selectedProposal.client_details?.address_line_one || '-' }}</p>
+            </div>
+
+            <div class="info-block">
+              <label>Address Line 2</label>
+              <p>{{ selectedProposal.client_details?.address_line_two || '-' }}</p>
+            </div>
+
+            <div class="info-block">
+              <label>City / District</label>
+              <p>{{ selectedProposal.client_details?.district || '-' }}</p>
+            </div>
+
+            <div class="info-block">
+              <label>State</label>
+              <p>{{ selectedProposal.client_details?.state || '-' }}</p>
+            </div>
+
+            <div class="info-block">
+              <label>Country</label>
+              <p>{{ selectedProposal.client_details?.country || '-' }}</p>
+            </div>
+
+            <div class="info-block">
+              <label>Pincode</label>
+              <p>{{ selectedProposal.client_details?.pin_code || '-' }}</p>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- ================= COMPANY ================= -->
+        <div class="card info-card">
+          <div class="card-header">Company Details</div>
+
+          <div class="card-body grid-2">
+
+            <div class="info-block">
+              <label>Company Name</label>
+              <p>{{ selectedProposal.client_details?.company_name || '-' }}</p>
+            </div>
+
+            <div class="info-block">
+              <label>Company Address</label>
+              <p>{{ selectedProposal.client_details?.company_address || '-' }}</p>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- ================= INSTALLATION ================= -->
+        <div class="card info-card">
+          <div class="card-header">Project / Installation</div>
+
+          <div class="card-body grid-2">
+
+            <div class="info-block">
+              <label>Installation Rep</label>
+              <p>{{ selectedProposal.client_details?.installation_rep_in_charge || '-' }}</p>
+            </div>
+
+            <div class="info-block">
+              <label>Date of Installation</label>
+              <p>{{ selectedProposal.client_details?.date_of_installation || '-' }}</p>
+            </div>
+
+            <div class="info-block">
+              <label>Architect Name</label>
+              <p>{{ selectedProposal.client_details?.architect_name || '-' }}</p>
+            </div>
+
+            <div class="info-block">
+              <label>Architect Phone</label>
+              <p>{{ selectedProposal.client_details?.architect_phone || '-' }}</p>
+            </div>
+
+            <div class="info-block">
+              <label>Site Contractor</label>
+              <p>{{ selectedProposal.client_details?.site_contractor_name || '-' }}</p>
+            </div>
+
+            <div class="info-block">
+              <label>Contractor Phone</label>
+              <p>{{ selectedProposal.client_details?.site_contractor_phone || '-' }}</p>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- ================= CREATED BY ================= -->
+        <div class="card info-card">
+          <div class="card-header">Created By</div>
+
+          <div class="card-body grid-2">
+
+            <div class="info-block">
+              <label>User Name</label>
+              <p>{{ selectedProposal.created_by?.user_name }}</p>
+            </div>
+
+            <div class="info-block">
+              <label>Role</label>
+              <p>{{ selectedProposal.created_by?.role?.role_name }}</p>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- ================= DELIVERY ================= -->
+        <div class="card info-card">
+          <div class="card-header">Delivery Details</div>
+
+          <div class="card-body grid-2">
+
+            <!-- 🔥 RECIPIENT -->
+            <div class="info-block">
+              <label>Recipient Name</label>
+
+              <!-- IF SAME RECIPIENT -->
+              <p *ngIf="selectedProposal.use_same_recipient">
+                {{ selectedProposal.client_details?.first_name }}
+                {{ selectedProposal.client_details?.last_name }}
+              </p>
+
+              <!-- ELSE CUSTOM -->
+              <p *ngIf="!selectedProposal.use_same_recipient">
+                {{ selectedProposal.recipient_name || '-' }}
+              </p>
+            </div>
+
+            <!-- 🔥 ADDRESS -->
+            <div class="info-block">
+              <label>Shipping Address</label>
+
+              <!-- IF SAME ADDRESS -->
+              <p *ngIf="selectedProposal.use_same_address">
+                {{ selectedProposal.client_details?.address_line_one }},
+                {{ selectedProposal.client_details?.address_line_two }},
+                {{ selectedProposal.client_details?.district }},
+                {{ selectedProposal.client_details?.state }},
+                {{ selectedProposal.client_details?.pin_code }}
+              </p>
+
+              <!-- ELSE CUSTOM -->
+              <p *ngIf="!selectedProposal.use_same_address">
+                {{ selectedProposal.ship_to_address || '-' }}
+              </p>
+            </div>
+
+            <!-- FLAGS -->
+            <div class="info-block">
+              <label>Same Address</label>
+              <span class="badge" [class.yes]="selectedProposal.use_same_address"
+                [class.no]="!selectedProposal.use_same_address">
+                {{ selectedProposal.use_same_address ? 'Yes' : 'No' }}
+              </span>
+            </div>
+
+            <div class="info-block">
+              <label>Same Recipient</label>
+              <span class="badge" [class.yes]="selectedProposal.use_same_recipient"
+                [class.no]="!selectedProposal.use_same_recipient">
+                {{ selectedProposal.use_same_recipient ? 'Yes' : 'No' }}
+              </span>
+            </div>
+
+          </div>
+        </div>
+
       </div>
-    </div>
-  </div>
 
-  <!-- USER CARD -->
-  <div class="card info-card">
-    <div class="card-header">
-      <span>👨‍💼 Created By</span>
-    </div>
+      <!-- ================= PRODUCTS ================= -->
+      <div *ngIf="selectedProposal.proposal_type === 'productsWise'" class="card">
+        <h3>Products</h3>
 
-    <div class="card-body">
-      <h3>{{ selectedProposal.created_by?.user_name }}</h3>
+        <div class="product-grid">
+          <div class="product-card" *ngFor="let p of selectedProposal.products_wise_items">
 
-      <div class="info-row">
-        <span>🏷️</span>
-        <p>{{ selectedProposal.created_by?.role?.role_name }}</p>
-      </div>
-    </div>
-  </div>
+            <div class="img-box">
+              <img *ngIf="p.images?.length" [src]="p.images[0]" />
 
-  <!-- QUICK SUMMARY CARD -->
-  <div class="card summary-card">
-    <h4>Total Payable</h4>
-    <h1>₹{{ selectedProposal.financial_breakdown?.finalTotal | number }}</h1>
+              <div *ngIf="!p.images?.length" class="no-img">
+                No Image
+              </div>
+            </div>
 
-    <div class="summary-mini">
-      <div>
-        <span>Discount</span>
-        <b>{{ selectedProposal.discount_percentage }}%</b>
-      </div>
+            <div class="info">
+              <h4>{{ p.name }}</h4>
+              <p class="muted">{{ p.category }}</p>
 
-      <div>
-        <span>Install</span>
-        <b>{{ selectedProposal.installation_percentage }}%</b>
-      </div>
-    </div>
-  </div>
+              <div class="meta">
+                <span>Qty: {{ p.quantity }}</span>
+                <span>₹{{ p.price }}</span>
+              </div>
 
-</div>
+              <div class="tag">{{ p.wiring_type }}</div>
+            </div>
 
-        <!-- SUMMARY -->
-       <div class="card finance-pro">
-  <div class="finance-header">
-    <h3>Financial Breakdown</h3>
-    <!-- <span class="chip">INR</span> -->
-  </div>
-
-  <div class="finance-grid">
-
-    <!-- LEFT: amounts -->
-    <div class="finance-left">
-
-      <div class="line">
-        <span>Products Total</span>
-        <strong>₹{{ selectedProposal.financial_breakdown?.grandProductsTotal | number }}</strong>
+          </div>
+        </div>
       </div>
 
-      <div class="line">
-        <span>Non Nuos Products</span>
-        <strong>₹{{ selectedProposal.financial_breakdown?.nonNuosProductsTotal | number }}</strong>
-      </div>
+      <!-- ================= STRUCTURE ================= -->
+      <div *ngIf="selectedProposal.proposal_type === 'structureWise'">
 
-      <div class="line discount">
-        <span>Discount ({{ selectedProposal.discount_percentage }}%)</span>
-        <strong>- ₹{{ selectedProposal.financial_breakdown?.discountAmount | number }}</strong>
-      </div>
+        <!-- FLOOR -->
+        <div *ngFor="let floor of getFloors()" class="floor-container">
+          <h2 class="level-title">Floor: {{ floor.name }}</h2>
 
-      <div class="divider"></div>
+          <!-- HOME -->
+          <div *ngFor="let home of getHomes(floor)" class="home-container">
+            <h3 class="level-sub">Home: {{ home.name }}</h3>
 
-      <div class="line highlight">
-        <span>After Discount</span>
-        <strong>₹{{ selectedProposal.financial_breakdown?.afterDiscount | number }}</strong>
-      </div>
+            <!-- ROOM -->
+            <div *ngFor="let room of getRooms(home)" class="room-container">
+              <h4 class="level-sub2">Room: {{ room.name }}</h4>
 
-      <div class="line">
-        <span>Installation ({{ selectedProposal.installation_percentage }}%)</span>
-        <strong>₹{{ selectedProposal.financial_breakdown?.installationAmount | number }}</strong>
-      </div>
+              <!-- ================= ROOM PRODUCTS ================= -->
+              <div *ngIf="room?.products?.length" class="section-box">
 
-      <div class="line">
-        <span>Commissioning ({{ selectedProposal.commissioning_percentage }}%)</span>
-        <strong>₹{{ selectedProposal.financial_breakdown?.commissioningAmount | number }}</strong>
-      </div>
+                <div class="section-header">
+                  Room Products
+                </div>
 
-      <div class="divider"></div>
+                <div class="product-grid">
 
-      <div class="line total">
-        <span>Final Total</span>
-        <strong>₹{{ selectedProposal.financial_breakdown?.finalTotal | number }}</strong>
-      </div>
-
-    </div>
-
-    <!-- RIGHT: summary card -->
-    <!-- <div class="finance-right">
-      <div class="summary-box">
-        <p class="label">Payable Amount</p>
-        <h1>₹{{ selectedProposal.financial_breakdown?.finalTotal | number }}</h1>
-        <p class="note">Inclusive of all charges</p>
-      </div>
-    </div> -->
-
-  </div>
-</div>
-
-        <!-- ================= PRODUCTS ================= -->
-        <div *ngIf="selectedProposal.proposal_type === 'productsWise'" class="card">
-            <h3>Products</h3>
-
-            <div class="product-grid">
-                <div class="product-card" *ngFor="let p of selectedProposal.products_wise_items">
+                  <div *ngFor="let p of room.products" class="product-card">
 
                     <div class="img-box">
-                        <img *ngIf="p.images?.length" [src]="p.images[0]" />
-
-                        <div *ngIf="!p.images?.length" class="no-img">
-                            No Image
-                        </div>
+                      <img *ngIf="p.images?.length" [src]="p.images[0]" />
+                      <div *ngIf="!p.images?.length" class="no-img">No Image</div>
                     </div>
 
-                    <div class="info">
-                        <h4>{{ p.name }}</h4>
-                        <p class="muted">{{ p.category }}</p>
+                    <div class="product-info">
+                      <h5>{{ p.name }}</h5>
 
-                        <div class="meta">
-                            <span>Qty: {{ p.quantity }}</span>
-                            <span>₹{{ p.price }}</span>
-                        </div>
+                      <div class="meta">
+                        <span>{{ p.category }}</span>
+                        <span>₹{{ p.price }}</span>
+                      </div>
 
-                        <div class="tag">{{ p.wiring_type }}</div>
+                      <div class="meta small">
+                        <span>{{ p.wiring_type }}</span>
+                        <span *ngIf="p.modSize">MOD {{ p.modSize }}</span>
+                      </div>
                     </div>
+
+                  </div>
 
                 </div>
-            </div>
-        </div>
 
-        <!-- ================= STRUCTURE ================= -->
-        <div *ngIf="selectedProposal.proposal_type === 'structureWise'">
+              </div>
 
-            <div *ngFor="let floor of getFloors()" class="floor-box">
-                <h2>🏢 {{ floor.name }}</h2>
+              <!-- ================= SWITCHBOARDS ================= -->
+              <div *ngIf="getSwitchboards(room).length" class="section-box">
 
-                <div *ngFor="let home of getHomes(floor)" class="home-box">
-                    <h3>🏠 {{ home.name }}</h3>
+                <div class="section-header">
+                  Switchboards
+                </div>
 
-                    <div *ngFor="let room of getRooms(home)" class="room-box">
-                        <h4>🚪 {{ room.name }}</h4>
+                <div class="switchboard-grid">
 
-                        <div class="switchboard-grid">
+                  <div *ngFor="let sb of getSwitchboards(room)" class="switchboard-card">
 
-                            <div *ngFor="let sb of getSwitchboards(room)" class="switchboard-box">
+                    <!-- HEADER -->
+                    <div class="sb-header">
+                      <strong>{{ sb.name }}</strong>
+                      <span class="badge">MOD {{ sb.mod }}</span>
+                    </div>
 
-                                <!-- HEADER -->
-                                <div class="sb-header">
-                                    <span>{{ sb.name }}</span>
-                                    <span class="badge">MOD {{ sb.mod }}</span>
-                                </div>
+                    <!-- PRODUCTS -->
+                    <div *ngIf="sb?.products?.length; else noProducts">
 
-                                <!-- PRODUCTS -->
-                                <div class="sb-products">
-                                    <div *ngFor="let p of getProducts(sb)" class="sb-product">
+                      <div class="product-grid small">
 
-                                        <div class="img-box small">
+                        <div *ngFor="let p of sb.products" class="product-card">
 
-                                            <img *ngIf="p.images?.length" [src]="p.images[0]" />
+                          <div class="img-box">
+                            <img *ngIf="p.images?.length" [src]="p.images[0]" />
+                            <div *ngIf="!p.images?.length" class="no-img">No Image</div>
+                          </div>
 
-                                            <div *ngIf="!p.images?.length" class="no-img">
-                                                No Image
-                                            </div>
+                          <div class="product-info">
+                            <h5>{{ p.name }}</h5>
 
-                                        </div>
-
-                                        <div class="p-name">{{ p.name }}</div>
-
-                                    </div>
-                                </div>
-
+                            <div class="meta">
+                              <span>{{ p.category }}</span>
+                              <span>₹{{ p.price }}</span>
                             </div>
+                          </div>
 
                         </div>
 
-                    </div>
-                </div>
-            </div>
+                      </div>
 
+                    </div>
+
+                    <ng-template #noProducts>
+                      <div class="no-data">No products</div>
+                    </ng-template>
+
+                  </div>
+
+                </div>
+
+              </div>
+
+            </div>
+          </div>
         </div>
+
+      </div>
 
     </div>
+  </div>
 </div>

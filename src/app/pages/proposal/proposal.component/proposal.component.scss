@@ -583,8 +583,9 @@
 }
 
 .card-header {
-  font-size: 13px;
-  color: #777;
+  font-size: 16px;
+  font-weight: 600;   /* ✅ makes it bold */
+  color: #111827;     /* ✅ darker professional color */
   margin-bottom: 10px;
 }
 
@@ -598,7 +599,7 @@
   align-items: center;
   gap: 8px;
   font-size: 14px;
-  margin-bottom: 5px;
+  margin-bottom: 10px;
 }
 
 /* SUMMARY CARD */
@@ -651,4 +652,211 @@
 .search-box input:focus {
   border-color: #1976d2;
   outline: none;
+}
+
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.info-block label {
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.info-block p {
+  font-weight: 500;
+  margin-top: 4px;
+}
+
+/* Badge */
+.badge {
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+}
+
+.badge.yes {
+  background: #e6f4ea;
+  color: #16a34a;
+}
+
+.badge.no {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+
+/* FLOOR */
+.floor-card {
+  margin-bottom: 25px;
+  padding: 15px;
+  background: #fff;
+  border-radius: 10px;
+  border-left: 5px solid #2563eb;
+}
+
+/* HOME */
+.home-card {
+  margin-left: 10px;
+  margin-top: 10px;
+}
+
+/* ROOM */
+.room-card {
+  margin-left: 20px;
+  margin-top: 10px;
+}
+
+/* SWITCHBOARD GRID */
+.switchboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 12px;
+  margin-top: 10px;
+}
+
+/* SWITCHBOARD CARD */
+.switchboard-card {
+  background: #fafafa;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #eee;
+}
+
+/* HEADER */
+.sb-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.sb-name {
+  font-weight: 600;
+}
+
+/* PRODUCTS */
+.product-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* PRODUCT ITEM */
+.product-item {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  border-top: 1px solid #eee;
+  padding-top: 8px;
+}
+
+/* IMAGE */
+.img-box.small img {
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
+}
+
+/* PRODUCT INFO */
+.product-info {
+  flex: 1;
+}
+
+.p-name {
+  font-weight: 500;
+}
+
+.p-meta {
+  font-size: 12px;
+  color: #666;
+  display: flex;
+  gap: 10px;
+}
+
+/* BADGE */
+.badge {
+  background: #2563eb;
+  color: #fff;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.info-block label {
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.info-block p {
+  font-weight: 500;
+  margin-top: 4px;
+}
+
+/* badge */
+.badge {
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+}
+
+.badge.yes {
+  background: #e6f4ea;
+  color: #16a34a;
+}
+
+.badge.no {
+  background: #fee2e2;
+  color: #dc2626;
+}
+/* SECTION BOX */
+.section-box {
+  margin-top: 12px;
+  padding: 10px;
+  border-radius: 8px;
+  background: #f9fafb;
+  border: 1px solid #eee;
+}
+
+/* HEADER */
+.section-header {
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #374151;
+}
+
+/* SWITCHBOARD GRID */
+.switchboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 12px;
+}
+
+/* SWITCHBOARD CARD */
+.switchboard-card {
+  background: #fff;
+  border-radius: 8px;
+  padding: 10px;
+  border: 1px solid #e5e7eb;
+}
+
+/* SMALL GRID */
+.product-grid.small {
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+}
+
+/* NO DATA */
+.no-data {
+  text-align: center;
+  font-size: 12px;
+  color: #999;
 }

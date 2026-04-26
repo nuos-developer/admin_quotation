@@ -50,7 +50,7 @@ button {
 .btn.primary {
   background: #4f46e5;
   color: #fff;
-  padding: 8px 14px;
+  padding: 7px 15px;
   border-radius: 6px;
 }
 
@@ -219,5 +219,88 @@ button.success { color: green; }
 .search-box input:focus {
   border-color: #1976d2;
   outline: none;
+}
+
+.btn-cancel {
+  padding: 8px 16px;
+  background: #4d7ee9;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+/* CANCEL */
+.btn-cancel {
+  background: #e5e7eb;
+  color: #333;
+  padding: 8px 14px;
+  border-radius: 6px;
+  border: none;
+}
+
+/* SAVE (GREEN) */
+.btn-submit {
+  background: #16a34a;
+  color: #fff;
+  padding: 8px 14px;
+  border-radius: 6px;
+  border: none;
+}
+
+.btn-submit:hover {
+  background: #15803d;
+}
+
+/* UPDATE (BLUE) */
+.btn-update {
+  background: #2563eb;
+  color: #fff;
+  padding: 8px 14px;
+  border-radius: 6px;
+  border: none;
+}
+
+.btn-update:hover {
+  background: #1d4ed8;
+}
+
+/* NO (Cancel / Neutral) */
+.btn-no {
+  background: #e5e7eb;   /* light gray */
+  color: #333;
+  padding: 8px 14px;
+  border-radius: 6px;
+  border: none;
+}
+
+.btn-no:hover {
+  background: #d1d5db;
+}
+
+/* YES (Confirm) */
+.btn-yes {
+  background: #16a34a;   /* green */
+  color: #fff;
+  padding: 8px 14px;
+  border-radius: 6px;
+  border: none;
+}
+
+.btn-yes:hover {
+  background: #15803d;
+}
+
+.search-box {
+  display: flex;
+  justify-content: space-between;  /* 🔥 pushes button to right */
+  align-items: center;
+  gap: 10px;
+}
+
+/* input should take available space */
+.search-box input {
+  flex: 1;
+  max-width: 400px; /* optional */
 }
 

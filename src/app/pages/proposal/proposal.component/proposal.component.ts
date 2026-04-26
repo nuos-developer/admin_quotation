@@ -55,8 +55,10 @@ loadProposals() {
   }
 
   /* ================= SAFE ARRAY HELPERS ================= */
-
+  
+  
   getFloors() {
+    console.log(this.selectedProposal?.floor);
     return this.toArray(this.selectedProposal?.floor);
   }
 

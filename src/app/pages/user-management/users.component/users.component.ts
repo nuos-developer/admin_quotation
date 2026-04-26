@@ -1,8 +1,11 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { forkJoin } from 'rxjs';
+
 import { AdminService } from '../../../core/services/admin.service';
 import { LoaderService } from '../../../core/services/loader.service';
+import { ToastService } from '../../../core/services/toast.service';
 
 interface PermissionFlags {
   can_create: boolean;
@@ -21,12 +24,13 @@ interface PermissionFlags {
 export class UsersComponent implements OnInit {
 
   users: any[] = [];
+  filteredUsers: any[] = [];
   roles: any[] = [];
   modules: any[] = [];
-  searchText: string = '';
-filteredUsers: any[] = [];
 
-  selectedUser: any;
+  searchText: string = '';
+
+  selectedUser: any = null;
   selectedRoleId: number | null = null;
 
   showView = false;
@@ -38,6 +42,7 @@ filteredUsers: any[] = [];
   constructor(
     private admin: AdminService,
     private loader: LoaderService,
+    private toast: ToastService,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -45,29 +50,30 @@ filteredUsers: any[] = [];
     this.loadUsers();
   }
 
-  /* 🔹 LOAD USERS */
+  /* ================= LOAD USERS ================= */
   loadUsers(): void {
-    this.loader.show();   // 🔥 START LOADER
+    this.loader.show();
 
     this.admin.getUsers().subscribe({
       next: (res: any) => {
-  this.users = res.data || [];
-this.filteredUsers = [...this.users]; // ✅ important
-        this.loader.hide();   // 🔥 STOP
+        this.users = res.data || [];
+        this.filteredUsers = [...this.users];
+        this.loader.hide();
       },
       error: () => {
+        this.toast.show('Failed to load users', 'error');
         this.loader.hide();
       }
     });
   }
 
-  /* VIEW USER */
+  /* ================= VIEW ================= */
   viewUser(user: any): void {
     this.selectedUser = { ...user };
     this.showView = true;
   }
 
-  /* 🔹 OPEN PERMISSION MODAL */
+  /* ================= OPEN PERMISSION ================= */
   openPermission(user: any): void {
     this.selectedUser = user;
     this.showPermission = true;
@@ -76,15 +82,19 @@ this.filteredUsers = [...this.users]; // ✅ important
     this.selectedRoleId = null;
     this.hasPermissionSelected = false;
 
-    this.loader.show();   // 🔥 START LOADER
+    this.loader.show();
 
-    this.admin.getRoles().subscribe(roleRes => {
-      this.roles = roleRes.data || [];
+    // ✅ PARALLEL API CALL (BEST PRACTICE)
+    forkJoin({
+      roles: this.admin.getRoles(),
+      modules: this.admin.getModules()
+    }).subscribe({
+      next: (res: any) => {
+        this.roles = res.roles.data || [];
+        this.modules = res.modules.data || [];
 
-      this.admin.getModules().subscribe(modRes => {
-        this.modules = modRes.data || [];
-
-        this.modules.forEach(m => {
+        // initialize map
+        this.modules.forEach((m: any) => {
           this.permissionsMap[m.id] = {
             can_create: false,
             can_view: false,
@@ -94,11 +104,15 @@ this.filteredUsers = [...this.users]; // ✅ important
         });
 
         this.loadUserPermissions(user.id);
-      });
+      },
+      error: () => {
+        this.toast.show('Failed to load roles/modules', 'error');
+        this.loader.hide();
+      }
     });
   }
 
-  /* 🔹 LOAD USER PERMISSIONS */
+  /* ================= LOAD USER PERMISSIONS ================= */
   loadUserPermissions(userId: number): void {
     this.admin.getUserPermissions(userId).subscribe({
       next: (res: any) => {
@@ -108,6 +122,8 @@ this.filteredUsers = [...this.users]; // ✅ important
           this.selectedRoleId = Number(perms[0].role_id);
 
           perms.forEach((p: any) => {
+            if (!this.permissionsMap[p.module_id]) return;
+
             this.permissionsMap[p.module_id] = {
               can_create: p.can_create,
               can_view: p.can_view,
@@ -118,34 +134,35 @@ this.filteredUsers = [...this.users]; // ✅ important
         }
 
         this.onPermissionChange();
-        this.loader.hide();   // 🔥 FINAL STOP
-        this.cdr.detectChanges();
+        this.loader.hide();
       },
       error: () => {
+        this.toast.show('Failed to load permissions', 'error');
         this.loader.hide();
       }
     });
   }
 
+  /* ================= PERMISSION CHECK ================= */
   onPermissionChange(): void {
-    this.hasPermissionSelected = Object.values(this.permissionsMap).some(p =>
-      p.can_create || p.can_view || p.can_update || p.can_delete
+    this.hasPermissionSelected = Object.values(this.permissionsMap).some(
+      p => p.can_create || p.can_view || p.can_update || p.can_delete
     );
   }
 
-  /* 🔹 SAVE PERMISSIONS */
+  /* ================= SAVE ================= */
   saveAllPermissions(): void {
     if (!this.selectedRoleId) {
-      alert('Please select role');
+      this.toast.show('Please select role', 'error');
       return;
     }
 
-    this.loader.show();   // 🔥 START
+    this.loader.show();
 
     const permissionsPayload = this.modules
       .filter(m => {
         const p = this.permissionsMap[m.id];
-        return p.can_create || p.can_view || p.can_update || p.can_delete;
+        return p && (p.can_create || p.can_view || p.can_update || p.can_delete);
       })
       .map(m => ({
         module_id: m.id,
@@ -161,32 +178,32 @@ this.filteredUsers = [...this.users]; // ✅ important
 
     this.admin.assignPermission(payload).subscribe({
       next: () => {
-        alert('Permissions saved successfully');
-        this.loader.hide();   // 🔥 STOP
+        this.toast.show('Permissions saved successfully', 'success');
+        this.loader.hide();
         this.close();
       },
       error: () => {
+        this.toast.show('Failed to save permissions', 'error');
         this.loader.hide();
       }
     });
   }
 
+  /* ================= SEARCH ================= */
+  filterUsers(): void {
+    const search = this.searchText.toLowerCase();
+
+    this.filteredUsers = this.users.filter(u =>
+      (u.user_name || '').toLowerCase().includes(search) ||
+      (u.email_id || '').toLowerCase().includes(search) ||
+      (u.mobile_number || '').includes(search)
+    );
+  }
+
+  /* ================= CLOSE ================= */
   close(): void {
     this.showView = false;
     this.showPermission = false;
     this.selectedUser = null;
   }
-
-  filterUsers() {
-  const search = this.searchText.toLowerCase();
-
-  this.filteredUsers = this.users.filter(u => {
-    return (
-      u.user_name?.toLowerCase().includes(search) ||
-      u.email_id?.toLowerCase().includes(search) ||
-      u.mobile_number?.includes(search)
-    );
-  });
-}
-
 }

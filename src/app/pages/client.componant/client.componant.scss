@@ -119,7 +119,7 @@ input {
 }
 
 .rejected {
-  border-color: red;
+  border-color: rgb(65, 112, 239);
   color: red;
   font-weight: bold;
 }
@@ -132,12 +132,11 @@ input {
 }
 
 .btn-cancel {
-  padding: 8px 16px;
-  background: red;
-  color: white;
+  background: #e5e7eb;
+  color: #333;
+  padding: 8px 14px;
+  border-radius: 6px;
   border: none;
-  border-radius: 5px;
-  cursor: pointer;
 }
 
 /* 🔄 Full page center loader */

@@ -1,0 +1,6 @@
+<router-outlet></router-outlet>
+
+<!-- 🔥 TOAST -->
+<div *ngIf="toast" class="toast" [ngClass]="toast.type">
+  {{ toast.message }}
+</div>

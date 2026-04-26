@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdminService } from '../../../core/services/admin.service';
 import { LoaderService } from '../../../core/services/loader.service';
+import { ToastService } from '../../../core/services/toast.service';
 
 @Component({
   selector: 'app-product',
@@ -18,10 +19,10 @@ export class ProductComponent implements OnInit {
   activeProducts: any[] = [];
   inactiveProducts: any[] = [];
   wiringTypes: any[] = [];
-searchText: string = '';
+  searchText: string = '';
 
-filteredActiveProducts: any[] = [];
-filteredInactiveProducts: any[] = [];
+  filteredActiveProducts: any[] = [];
+  filteredInactiveProducts: any[] = [];
   showAdd = false;
   showEdit = false;
   showView = false;
@@ -30,7 +31,7 @@ filteredInactiveProducts: any[] = [];
   confirmAction: 'ACTIVATE' | 'DEACTIVATE' | null = null;
   confirmProductId: number | null = null;
   confirmMessage = '';
-
+  showModal: boolean = false;
   selectedProduct: any = null;
 
   productForm: any = {
@@ -45,8 +46,9 @@ filteredInactiveProducts: any[] = [];
 
   constructor(
     private admin: AdminService,
-    private loader: LoaderService   // 🔥 add this
-  ) {}
+    private loader: LoaderService,
+    private toast: ToastService, // 🔥 add this
+  ) { }
 
   ngOnInit(): void {
     this.activeTab = 'ACTIVE';
@@ -60,13 +62,13 @@ filteredInactiveProducts: any[] = [];
 
     this.admin.getActiveProduct().subscribe({
       next: (res: any) => {
-       this.activeProducts = res.resp?.data || [];
-this.filteredActiveProducts = [...this.activeProducts]; // ✅
+        this.activeProducts = res.resp?.data || [];
+        this.filteredActiveProducts = [...this.activeProducts]; // ✅
 
         this.admin.getInactiveProduct().subscribe({
           next: (res2: any) => {
-         this.inactiveProducts = res2.resp?.data || [];
-this.filteredInactiveProducts = [...this.inactiveProducts]; // ✅
+            this.inactiveProducts = res2.resp?.data || [];
+            this.filteredInactiveProducts = [...this.inactiveProducts]; // ✅
             this.loader.hide();   // 🔥 END
           },
           error: () => this.loader.hide()
@@ -109,12 +111,15 @@ this.filteredInactiveProducts = [...this.inactiveProducts]; // ✅
 
     this.admin.addProduct(fd).subscribe({
       next: () => {
-        alert('Product added successfully');
+        this.toast.show('Product Created successfully', 'success');
+        this.loader.hide();
         this.close();
         this.loadAllProducts();
-        this.loader.hide();
       },
-      error: () => this.loader.hide()
+      error: () => {
+        this.toast.show('Failed to create Product', 'error');
+        this.loader.hide();
+      }
     });
   }
 
@@ -136,12 +141,15 @@ this.filteredInactiveProducts = [...this.inactiveProducts]; // ✅
 
     this.admin.UpdateProduct(this.productForm.id, fd).subscribe({
       next: () => {
-        alert('Product updated successfully');
+        this.toast.show('Product Updated successfully', 'success');
+        this.loader.hide();
         this.close();
         this.loadAllProducts();
-        this.loader.hide();
       },
-      error: () => this.loader.hide()
+      error: () => {
+        this.toast.show('Failed to Update Product', 'error');
+        this.loader.hide();
+      }
     });
   }
 
@@ -157,15 +165,31 @@ this.filteredInactiveProducts = [...this.inactiveProducts]; // ✅
 
     if (action === 'DEACTIVATE') {
       this.admin.inactiveProduct(id).subscribe({
-        next: () => this.loadAllProducts(),
-        error: () => this.loader.hide()
+        next: () => {
+          this.loader.hide();
+        this.toast.show('Product Inactive successfully', 'success');
+        this.close();
+        this.loadAllProducts();
+      },
+      error: () => {
+        this.toast.show('Failed to Inactive Product', 'error');
+        this.loader.hide();
+      }
       });
     }
 
     if (action === 'ACTIVATE') {
       this.admin.activeProduct(id).subscribe({
-        next: () => this.loadAllProducts(),
-        error: () => this.loader.hide()
+        next: () => {
+        this.toast.show('Product Active successfully', 'success');
+        this.loader.hide();
+        this.close();
+        this.loadAllProducts();
+      },
+      error: () => {
+        this.toast.show('Failed to Active Product', 'error');
+        this.loader.hide();
+      }
       });
     }
   }
@@ -178,6 +202,7 @@ this.filteredInactiveProducts = [...this.inactiveProducts]; // ✅
 
   openAdd(): void {
     this.resetForm();
+    this.showModal = true;
     this.showAdd = true;
   }
 
@@ -187,6 +212,7 @@ this.filteredInactiveProducts = [...this.inactiveProducts]; // ✅
 
   viewProduct(p: any): void {
     this.selectedProduct = p;
+    this.showModal = true;
     this.showView = true;
   }
 
@@ -214,7 +240,7 @@ this.filteredInactiveProducts = [...this.inactiveProducts]; // ✅
     this.confirmProductId = id;
     this.confirmMessage =
       action === 'DEACTIVATE'
-        ? 'Are you sure you want to deactivate this product?'
+        ? 'Are you sure you want to inactivate this product?'
         : 'Are you sure you want to activate this product?';
 
     this.showConfirm = true;
@@ -248,6 +274,7 @@ this.filteredInactiveProducts = [...this.inactiveProducts]; // ✅
     this.showEdit = false;
     this.showView = false;
     this.selectedProduct = null;
+    this.showModal = false;
   }
 
   previewImage: string | null = null;
@@ -261,16 +288,21 @@ this.filteredInactiveProducts = [...this.inactiveProducts]; // ✅
   }
 
   filterProducts() {
-  const search = this.searchText.toLowerCase();
+    const search = this.searchText.toLowerCase();
 
-  this.filteredActiveProducts = this.activeProducts.filter(p =>
-    p.product_name?.toLowerCase().includes(search) ||
-    p.category?.toLowerCase().includes(search)
-  );
+    this.filteredActiveProducts = this.activeProducts.filter(p =>
+      p.product_name?.toLowerCase().includes(search) ||
+      p.category?.toLowerCase().includes(search)
+    );
 
-  this.filteredInactiveProducts = this.inactiveProducts.filter(p =>
-    p.product_name?.toLowerCase().includes(search) ||
-    p.category?.toLowerCase().includes(search)
-  );
-}
+    this.filteredInactiveProducts = this.inactiveProducts.filter(p =>
+      p.product_name?.toLowerCase().includes(search) ||
+      p.category?.toLowerCase().includes(search)
+    );
+  }
+
+  closeModal() {
+    this.showModal = false;
+    this.selectedProduct = null;
+  }
 }

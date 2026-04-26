@@ -1,9 +1,8 @@
+
 <div class="page-header">
+
     <h2>Products</h2>
 
-    <button type="button" class="btn primary" *ngIf="activeTab === 'ACTIVE'" (click)="openAdd()">
-        ➕ Add Product
-    </button>
 </div>
 
 <!-- ================= TABS ================= -->
@@ -17,12 +16,10 @@
     </button>
 </div>
 <div class="search-box">
-  <input
-    type="text"
-    placeholder="🔍 Search product..."
-    [(ngModel)]="searchText"
-    (input)="filterProducts()"
-  />
+    <input type="text" placeholder="🔍 Search product..." [(ngModel)]="searchText" (input)="filterProducts()" />
+    <button type="button" class="btn primary" *ngIf="activeTab === 'ACTIVE'" (click)="openAdd()">
+        ➕ Add Product
+    </button>
 </div>
 
 <!-- ================= ACTIVE ================= -->
@@ -38,7 +35,7 @@
             </tr>
         </thead>
         <tbody>
-           <tr *ngFor="let p of filteredActiveProducts; let i = index">
+            <tr *ngFor="let p of filteredActiveProducts; let i = index">
                 <td>{{ i + 1 }}</td>
                 <td>{{ p.product_name }}</td>
                 <td>{{ p.category }}</td>
@@ -89,8 +86,8 @@
         <h3>Confirm</h3>
         <p>{{ confirmMessage }}</p>
         <div class="modal-footer">
-            <button type="button" class="secondary" (click)="confirmNo()">No</button>
-            <button type="button" class="primary" (click)="confirmYes()">Yes</button>
+            <button type="button" class="btn-no" (click)="confirmNo()">No</button>
+            <button type="button" class="btn-yes" (click)="confirmYes()">Yes</button>
         </div>
     </div>
 </div>
@@ -145,7 +142,7 @@
         </div>
 
         <div class="modal-footer">
-            <button type="button" class="secondary" (click)="close()">Close</button>
+            <button class="btn-cancel" (click)="close()">Close</button>
         </div>
 
     </div>
@@ -180,7 +177,7 @@
             </div>
 
             <div class="form-field">
-                <label>Wiring Type</label>{{productForm | json}}
+                <label>Wiring Type</label>
                 <select [(ngModel)]="productForm.wiring_type_id">
                     <option [ngValue]="null">Select Wiring Type</option>
                     <option *ngFor="let w of wiringTypes" [ngValue]="w.id">
@@ -203,8 +200,10 @@
 
 
         <div class="modal-footer">
-            <button type="button" class="secondary" (click)="close()">Cancel</button>
-            <button type="button" class="primary" (click)="showAdd ? addProduct() : updateProduct()">
+            <button class="btn-cancel" (click)="close()">Close</button>
+            <button type="button" [ngClass]="showAdd ? 'btn-submit' : 'btn-update'"
+                (click)="showAdd ? addProduct() : updateProduct()">
+
                 {{ showAdd ? 'Save' : 'Update' }}
             </button>
         </div>
