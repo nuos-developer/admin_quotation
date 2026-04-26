@@ -39,20 +39,20 @@
 
       <!-- Submenu -->
       <div class="submenu" *ngIf="sidebarOpen && userMgmtOpen">
-        <a routerLink="/users.component" routerLinkActive="active">
+        <a routerLink="/users" routerLinkActive="active">
           <span class="icon">👤</span>
           <span class="text">Users</span>
         </a>
       </div>
 
       <!-- Products -->
-      <a routerLink="/product.component" routerLinkActive="active">
+      <a routerLink="/product" routerLinkActive="active">
         <span class="icon">📦</span>
         <span class="text" *ngIf="sidebarOpen">Products</span>
       </a>
 
       <!-- Proposals -->
-      <a routerLink="/proposal.component" routerLinkActive="active">
+      <a routerLink="/proposal" routerLinkActive="active">
         <span class="icon">📑</span>
         <span class="text" *ngIf="sidebarOpen">Proposals</span>
       </a>

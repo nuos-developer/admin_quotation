@@ -21,19 +21,19 @@ export const routes: Routes = [
           import('./pages/dashboard/dashboard').then(m => m.Dashboard)
       },
       {
-        path: 'users.component',
+        path: 'users',
         loadComponent: () =>
           import('./pages/user-management/users.component/users.component')
             .then(m => m.UsersComponent)
       },
       {
-        path: 'product.component',
+        path: 'product',
         loadComponent: () =>
           import('./pages/products/product.component/product.component')
             .then(m => m.ProductComponent)
       },
       {
-        path: 'proposal.component',
+        path: 'proposal',
         loadComponent: () =>
           import('./pages/proposal/proposal.component/proposal.component')
             .then(m => m.ProposalComponent)
