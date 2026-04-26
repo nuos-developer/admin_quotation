@@ -254,24 +254,6 @@
                 {{ selectedProposal.ship_to_address || '-' }}
               </p>
             </div>
-
-            <!-- FLAGS -->
-            <div class="info-block">
-              <label>Same Address</label>
-              <span class="badge" [class.yes]="selectedProposal.use_same_address"
-                [class.no]="!selectedProposal.use_same_address">
-                {{ selectedProposal.use_same_address ? 'Yes' : 'No' }}
-              </span>
-            </div>
-
-            <div class="info-block">
-              <label>Same Recipient</label>
-              <span class="badge" [class.yes]="selectedProposal.use_same_recipient"
-                [class.no]="!selectedProposal.use_same_recipient">
-                {{ selectedProposal.use_same_recipient ? 'Yes' : 'No' }}
-              </span>
-            </div>
-
           </div>
         </div>
 
@@ -281,7 +263,7 @@
       <div *ngIf="selectedProposal.proposal_type === 'productsWise'" class="card">
         <h3>Products</h3>
 
-        <div class="product-grid">
+        <div class="product-grid no-break">
           <div class="product-card" *ngFor="let p of selectedProposal.products_wise_items">
 
             <div class="img-box">
@@ -326,17 +308,21 @@
               <!-- ================= ROOM PRODUCTS ================= -->
               <div *ngIf="room?.products?.length" class="section-box">
 
-                <div class="section-header">
-                  Room Products
-                </div>
+                <div class="section-header">Room Products</div>
 
-                <div class="product-grid">
+                <div class="product-grid no-break">
 
                   <div *ngFor="let p of room.products" class="product-card">
 
-                    <div class="img-box">
+                    <!-- 🔥 COLOR APPLIED -->
+                    <div class="img-box" [style.background]="getColor(room.colorValue || floor.colorValue)">
+
                       <img *ngIf="p.images?.length" [src]="p.images[0]" />
-                      <div *ngIf="!p.images?.length" class="no-img">No Image</div>
+
+                      <div *ngIf="!p.images?.length" class="no-img">
+                        No Image
+                      </div>
+
                     </div>
 
                     <div class="product-info">
@@ -356,15 +342,12 @@
                   </div>
 
                 </div>
-
               </div>
 
               <!-- ================= SWITCHBOARDS ================= -->
               <div *ngIf="getSwitchboards(room).length" class="section-box">
 
-                <div class="section-header">
-                  Switchboards
-                </div>
+                <div class="section-header">Switchboards</div>
 
                 <div class="switchboard-grid">
 
@@ -383,9 +366,16 @@
 
                         <div *ngFor="let p of sb.products" class="product-card">
 
-                          <div class="img-box">
+                          <!-- 🔥 COLOR APPLIED -->
+                          <div class="img-box"
+                            [style.background]="getColor(sb.colorValue || room.colorValue || floor.colorValue)">
+
                             <img *ngIf="p.images?.length" [src]="p.images[0]" />
-                            <div *ngIf="!p.images?.length" class="no-img">No Image</div>
+
+                            <div *ngIf="!p.images?.length" class="no-img">
+                              No Image
+                            </div>
+
                           </div>
 
                           <div class="product-info">
