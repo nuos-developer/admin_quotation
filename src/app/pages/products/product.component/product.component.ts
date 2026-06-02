@@ -26,7 +26,8 @@ export class ProductComponent implements OnInit {
   showAdd = false;
   showEdit = false;
   showView = false;
-  
+  submitted = false;
+
 
   showConfirm = false;
   confirmAction: 'ACTIVATE' | 'DEACTIVATE' | null = null;
@@ -94,6 +95,11 @@ export class ProductComponent implements OnInit {
 
   /* ================= ADD ================= */
   addProduct(): void {
+
+    if (!this.validateForm()) {
+      return;
+    }
+
     const fd = new FormData();
 
     console.log('WIRING TYPE ID:', this.productForm.wiring_type_id);
@@ -126,6 +132,10 @@ export class ProductComponent implements OnInit {
 
   /* ================= UPDATE ================= */
   updateProduct(): void {
+
+    if (!this.validateForm()) {
+      return;
+    }
 
     const fd = new FormData();
 
@@ -357,6 +367,9 @@ export class ProductComponent implements OnInit {
   }
 
   close(): void {
+
+    this.submitted = false;
+
     this.showAdd = false;
     this.showEdit = false;
     this.showView = false;
@@ -395,10 +408,37 @@ export class ProductComponent implements OnInit {
 
   getCategoryName(category: string): string {
 
-  if (!category) return '-';
+    if (!category) return '-';
 
-  return category === 'NUOS'
-    ? 'NUOS Products'
-    : 'Non-NUOS Products';
-}
+    return category === 'NUOS'
+      ? 'NUOS Products'
+      : 'Non-NUOS Products';
+  }
+
+  validateForm(): boolean {
+
+    this.submitted = true;
+
+    if (!this.productForm.product_name?.trim()) {
+      return false;
+    }
+
+    if (!this.productForm.category) {
+      return false;
+    }
+
+    if (
+      this.productForm.price === '' ||
+      this.productForm.price === null ||
+      this.productForm.price === undefined
+    ) {
+      return false;
+    }
+
+    if (!this.productForm.wiring_type_id) {
+      return false;
+    }
+
+    return true;
+  }
 }

@@ -28,7 +28,8 @@
   border-collapse: collapse;
   text-align: center;
 
-  th, td {
+  th,
+  td {
     padding: 10px;
     border-bottom: 1px solid #ddd;
   }
@@ -54,13 +55,18 @@ button {
   border-radius: 6px;
 }
 
-button.danger { color: red; }
-button.success { color: green; }
+button.danger {
+  color: red;
+}
+
+button.success {
+  color: green;
+}
 
 .modal {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.45);
+  background: rgba(0, 0, 0, 0.45);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -127,7 +133,8 @@ button.success { color: green; }
 .form-field input,
 .form-field select {
   width: 100%;
-  height: 40px;                 /* SAME HEIGHT */
+  height: 40px;
+  /* SAME HEIGHT */
   padding: 8px 12px;
   font-size: 14px;
   border-radius: 6px;
@@ -149,7 +156,8 @@ button.success { color: green; }
   background-position: right 12px center;
   background-size: 12px;
 
-  padding-right: 36px; /* space for arrow */
+  padding-right: 36px;
+  /* space for arrow */
 }
 
 /* focus state (same for both) */
@@ -175,7 +183,7 @@ button.success { color: green; }
   max-width: 90vw;
   max-height: 85vh;
   border-radius: 8px;
-  box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
 }
 
 .image-close {
@@ -267,7 +275,8 @@ button.success { color: green; }
 
 /* NO (Cancel / Neutral) */
 .btn-no {
-  background: #e5e7eb;   /* light gray */
+  background: #e5e7eb;
+  /* light gray */
   color: #333;
   padding: 8px 14px;
   border-radius: 6px;
@@ -280,7 +289,8 @@ button.success { color: green; }
 
 /* YES (Confirm) */
 .btn-yes {
-  background: #16a34a;   /* green */
+  background: #16a34a;
+  /* green */
   color: #fff;
   padding: 8px 14px;
   border-radius: 6px;
@@ -293,7 +303,8 @@ button.success { color: green; }
 
 .search-box {
   display: flex;
-  justify-content: space-between;  /* 🔥 pushes button to right */
+  justify-content: space-between;
+  /* 🔥 pushes button to right */
   align-items: center;
   gap: 10px;
 }
@@ -301,6 +312,17 @@ button.success { color: green; }
 /* input should take available space */
 .search-box input {
   flex: 1;
-  max-width: 400px; /* optional */
+  max-width: 400px;
+  /* optional */
 }
 
+.required {
+  color: red;
+}
+
+.error-msg {
+  color: #dc2626;
+  font-size: 12px;
+  margin-top: 4px;
+  display: block;
+}

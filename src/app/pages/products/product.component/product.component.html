@@ -156,12 +156,15 @@
         <div class="form-grid">
 
             <div class="form-field">
-                <label>Product Name</label>
+                <label>Product Name <span class="required">*</span></label>
                 <input [(ngModel)]="productForm.product_name">
+                <div class="error-msg" *ngIf="submitted && !productForm.product_name?.trim()">
+                    Product Name is required
+                </div>
             </div>
 
             <div class="form-field">
-                <label>Category</label>
+                <label>Category <span class="required">*</span></label>
 
                 <select [(ngModel)]="productForm.category">
 
@@ -178,6 +181,9 @@
                     </option>
 
                 </select>
+                <div class="error-msg" *ngIf="submitted && !productForm.category">
+                    Category is required
+                </div>
             </div>
             <div class="form-field">
                 <label>Module Size</label>
@@ -185,19 +191,29 @@
             </div>
 
             <div class="form-field">
-                <label>Price</label>
+                <label>Price <span class="required">*</span></label>
                 <input [(ngModel)]="productForm.price">
+                <div class="error-msg" *ngIf="submitted &&
+         (productForm.price === '' ||
+          productForm.price === null ||
+          productForm.price === undefined)">
+                    Price is required
+                </div>
             </div>
 
             <div class="form-field">
-                <label>Wiring Type</label>
+                <label>Wiring Type <span class="required">*</span></label>
                 <select [(ngModel)]="productForm.wiring_type_id">
                     <option [ngValue]="null">Select Wiring Type</option>
                     <option *ngFor="let w of wiringTypes" [ngValue]="w.id">
                         {{ w.wiring_name }}
                     </option>
                 </select>
+                <div class="error-msg" *ngIf="submitted && !productForm.wiring_type_id">
+                    Wiring Type is required
+                </div>
             </div>
+
 
             <div class="form-field">
                 <label>Zigbee Type</label>
