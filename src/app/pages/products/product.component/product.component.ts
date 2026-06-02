@@ -26,6 +26,7 @@ export class ProductComponent implements OnInit {
   showAdd = false;
   showEdit = false;
   showView = false;
+  
 
   showConfirm = false;
   confirmAction: 'ACTIVATE' | 'DEACTIVATE' | null = null;
@@ -125,34 +126,105 @@ export class ProductComponent implements OnInit {
 
   /* ================= UPDATE ================= */
   updateProduct(): void {
+
     const fd = new FormData();
 
+    // =====================================
+    // APPEND FORM VALUES
+    // =====================================
     Object.keys(this.productForm).forEach(key => {
-      if (key !== 'images') {
-        fd.append(key, this.productForm[key]);
+
+      if (key === 'images') return;
+
+      if (
+        this.productForm[key] !== null &&
+        this.productForm[key] !== undefined
+      ) {
+
+        fd.append(
+          key,
+          this.productForm[key]
+        );
       }
     });
 
-    this.productForm.images.forEach((f: File) => {
-      fd.append('images', f);
-    });
+    // =====================================
+    // APPEND IMAGES
+    // =====================================
+    if (
+      this.productForm.images &&
+      this.productForm.images.length > 0
+    ) {
+
+      this.productForm.images.forEach(
+        (file: File) => {
+
+          fd.append(
+            'images',
+            file
+          );
+        }
+      );
+    }
+
+    // =====================================
+    // DEBUG PAYLOAD
+    // =====================================
+    console.log('COMPONENT FORMDATA');
+
+    // fd.forEach((value, key) => {
+
+    //   console.log('222222222',
+    //     key,
+    //     value
+    //   );
+    // });
 
     this.loader.show();
 
-    this.admin.UpdateProduct(this.productForm.id, fd).subscribe({
-      next: () => {
-        this.toast.show('Product Updated successfully', 'success');
+    // =====================================
+    // API CALL
+    // =====================================
+    this.admin.UpdateProduct(
+      this.productForm.id,
+      fd
+    ).subscribe({
+
+      next: (res) => {
+
+        console.log(
+          'UPDATE SUCCESS',
+          res
+        );
+
+        this.toast.show(
+          'Product Updated successfully',
+          'success'
+        );
+
         this.loader.hide();
+
         this.close();
+
         this.loadAllProducts();
       },
-      error: () => {
-        this.toast.show('Failed to Update Product', 'error');
+
+      error: (err) => {
+
+        console.log(
+          'UPDATE ERROR',
+          err
+        );
+
+        this.toast.show(
+          'Failed to Update Product',
+          'error'
+        );
+
         this.loader.hide();
       }
     });
   }
-
   /* ================= ACTIVATE / DEACTIVATE ================= */
   confirmYes(): void {
     if (!this.confirmProductId || !this.confirmAction) return;
@@ -167,29 +239,29 @@ export class ProductComponent implements OnInit {
       this.admin.inactiveProduct(id).subscribe({
         next: () => {
           this.loader.hide();
-        this.toast.show('Product Inactive successfully', 'success');
-        this.close();
-        this.loadAllProducts();
-      },
-      error: () => {
-        this.toast.show('Failed to Inactive Product', 'error');
-        this.loader.hide();
-      }
+          this.toast.show('Product Inactive successfully', 'success');
+          this.close();
+          this.loadAllProducts();
+        },
+        error: () => {
+          this.toast.show('Failed to Inactive Product', 'error');
+          this.loader.hide();
+        }
       });
     }
 
     if (action === 'ACTIVATE') {
       this.admin.activeProduct(id).subscribe({
         next: () => {
-        this.toast.show('Product Active successfully', 'success');
-        this.loader.hide();
-        this.close();
-        this.loadAllProducts();
-      },
-      error: () => {
-        this.toast.show('Failed to Active Product', 'error');
-        this.loader.hide();
-      }
+          this.toast.show('Product Active successfully', 'success');
+          this.loader.hide();
+          this.close();
+          this.loadAllProducts();
+        },
+        error: () => {
+          this.toast.show('Failed to Active Product', 'error');
+          this.loader.hide();
+        }
       });
     }
   }
@@ -222,6 +294,9 @@ export class ProductComponent implements OnInit {
   }
 
   editProduct(p: any): void {
+
+    console.log('EDIT PRODUCT:', p);
+
     this.productForm = {
       id: p.id,
       product_name: p.product_name,
@@ -230,8 +305,20 @@ export class ProductComponent implements OnInit {
       price: p.price,
       wiring_type_id: p.wiring_type_id,
       zigbee_type: p.zigbee_type,
+
+      // IMPORTANT
       images: []
     };
+
+    console.log(
+      'PRODUCT FORM:',
+      this.productForm
+    );
+
+    // OPEN MODAL
+    this.showModal = true;
+
+    // OPEN EDIT FORM
     this.showEdit = true;
   }
 
@@ -305,4 +392,13 @@ export class ProductComponent implements OnInit {
     this.showModal = false;
     this.selectedProduct = null;
   }
+
+  getCategoryName(category: string): string {
+
+  if (!category) return '-';
+
+  return category === 'NUOS'
+    ? 'NUOS Products'
+    : 'Non-NUOS Products';
+}
 }

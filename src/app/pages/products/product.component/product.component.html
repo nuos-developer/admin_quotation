@@ -1,4 +1,3 @@
-
 <div class="page-header">
 
     <h2>Products</h2>
@@ -163,9 +162,23 @@
 
             <div class="form-field">
                 <label>Category</label>
-                <input [(ngModel)]="productForm.category">
-            </div>
 
+                <select [(ngModel)]="productForm.category">
+
+                    <option value="">
+                        Select Category
+                    </option>
+
+                    <option value=" NUOS Products">
+                        NUOS Products
+                    </option>
+
+                    <option value="Non-NUOS Products">
+                        Non-NUOS Products
+                    </option>
+
+                </select>
+            </div>
             <div class="form-field">
                 <label>Module Size</label>
                 <input type="number" [(ngModel)]="productForm.mod_size">

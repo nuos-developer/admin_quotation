@@ -355,3 +355,36 @@
   break-inside: avoid;
   page-break-inside: avoid;
 }
+
+
+.financial-card {
+  width: 300%;
+  margin-top: 1px;
+}
+
+.financial-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.financial-table th,
+.financial-table td {
+  border: 1px solid #e5e7eb;
+  padding: 12px 16px;
+  text-align: left;
+}
+
+
+.financial-table tbody tr:hover {
+  background: #f9fafb;
+}
+
+.grand-total-row {
+  background: #eef6ff;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.grand-total-row td {
+  color: #0f172a;
+}

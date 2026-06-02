@@ -34,7 +34,7 @@
     "@angular/ssr": "^21.1.1",
     "express": "^5.1.0",
     "html2canvas": "^1.4.1",
-    "jspdf": "^4.1.0",
+    "jspdf": "^4.2.1",
     "jspdf-autotable": "^5.0.7",
     "jwt-decode": "^4.0.0",
     "rxjs": "~7.8.0",
