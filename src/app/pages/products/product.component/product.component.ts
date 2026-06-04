@@ -46,6 +46,8 @@ export class ProductComponent implements OnInit {
     images: []
   };
 
+  private readonly newProperty = this;
+
   constructor(
     private admin: AdminService,
     private loader: LoaderService,
@@ -95,11 +97,6 @@ export class ProductComponent implements OnInit {
 
   /* ================= ADD ================= */
   addProduct(): void {
-
-    if (!this.validateForm()) {
-      return;
-    }
-
     const fd = new FormData();
 
     console.log('WIRING TYPE ID:', this.productForm.wiring_type_id);
@@ -139,73 +136,31 @@ export class ProductComponent implements OnInit {
 
     const fd = new FormData();
 
-    // =====================================
-    // APPEND FORM VALUES
-    // =====================================
-    Object.keys(this.productForm).forEach(key => {
+    fd.append('product_name', this.productForm.product_name);
+    fd.append('category', this.productForm.category);
+    fd.append('mod_size', this.productForm.mod_size || '');
+    fd.append('price', this.productForm.price);
+    fd.append('wiring_type_id', this.productForm.wiring_type_id);
+    fd.append('zigbee_type', this.productForm.zigbee_type || '');
 
-      if (key === 'images') return;
+    if (this.productForm.images?.length) {
 
-      if (
-        this.productForm[key] !== null &&
-        this.productForm[key] !== undefined
-      ) {
-
-        fd.append(
-          key,
-          this.productForm[key]
-        );
-      }
-    });
-
-    // =====================================
-    // APPEND IMAGES
-    // =====================================
-    if (
-      this.productForm.images &&
-      this.productForm.images.length > 0
-    ) {
-
-      this.productForm.images.forEach(
-        (file: File) => {
-
-          fd.append(
-            'images',
-            file
-          );
-        }
-      );
+      this.productForm.images.forEach((file: File) => {
+        fd.append('images', file);
+      });
     }
 
-    // =====================================
-    // DEBUG PAYLOAD
-    // =====================================
-    console.log('COMPONENT FORMDATA');
-
-    // fd.forEach((value, key) => {
-
-    //   console.log('222222222',
-    //     key,
-    //     value
-    //   );
-    // });
+    fd.forEach((value, key) => {
+      console.log(key, value);
+    });
 
     this.loader.show();
 
-    // =====================================
-    // API CALL
-    // =====================================
     this.admin.UpdateProduct(
       this.productForm.id,
       fd
     ).subscribe({
-
-      next: (res) => {
-
-        console.log(
-          'UPDATE SUCCESS',
-          res
-        );
+      next: () => {
 
         this.toast.show(
           'Product Updated successfully',
@@ -213,18 +168,13 @@ export class ProductComponent implements OnInit {
         );
 
         this.loader.hide();
-
         this.close();
-
         this.loadAllProducts();
       },
 
       error: (err) => {
 
-        console.log(
-          'UPDATE ERROR',
-          err
-        );
+        console.log(err);
 
         this.toast.show(
           'Failed to Update Product',
@@ -367,9 +317,6 @@ export class ProductComponent implements OnInit {
   }
 
   close(): void {
-
-    this.submitted = false;
-
     this.showAdd = false;
     this.showEdit = false;
     this.showView = false;
@@ -417,7 +364,7 @@ export class ProductComponent implements OnInit {
 
   validateForm(): boolean {
 
-    this.submitted = true;
+    this.newProperty.submitted = true;
 
     if (!this.productForm.product_name?.trim()) {
       return false;

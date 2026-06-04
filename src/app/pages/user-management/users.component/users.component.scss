@@ -247,7 +247,7 @@ button:hover {
 .search-input {
   padding: 8px 12px;
   border-radius: 6px;
-  border: 1px solid #ddd;
+  border: 1px solid #ffffff;
   width: 250px;
 }
 
@@ -269,4 +269,38 @@ button:hover {
   margin-bottom: 6px;
   font-size: 16px;
    padding: 2px 15px;
+}
+
+.sticky-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: #fff;
+  margin: 0;
+  padding: 10px 0;
+}
+
+.sticky-search {
+  position: sticky;
+  top: 50px;
+  z-index: 99;
+  background: #fff;
+  padding: 10px 0;
+}
+
+.table-container {
+  max-height: 600px;
+  overflow-y: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table thead th {
+  position: sticky;
+  top: 0;
+  background: #fff;
+  z-index: 10;
 }

@@ -51,10 +51,9 @@ export class AdminService {
         return this.http.post(`${environment.apiUrl}/admin/product/addProduct`, formData);
     }
 
+    
     UpdateProduct(productId: number, formData: any) {
 
-        console.log(formData);
-        
         return this.http.put(`${environment.apiUrl}/admin/product/updateProduct/${productId}`, formData);
     }
 

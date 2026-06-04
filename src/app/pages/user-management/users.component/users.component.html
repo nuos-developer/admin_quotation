@@ -1,34 +1,40 @@
-<h2>Users</h2>
-<div class="page-header">
-
-  <input type="text" placeholder="🔍 Search user..." [(ngModel)]="searchText" (input)="filterUsers()"
-    class="search-input" />
+<h2 class="sticky-header">Users</h2>
+<div class="page-header sticky-search">
+  <input
+    type="text"
+    placeholder="🔍 Search user..."
+    [(ngModel)]="searchText"
+    (input)="filterUsers()"
+    class="search-input"
+  />
 </div>
 
-<table class="table">
-  <thead>
-    <tr>
-      <th>Name</th>
-      <th>Email</th>
-      <th>Mobile</th>
-      <th>Status</th>
-      <th>Action</th>
-    </tr>
-  </thead>
+<div class="table-container">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Mobile</th>
+        <th>Status</th>
+        <th>Action</th>
+      </tr>
+    </thead>
 
-  <tbody>
-    <tr *ngFor="let u of filteredUsers">
-      <td>{{ u.user_name }}</td>
-      <td>{{ u.email_id }}</td>
-      <td>{{ u.mobile_number }}</td>
-      <td>{{ u.is_admin_approve }}</td>
-      <td>
-        <button (click)="viewUser(u)">👁</button>
-        <button (click)="openPermission(u)">🔑</button>
-      </td>
-    </tr>
-  </tbody>
-</table>
+    <tbody>
+      <tr *ngFor="let u of filteredUsers">
+        <td>{{ u.user_name }}</td>
+        <td>{{ u.email_id }}</td>
+        <td>{{ u.mobile_number }}</td>
+        <td>{{ u.is_admin_approve }}</td>
+        <td>
+          <button (click)="viewUser(u)">👁</button>
+          <button (click)="openPermission(u)">🔑</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
 
 <!-- ================= VIEW USER MODAL ================= -->
 <div class="modal" *ngIf="showView">
@@ -68,51 +74,51 @@
           <input [(ngModel)]="selectedUser.is_admin_approve" disabled>
         </div>
         <div>
-          <label>address</label>
+          <label>Address</label>
           <input [(ngModel)]="selectedUser.address" disabled>
         </div>
         <div>
-          <label>pin_code</label>
+          <label>Pin code</label>
           <input [(ngModel)]="selectedUser.pin_code" disabled>
         </div>
         <div>
-          <label>country</label>
+          <label>Country</label>
           <input [(ngModel)]="selectedUser.country" disabled>
         </div>
         <div>
-          <label>state</label>
+          <label>State</label>
           <input [(ngModel)]="selectedUser.state" disabled>
         </div>
         <div>
-          <label>district</label>
+          <label>District</label>
           <input [(ngModel)]="selectedUser.district" disabled>
         </div>
         <div>
-          <label>taluk</label>
+          <label>Taluk</label>
           <input [(ngModel)]="selectedUser.taluk" disabled>
         </div>
         <div>
-          <label>division</label>
+          <label>Division</label>
           <input [(ngModel)]="selectedUser.division" disabled>
         </div>
         <div>
-          <label>region</label>
+          <label>Region</label>
           <input [(ngModel)]="selectedUser.region" disabled>
         </div>
         <div>
-          <label>company_name</label>
+          <label>Company Name</label>
           <input [(ngModel)]="selectedUser.company_name" disabled>
         </div>
         <div>
-          <label>company_address</label>
+          <label>Company Address</label>
           <input [(ngModel)]="selectedUser.company_address" disabled>
         </div>
         <div>
-          <label>gst_name</label>
+          <label>Gst Name</label>
           <input [(ngModel)]="selectedUser.gst_name" disabled>
         </div>
         <div>
-          <label>role_name</label>
+          <label>Role Name</label>
           <input [(ngModel)]="selectedUser.role_name" disabled>
         </div>
 
