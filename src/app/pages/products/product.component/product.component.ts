@@ -97,6 +97,11 @@ export class ProductComponent implements OnInit {
 
   /* ================= ADD ================= */
   addProduct(): void {
+
+    if (!this.validateForm()) {
+      return;
+    }
+    
     const fd = new FormData();
 
     console.log('WIRING TYPE ID:', this.productForm.wiring_type_id);
