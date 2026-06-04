@@ -1,12 +1,7 @@
 <h2 class="sticky-header">Users</h2>
 <div class="page-header sticky-search">
-  <input
-    type="text"
-    placeholder="🔍 Search user..."
-    [(ngModel)]="searchText"
-    (input)="filterUsers()"
-    class="search-input"
-  />
+  <input type="text" placeholder="🔍 Search user..." [(ngModel)]="searchText" (input)="filterUsers()"
+    class="search-input" />
 </div>
 
 <div class="table-container">
@@ -17,6 +12,7 @@
         <th>Email</th>
         <th>Mobile</th>
         <th>Status</th>
+        <!-- <th>Approved At</th> -->
         <th>Action</th>
       </tr>
     </thead>
@@ -27,6 +23,7 @@
         <td>{{ u.email_id }}</td>
         <td>{{ u.mobile_number }}</td>
         <td>{{ u.is_admin_approve }}</td>
+        <!-- <td>{{u.approved_at | date:'dd-MM-yyyy HH:mm:ss'}}</td> -->
         <td>
           <button (click)="viewUser(u)">👁</button>
           <button (click)="openPermission(u)">🔑</button>
@@ -121,6 +118,15 @@
           <label>Role Name</label>
           <input [(ngModel)]="selectedUser.role_name" disabled>
         </div>
+        <div>
+          <label>Registered Date And Time</label>
+          <input [value]="selectedUser?.registed_at | date:'dd-MM-yyyy HH:mm:ss'" disabled>
+        </div>
+
+        <div>
+          <label>Approved Date And Time</label>
+          <input [value]="selectedUser?.approved_at | date:'dd-MM-yyyy HH:mm:ss'" disabled>
+        </div>
 
       </div>
 
@@ -140,10 +146,10 @@
     <div class="modal-header">
       <h3>Manage Permissions</h3>
       <div class="user-info">
-  <div><strong>User Name:</strong> {{ selectedUser.user_name }}</div>
-  <div><strong>Email:</strong> {{ selectedUser.email_id }}</div>
-  <div><strong>Request Role:</strong> {{ selectedUser.role_name }}</div>
-</div>
+        <div><strong>User Name:</strong> {{ selectedUser.user_name }}</div>
+        <div><strong>Email:</strong> {{ selectedUser.email_id }}</div>
+        <div><strong>Request Role:</strong> {{ selectedUser.role_name }}</div>
+      </div>
     </div>
 
     <div class="modal-body">
