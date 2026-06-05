@@ -27,6 +27,8 @@
         <td>
           <button (click)="viewUser(u)">👁</button>
           <button (click)="openPermission(u)">🔑</button>
+          <button class="delete-btn" (click)="openDeleteConfirm(u)">
+            🗑️</button>
         </td>
       </tr>
     </tbody>
@@ -204,6 +206,30 @@
       <button class="secondary" (click)="close()">Cancel</button>
       <button class="primary" [disabled]="!hasPermissionSelected" (click)="saveAllPermissions()">
         Save Permissions
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<!-- DELETE CONFIRM MODAL -->
+<div class="modal" *ngIf="showDeleteConfirm">
+  <div class="modal-box small">
+
+    <h3>Confirm Delete</h3>
+
+    <p>
+      Are you sure you want to delete
+      <strong>{{ selectedUser?.user_name }}</strong>?
+    </p>
+
+    <div class="modal-footer">
+      <button type="button" class="btn-no" (click)="cancelDelete()">
+        No
+      </button>
+
+      <button type="button" class="btn-yes" (click)="deleteUser()">
+        Delete
       </button>
     </div>
 

@@ -47,11 +47,17 @@ export class AdminService {
         return this.http.post(`${environment.apiUrl}/admin/assign_access`, payload);
     }
 
+    deleteUser(id: number) {
+        return this.http.delete(
+            `${environment.apiUrl}/admin/delete_user/${id}`
+        );
+    }
+
     addProduct(formData: any) {
         return this.http.post(`${environment.apiUrl}/admin/product/addProduct`, formData);
     }
 
-    
+
     UpdateProduct(productId: number, formData: any) {
 
         return this.http.put(`${environment.apiUrl}/admin/product/updateProduct/${productId}`, formData);
@@ -88,7 +94,7 @@ export class AdminService {
             `${environment.apiUrl}/admin/product/getproposal`
         );
     }
-    getProposalById(proposalId : number) {
+    getProposalById(proposalId: number) {
         return this.http.get<ApiResponse<any[]>>(
             `${environment.apiUrl}/admin/product/getproposalById/${proposalId}`
         );

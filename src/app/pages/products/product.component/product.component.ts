@@ -101,7 +101,7 @@ export class ProductComponent implements OnInit {
     if (!this.validateForm()) {
       return;
     }
-    
+
     const fd = new FormData();
 
     console.log('WIRING TYPE ID:', this.productForm.wiring_type_id);
@@ -339,20 +339,19 @@ export class ProductComponent implements OnInit {
     this.previewImage = null;
   }
 
-  filterProducts() {
-    const search = this.searchText.toLowerCase();
+  filterProducts(): void {
+    const search = this.searchText.toLowerCase().trim();
 
     this.filteredActiveProducts = this.activeProducts.filter(p =>
-      p.product_name?.toLowerCase().includes(search) ||
-      p.category?.toLowerCase().includes(search)
+      (p.product_name || '').toLowerCase().includes(search) ||
+      (p.category || '').toLowerCase().includes(search)
     );
 
     this.filteredInactiveProducts = this.inactiveProducts.filter(p =>
-      p.product_name?.toLowerCase().includes(search) ||
-      p.category?.toLowerCase().includes(search)
+      (p.product_name || '').toLowerCase().includes(search) ||
+      (p.category || '').toLowerCase().includes(search)
     );
   }
-
   closeModal() {
     this.showModal = false;
     this.selectedProduct = null;

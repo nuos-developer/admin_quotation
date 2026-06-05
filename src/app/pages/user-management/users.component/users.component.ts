@@ -35,6 +35,8 @@ export class UsersComponent implements OnInit {
 
   showView = false;
   showPermission = false;
+  showDeleteConfirm = false;
+deleteUserId: number | null = null;
 
   permissionsMap: Record<number, PermissionFlags> = {};
   hasPermissionSelected = false;
@@ -201,9 +203,56 @@ export class UsersComponent implements OnInit {
   }
 
   /* ================= CLOSE ================= */
-  close(): void {
-    this.showView = false;
-    this.showPermission = false;
-    this.selectedUser = null;
+ close(): void {
+  this.showView = false;
+  this.showPermission = false;
+  this.showDeleteConfirm = false;
+  this.selectedUser = null;
+}
+
+  openDeleteConfirm(user: any): void {
+  this.selectedUser = user;
+  this.deleteUserId = user.id;
+  this.showDeleteConfirm = true;
+}
+
+cancelDelete(): void {
+  this.showDeleteConfirm = false;
+  this.deleteUserId = null;
+}
+
+deleteUser(): void {
+
+  if (!this.deleteUserId) {
+    return;
   }
+
+  this.loader.show();
+
+  this.admin.deleteUser(this.deleteUserId).subscribe({
+    next: () => {
+
+      this.toast.show(
+        'User deleted successfully',
+        'success'
+      );
+
+      this.showDeleteConfirm = false;
+      this.deleteUserId = null;
+
+      this.loadUsers();
+
+      this.loader.hide();
+    },
+    error: () => {
+
+      this.toast.show(
+        'Failed to delete user',
+        'error'
+      );
+
+      this.loader.hide();
+    }
+  });
+}
 }

@@ -30,21 +30,17 @@ button.danger {
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
 }
-
 .modal-box {
   background: #fff;
+  padding: 20px;
   border-radius: 10px;
-  width: 90%;
-  max-width: 900px;
-  max-height: 90vh;
-  display: flex;
-  flex-direction: column;
-}
+  width: 700px;
 
-.modal-box.large {
-  max-width: 900px;
+  &.small {
+    width: 400px;
+    text-align: center;
+  }
 }
 
 .modal-box.xlarge {
@@ -288,19 +284,31 @@ button:hover {
   padding: 10px 0;
 }
 
-.table-container {
-  max-height: 600px;
-  overflow-y: auto;
+
+.btn-no {
+  background: #e5e7eb;
+  /* light gray */
+  color: #333;
+  padding: 8px 14px;
+  border-radius: 6px;
+  border: none;
 }
 
-.table {
-  width: 100%;
-  border-collapse: collapse;
+.btn-no:hover {
+  background: #d1d5db;
 }
 
-.table thead th {
-  position: sticky;
-  top: 0;
-  background: #fff;
-  z-index: 10;
+/* YES (Confirm) */
+.btn-yes {
+  background: #16a34a;
+  /* green */
+  color: #fff;
+  padding: 8px 14px;
+  border-radius: 6px;
+  border: none;
 }
+
+.btn-yes:hover {
+  background: #15803d;
+}
+
