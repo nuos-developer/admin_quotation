@@ -188,8 +188,13 @@
                     </div>
                 </div>
                 <div class="form-field">
-                    <label>Module Size</label>
-                    <input type="number" [(ngModel)]="productForm.mod_size">
+                    <label>Mod Size</label>
+
+                    <select [(ngModel)]="productForm.mod_size">
+                        <option [ngValue]="null">Select Mod Size</option>
+                        <option [ngValue]="1">1</option>
+                        <option [ngValue]="2">2</option>
+                    </select>
                 </div>
 
                 <div class="form-field">
