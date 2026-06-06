@@ -40,7 +40,7 @@
                     <td>{{ i + 1 }}</td>
                     <td>{{ p.product_name }}</td>
                     <td>{{ p.category }}</td>
-                    <td>₹ {{ p.price }}</td>
+                    <td>{{ p.price | currency:'INR':'symbol':'1.0-0':'en-IN' }}</td>
                     <td>
                         <div class="action-group">
                             <button type="button" class="icon-btn" (click)="viewProduct(p)">👁</button>
@@ -71,7 +71,7 @@
                     <td>{{i+1}}
                     <td>{{ p.product_name }}</td>
                     <td>{{ p.category }}</td>
-                    <td>₹ {{ p.price }}</td>
+                    <td>{{ p.price | currency:'INR':'symbol':'1.0-0':'en-IN' }}</td>
                     <td>
                         <button type="button" (click)="viewProduct(p)">👁</button>
                         <button type="button" class="success" (click)="openConfirm('ACTIVATE', p.id)">✅</button>
@@ -119,7 +119,7 @@
 
                 <div class="form-field">
                     <label>Price</label>
-                    <input [value]="'₹ ' + selectedProduct.price" disabled>
+                    <input [value]="'₹ ' + (selectedProduct.price | number:'1.0-0':'en-IN')" disabled>
                 </div>
 
                 <div class="form-field">

@@ -279,7 +279,7 @@
 
             <tr>
               <td>Commissioning Percentage</td>
-              <td>{{ selectedProposal.commissioning_percentage || 0 }}%</td>
+              <td>{{ selectedProposal.commissioning_percentage || 0  }}%</td>
             </tr>
 
             <tr>
@@ -290,42 +290,42 @@
             <tr>
               <td>Grand Products Total</td>
               <td>
-                ₹{{ selectedProposal.financial_breakdown?.grandProductsTotal || 0 }}
+                {{ selectedProposal.financial_breakdown?.grandProductsTotal || 0 | currency:'INR':'symbol':'1.0-0':'en-IN'}}
               </td>
             </tr>
 
             <tr>
               <td>Discount Amount</td>
               <td>
-                ₹{{ selectedProposal.financial_breakdown?.discountAmount || 0 }}
+                {{ selectedProposal.financial_breakdown?.discountAmount || 0 | currency:'INR':'symbol':'1.0-0':'en-IN'}}
               </td>
             </tr>
 
             <tr>
               <td>After Discount</td>
               <td>
-                ₹{{ selectedProposal.financial_breakdown?.afterDiscount || 0 }}
+                {{ selectedProposal.financial_breakdown?.afterDiscount || 0 | currency:'INR':'symbol':'1.0-0':'en-IN'}}
               </td>
             </tr>
 
             <tr>
               <td>Installation Amount</td>
               <td>
-                ₹{{ selectedProposal.financial_breakdown?.installationAmount || 0 }}
+                {{ selectedProposal.financial_breakdown?.installationAmount || 0 | currency:'INR':'symbol':'1.0-0':'en-IN'}}
               </td>
             </tr>
 
             <tr>
               <td>Commissioning Amount</td>
               <td>
-                ₹{{ selectedProposal.financial_breakdown?.commissioningAmount || 0 }}
+                {{ selectedProposal.financial_breakdown?.commissioningAmount || 0 | currency:'INR':'symbol':'1.0-0':'en-IN'}}
               </td>
             </tr>
 
             <tr>
               <td>Non Nuos Products Total</td>
               <td>
-                ₹{{ selectedProposal.financial_breakdown?.nonNuosProductsTotal || 0 }}
+                {{ selectedProposal.financial_breakdown?.nonNuosProductsTotal || 0 | currency:'INR':'symbol':'1.0-0':'en-IN'}}
               </td>
             </tr>
 
@@ -333,7 +333,7 @@
               <td><strong>Final Total</strong></td>
               <td>
                 <strong>
-                  ₹{{ selectedProposal.financial_breakdown?.finalTotal || 0 }}
+                  {{ selectedProposal.financial_breakdown?.finalTotal || 0 | currency:'INR':'symbol':'1.0-0':'en-IN'}}
                 </strong>
               </td>
             </tr>
@@ -369,7 +369,7 @@
 
               <div class="meta">
                 <span>Qty: {{ p.quantity }}</span>
-                <span>₹{{ p.price }}</span>
+                <span>{{ p.price | currency:'INR':'symbol':'1.0-0':'en-IN'}}</span>
               </div>
 
               <div class="tag">{{ p.wiring_type }}</div>
@@ -419,7 +419,7 @@
 
                       <div class="meta">
                         <span>{{ p.category }}</span>
-                        <span>₹{{ p.price }}</span>
+                        <span>{{ p.price | currency:'INR':'symbol':'1.0-0':'en-IN'}}</span>
                       </div>
 
                       <div class="meta small">
@@ -472,7 +472,7 @@
 
                             <div class="meta">
                               <span>{{ p.category }}</span>
-                              <span>₹{{ p.price }}</span>
+                              <span>{{ p.price | currency:'INR':'symbol':'1.0-0':'en-IN'}}</span>
                             </div>
                           </div>
 
