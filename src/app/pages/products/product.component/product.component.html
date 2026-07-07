@@ -21,7 +21,7 @@
 
             <input type="text" placeholder="🔍 Search Product..." [(ngModel)]="searchText" (input)="filterProducts()">
 
-            <select class="category-filter" [(ngModel)]="selectedCategoryId" (change)="filterProducts()">
+            <select class="category-filter" [(ngModel)]="selectedCategoryId" (change)="filterCategory()">
 
                 <option [ngValue]="null">Select Product Category</option>
 
@@ -45,6 +45,7 @@
                 <tr>
                     <th>Sr. No.</th>
                     <th>Name</th>
+                    <th>Product Category</th>
                     <th (click)="sortByCategory()" class="sortable">
                         Product Type
                         <span *ngIf="categorySortOrder === 'asc'">▲</span>
@@ -58,7 +59,9 @@
                 <tr *ngFor="let p of filteredActiveProducts; let i = index">
                     <td>{{ i + 1 }}</td>
                     <td>{{ p.product_name }}</td>
+                    <td>{{p.category_type}}</td>
                     <td>{{ p.category }}</td>
+
                     <td>{{ p.price | currency:'INR':'symbol':'1.0-0':'en-IN' }}</td>
                     <td>
                         <div class="action-group">

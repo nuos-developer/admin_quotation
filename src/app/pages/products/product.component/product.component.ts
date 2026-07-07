@@ -484,23 +484,26 @@ export class ProductComponent implements OnInit {
 
   filterCategory(): void {
 
-    const search = this.searchText.toLowerCase().trim();
+  const search = this.searchText.toLowerCase().trim();
 
-    const filter = (products: any[]) =>
-      products.filter((p: any) => {
+  const filter = (products: any[]) =>
+    products.filter((p: any) => {
 
-        const matchesSearch =
-          (p.product_name || '').toLowerCase().includes(search);
+      // Search by product name
+      const matchesSearch =
+        !search ||
+        (p.product_name || '').toLowerCase().includes(search);
 
-        const matchesCategory =
-          this.selectedCategoryId === null ||
-          p.category_id === this.selectedCategoryId;
+      // Filter by selected category
+      const matchesCategory =
+        this.selectedCategoryId === null ||
+        p.category_id === this.selectedCategoryId;
 
-        return matchesSearch && matchesCategory;
-      });
+      return matchesSearch && matchesCategory;
+    });
 
-    this.filteredActiveProducts = filter(this.activeProducts);
-    this.filteredInactiveProducts = filter(this.inactiveProducts);
-  }
+  this.filteredActiveProducts = filter(this.activeProducts);
+  this.filteredInactiveProducts = filter(this.inactiveProducts);
+}
 
 }
