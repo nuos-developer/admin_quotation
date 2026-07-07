@@ -300,7 +300,6 @@ button.success {
 .btn-yes:hover {
   background: #15803d;
 }
-
 .search-box {
   display: flex;
   justify-content: space-between;
@@ -311,7 +310,7 @@ button.success {
 .search-filter-group {
   display: flex;
   align-items: center;
-  gap: 20px; // Space between Search and Category
+  gap: 20px;   // Space between Search and Category
   flex: 1;
 }
 
@@ -336,28 +335,12 @@ button.success {
   margin-left: auto;
 }
 
-.image-item {
-  position: relative;
-  display: inline-block;
-}
 
-.image-item img {
-  width: 120px;
-  height: 120px;
-  object-fit: cover;
-  border-radius: 8px;
-}
-
-.remove-image {
-  position: absolute;
-  top: -6px;
-  right: -6px;
-  width: 22px;
-  height: 22px;
-  border: none;
-  border-radius: 50%;
-  background: #ef4444;
-  color: #fff;
-  cursor: pointer;
+.error-msg {
+  display: block;
+  margin-top: 4px;
+  color: #dc2626;
   font-size: 12px;
+  font-weight: 500;
+  line-height: 1.4;
 }
