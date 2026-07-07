@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
 import { AdminService } from '../../../core/services/admin.service';
 import { LoaderService } from '../../../core/services/loader.service';
 import { ToastService } from '../../../core/services/toast.service';
@@ -8,7 +9,7 @@ import { ToastService } from '../../../core/services/toast.service';
 @Component({
   selector: 'app-product',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, NgMultiSelectDropDownModule],
   templateUrl: './product.component.html',
   styleUrl: './product.component.scss',
 })
@@ -20,6 +21,7 @@ export class ProductComponent implements OnInit {
   inactiveProducts: any[] = [];
   wiringTypes: any[] = [];
   searchText: string = '';
+  categories: any[] = [];
 
   filteredActiveProducts: any[] = [];
   filteredInactiveProducts: any[] = [];
@@ -31,10 +33,12 @@ export class ProductComponent implements OnInit {
 
   showConfirm = false;
   confirmAction: 'ACTIVATE' | 'DEACTIVATE' | null = null;
+  selectedCategoryId: number | null = null;
   confirmProductId: number | null = null;
   confirmMessage = '';
   showModal: boolean = false;
   selectedProduct: any = null;
+  categorySortOrder: 'asc' | 'desc' = 'asc';
 
   productForm: any = {
     product_name: '',
@@ -42,8 +46,23 @@ export class ProductComponent implements OnInit {
     mod_size: null,
     price: '',
     wiring_type_id: null,
+    category_id: null,
     zigbee_type: null,
+    switch_load_count: null,
+    description: null,
     images: []
+  };
+
+  selectedCategories: any[] = [];
+
+  dropdownSettings = {
+    singleSelection: false,
+    idField: 'id',
+    textField: 'category_type',
+    selectAllText: 'Select All',
+    unSelectAllText: 'Unselect All',
+    itemsShowLimit: 3,
+    allowSearchFilter: true
   };
 
   private readonly newProperty = this;
@@ -58,6 +77,7 @@ export class ProductComponent implements OnInit {
     this.activeTab = 'ACTIVE';
     this.loadAllProducts();
     this.loadWiringTypes();
+    this.loadCategories();
   }
 
   /* ================= LOAD PRODUCTS ================= */
@@ -89,6 +109,18 @@ export class ProductComponent implements OnInit {
     this.admin.getWire().subscribe({
       next: (res: any) => {
         this.wiringTypes = res.data || res.resp?.data || [];
+        this.loader.hide();
+      },
+      error: () => this.loader.hide()
+    });
+  }
+
+  loadCategories(): void {
+    this.loader.show();
+
+    this.admin.getCategories().subscribe({
+      next: (res: any) => {
+        this.categories = res.data || res.resp?.data || [];
         this.loader.hide();
       },
       error: () => this.loader.hide()
@@ -146,7 +178,10 @@ export class ProductComponent implements OnInit {
     fd.append('mod_size', this.productForm.mod_size || '');
     fd.append('price', this.productForm.price);
     fd.append('wiring_type_id', this.productForm.wiring_type_id);
+    fd.append('category_id', this.productForm.category_id);
     fd.append('zigbee_type', this.productForm.zigbee_type || '');
+    fd.append('switch_load_count', this.productForm.switch_load_count);
+    fd.append('description', this.productForm.description || '');
 
     if (this.productForm.images?.length) {
 
@@ -258,9 +293,12 @@ export class ProductComponent implements OnInit {
     return wiring ? wiring.wiring_name : '-';
   }
 
-  editProduct(p: any): void {
+  getCategory(id: number): string {
+    const category = this.categories.find(c => c.id === id);
+    return category ? category.category_type : '-';
+  }
 
-    console.log('EDIT PRODUCT:', p);
+  editProduct(p: any): void {
 
     this.productForm = {
       id: p.id,
@@ -269,23 +307,52 @@ export class ProductComponent implements OnInit {
       mod_size: p.mod_size,
       price: p.price,
       wiring_type_id: p.wiring_type_id,
+      category_id: p.category_id,
       zigbee_type: p.zigbee_type,
+      switch_load_count: p.switch_load_count,
+      description: p.description,
 
-      // IMPORTANT
-      images: []
+      // New images selected by user
+      images: [],
+
+      // Existing images
+      image_urls: p.image_urls || []
     };
 
-    console.log(
-      'PRODUCT FORM:',
-      this.productForm
-    );
-
-    // OPEN MODAL
     this.showModal = true;
-
-    // OPEN EDIT FORM
     this.showEdit = true;
   }
+  // editProduct(p: any): void {
+
+  //   console.log('EDIT PRODUCT:', p);
+
+  //   this.productForm = {
+  //     id: p.id,
+  //     product_name: p.product_name,
+  //     category: p.category,
+  //     mod_size: p.mod_size,
+  //     price: p.price,
+  //     wiring_type_id: p.wiring_type_id,
+  //     category_id: p.category_id,
+  //     zigbee_type: p.zigbee_type,
+  //     switch_load_count: p.switch_load_count,
+  //     description: p.description,
+
+  //     // IMPORTANT
+  //     images: []
+  //   };
+
+  //   console.log(
+  //     'PRODUCT FORM:',
+  //     this.productForm
+  //   );
+
+  //   // OPEN MODAL
+  //   this.showModal = true;
+
+  //   // OPEN EDIT FORM
+  //   this.showEdit = true;
+  // }
 
   openConfirm(action: 'ACTIVATE' | 'DEACTIVATE', id: number): void {
     this.confirmAction = action;
@@ -316,7 +383,10 @@ export class ProductComponent implements OnInit {
       mod_size: null,
       price: '',
       wiring_type_id: null,
+      category_id: null,
       zigbee_type: null,
+      switch_load_count: null,
+      description: null,
       images: []
     };
   }
@@ -392,4 +462,45 @@ export class ProductComponent implements OnInit {
 
     return true;
   }
+
+  sortByCategory() {
+
+    this.categorySortOrder =
+      this.categorySortOrder === 'asc' ? 'desc' : 'asc';
+
+    const direction = this.categorySortOrder === 'asc' ? 1 : -1;
+
+    this.filteredActiveProducts.sort((a: any, b: any) =>
+      a.category.localeCompare(b.category) * direction
+    );
+
+    this.filteredInactiveProducts.sort((a: any, b: any) =>
+      a.category.localeCompare(b.category) * direction
+    );
+
+  }
+
+
+
+  filterCategory(): void {
+
+    const search = this.searchText.toLowerCase().trim();
+
+    const filter = (products: any[]) =>
+      products.filter((p: any) => {
+
+        const matchesSearch =
+          (p.product_name || '').toLowerCase().includes(search);
+
+        const matchesCategory =
+          this.selectedCategoryId === null ||
+          p.category_id === this.selectedCategoryId;
+
+        return matchesSearch && matchesCategory;
+      });
+
+    this.filteredActiveProducts = filter(this.activeProducts);
+    this.filteredInactiveProducts = filter(this.inactiveProducts);
+  }
+
 }

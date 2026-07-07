@@ -16,11 +16,26 @@
         </button>
     </div>
     <div class="search-box">
-        <input type="text" placeholder="🔍 Search product..." [(ngModel)]="searchText" (input)="filterProducts()" />
+
+        <div class="search-filter-group">
+
+            <input type="text" placeholder="🔍 Search Product..." [(ngModel)]="searchText" (input)="filterProducts()">
+
+            <select class="category-filter" [(ngModel)]="selectedCategoryId" (change)="filterProducts()">
+
+                <option [ngValue]="null">Select Product Category</option>
+
+                <option *ngFor="let c of categories" [ngValue]="c.id">
+                    {{ c.category_type }}
+                </option>
+
+            </select>
+        </div>
 
         <button type="button" class="btn primary" *ngIf="activeTab === 'ACTIVE'" (click)="openAdd()">
             ➕ Add Product
         </button>
+
     </div>
 
     <!-- ================= ACTIVE ================= -->
@@ -30,7 +45,11 @@
                 <tr>
                     <th>Sr. No.</th>
                     <th>Name</th>
-                    <th>Category</th>
+                    <th (click)="sortByCategory()" class="sortable">
+                        Product Type
+                        <span *ngIf="categorySortOrder === 'asc'">▲</span>
+                        <span *ngIf="categorySortOrder === 'desc'">▼</span>
+                    </th>
                     <th>Price</th>
                     <th>Action</th>
                 </tr>
@@ -61,7 +80,11 @@
                 <tr>
                     <th>Sr. No</th>
                     <th>Name</th>
-                    <th>Category</th>
+                    <th (click)="sortByCategory()" class="sortable">
+                        Product Type
+                        <span *ngIf="categorySortOrder === 'asc'">▲</span>
+                        <span *ngIf="categorySortOrder === 'desc'">▼</span>
+                    </th>
                     <th>Price</th>
                     <th>Action</th>
                 </tr>
@@ -108,12 +131,16 @@
                 </div>
 
                 <div class="form-field">
-                    <label>Category</label>
+                    <label>Product Type</label>
                     <input [value]="selectedProduct.category" disabled>
+                </div>
+                <div class="form-field">
+                    <label>Category</label>
+                    <input [value]="getCategoryName(selectedProduct.category_id)" disabled>
                 </div>
 
                 <div class="form-field">
-                    <label>Module Size</label>
+                    <label>Mod Size</label>
                     <input [value]="selectedProduct.mod_size" disabled>
                 </div>
 
@@ -126,12 +153,19 @@
                     <label>Wiring Type</label>
                     <input [value]="getWiringName(selectedProduct.wiring_type_id)" disabled>
                 </div>
-
                 <div class="form-field">
                     <label>Zigbee Type</label>
                     <input [value]="selectedProduct.zigbee_type || '-'" disabled>
                 </div>
-
+                <div class="form-field">
+                    <label>Switch Load</label>
+                    <input [value]="selectedProduct.switch_load_count" disabled>
+                </div>
+                <div class="form-field">
+                    <label>Description</label>
+                    <textarea [value]="selectedProduct.description || '-'" rows="4" disabled>
+                    </textarea>
+                </div>
             </div>
 
             <!-- IMAGES -->
@@ -149,7 +183,6 @@
         </div>
     </div>
 
-
     <!-- ================= ADD / EDIT PRODUCT MODAL ================= -->
     <div class="modal" *ngIf="showAdd || showEdit">
         <div class="modal-box large">
@@ -166,12 +199,12 @@
                 </div>
 
                 <div class="form-field">
-                    <label>Category <span class="required">*</span></label>
+                    <label>Product Type <span class="required">*</span></label>
 
                     <select [(ngModel)]="productForm.category">
 
                         <option value="">
-                            Select Category
+                            Select Product Type
                         </option>
 
                         <option value="NUOS Products">
@@ -184,9 +217,10 @@
 
                     </select>
                     <div class="error-msg" *ngIf="submitted && !productForm.category">
-                        Category is required
+                        Product Type is required
                     </div>
                 </div>
+
                 <div class="form-field">
                     <label>Mod Size</label>
 
@@ -200,10 +234,8 @@
                 <div class="form-field">
                     <label>Price <span class="required">*</span></label>
                     <input [(ngModel)]="productForm.price">
-                    <div class="error-msg" *ngIf="submitted &&
-         (productForm.price === '' ||
-          productForm.price === null ||
-          productForm.price === undefined)">
+                    <div class="error-msg"
+                        *ngIf="submitted && (productForm.price === '' || productForm.price === null || productForm.price === undefined)">
                         Price is required
                     </div>
                 </div>
@@ -221,15 +253,64 @@
                     </div>
                 </div>
 
+                <div class="form-field">
+                    <label>Category <span class="required">*</span></label>
+
+                    <select [(ngModel)]="productForm.category_id">
+                        <option [ngValue]="null" selected>Select Category</option>
+
+                        <option *ngFor="let c of categories" [ngValue]="c.id">
+                            {{ c.category_type }}
+                        </option>
+                    </select>
+
+                    <div class="error-msg" *ngIf="submitted && !productForm.category_id">
+                        Category is required
+                    </div>
+                </div>
+
+
 
                 <div class="form-field">
                     <label>Zigbee Type</label>
                     <input [(ngModel)]="productForm.zigbee_type">
                 </div>
+                <div class="form-field">
+                    <label>Switch Load</label>
+                    <select [(ngModel)]="productForm.switch_load_count">
+                        {{productForm.switch_load_count | json}}
+                        <option [ngValue]="null">Select Switch Load</option>
+                        <option [ngValue]="1">1</option>
+                        <option [ngValue]="2">2</option>
+                        <option [ngValue]="3">3</option>
+                        <option [ngValue]="4">4</option>
+                    </select>
+                </div>
+
+
+                <div class="form-field">
+                    <label>Description</label>
+                    <textarea [(ngModel)]="productForm.description" name="description" rows="4"
+                        placeholder="Enter product description">
+                    </textarea>
+                </div>
+
 
                 <div class="form-field full">
                     <label>Product Images</label>
                     <input type="file" multiple (change)="onFileChange($event)">
+                </div>
+                <div class="form-field full" *ngIf="showEdit && productForm.image_urls?.length">
+
+                    <label>Product Image</label>
+
+                    <div class="image-grid">
+
+                        <img *ngFor="let img of productForm.image_urls" [src]="img" alt="Product Image"
+                            (click)="openImagePreview(img)">
+
+                    </div>
+
                 </div>
 
             </div>

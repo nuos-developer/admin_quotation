@@ -89,6 +89,12 @@ export class AdminService {
             `${environment.apiUrl}/admin/product/wire_type`
         );
     }
+    getCategories() {
+        return this.http.get<ApiResponse<any[]>>(
+            `${environment.apiUrl}/admin/product/category_type`
+        );
+    }
+    
     getProposals() {
         return this.http.get<ApiResponse<any[]>>(
             `${environment.apiUrl}/admin/product/getproposal`

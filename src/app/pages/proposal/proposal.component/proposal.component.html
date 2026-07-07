@@ -258,93 +258,100 @@
         </div>
 
         <!-- ================= FINANCIAL BREAKDOWN ================= -->
-    <div class="card info-card financial-card">
+        <div class="card info-card financial-card">
 
-      <div class="card-header">
-        Financial Breakdown
-      </div>
+          <div class="card-header">
+            Financial Breakdown
+          </div>
 
-      <div class="card-body">
+          <div class="card-body">
 
-        <table class="financial-table">
+            <table class="financial-table">
 
-          <thead>
-            <tr>
-              <th>Particular</th>
-              <th>Value</th>
-            </tr>
-          </thead>
+              <thead>
+                <tr>
+                  <th>Particular</th>
+                  <th>Value</th>
+                </tr>
+              </thead>
 
-          <tbody>
+              <tbody>
 
-            <tr>
-              <td>Commissioning Percentage</td>
-              <td>{{ selectedProposal.commissioning_percentage || 0  }}%</td>
-            </tr>
+                <tr>
+                  <td>Commissioning Percentage</td>
+                  <td>{{ selectedProposal.commissioning_percentage || 0 }}%</td>
+                </tr>
 
-            <tr>
-              <td>Discount Percentage</td>
-              <td>{{ selectedProposal.discount_percentage || 0 }}%</td>
-            </tr>
+                <tr>
+                  <td>Discount Percentage</td>
+                  <td>{{ selectedProposal.discount_percentage || 0 }}%</td>
+                </tr>
 
-            <tr>
-              <td>Grand Products Total</td>
-              <td>
-                {{ selectedProposal.financial_breakdown?.grandProductsTotal || 0 | currency:'INR':'symbol':'1.0-0':'en-IN'}}
-              </td>
-            </tr>
+                <tr>
+                  <td>Grand Products Total</td>
+                  <td>
+                    {{ selectedProposal.financial_breakdown?.grandProductsTotal || 0 |
+                    currency:'INR':'symbol':'1.0-0':'en-IN'}}
+                  </td>
+                </tr>
 
-            <tr>
-              <td>Discount Amount</td>
-              <td>
-                {{ selectedProposal.financial_breakdown?.discountAmount || 0 | currency:'INR':'symbol':'1.0-0':'en-IN'}}
-              </td>
-            </tr>
+                <tr>
+                  <td>Discount Amount</td>
+                  <td>
+                    {{ selectedProposal.financial_breakdown?.discountAmount || 0 |
+                    currency:'INR':'symbol':'1.0-0':'en-IN'}}
+                  </td>
+                </tr>
 
-            <tr>
-              <td>After Discount</td>
-              <td>
-                {{ selectedProposal.financial_breakdown?.afterDiscount || 0 | currency:'INR':'symbol':'1.0-0':'en-IN'}}
-              </td>
-            </tr>
+                <tr>
+                  <td>After Discount</td>
+                  <td>
+                    {{ selectedProposal.financial_breakdown?.afterDiscount || 0 |
+                    currency:'INR':'symbol':'1.0-0':'en-IN'}}
+                  </td>
+                </tr>
 
-            <tr>
-              <td>Installation Amount</td>
-              <td>
-                {{ selectedProposal.financial_breakdown?.installationAmount || 0 | currency:'INR':'symbol':'1.0-0':'en-IN'}}
-              </td>
-            </tr>
+                <tr>
+                  <td>Installation Amount</td>
+                  <td>
+                    {{ selectedProposal.financial_breakdown?.installationAmount || 0 |
+                    currency:'INR':'symbol':'1.0-0':'en-IN'}}
+                  </td>
+                </tr>
 
-            <tr>
-              <td>Commissioning Amount</td>
-              <td>
-                {{ selectedProposal.financial_breakdown?.commissioningAmount || 0 | currency:'INR':'symbol':'1.0-0':'en-IN'}}
-              </td>
-            </tr>
+                <tr>
+                  <td>Commissioning Amount</td>
+                  <td>
+                    {{ selectedProposal.financial_breakdown?.commissioningAmount || 0 |
+                    currency:'INR':'symbol':'1.0-0':'en-IN'}}
+                  </td>
+                </tr>
 
-            <tr>
-              <td>Non Nuos Products Total</td>
-              <td>
-                {{ selectedProposal.financial_breakdown?.nonNuosProductsTotal || 0 | currency:'INR':'symbol':'1.0-0':'en-IN'}}
-              </td>
-            </tr>
+                <tr>
+                  <td>Non Nuos Products Total</td>
+                  <td>
+                    {{ selectedProposal.financial_breakdown?.nonNuosProductsTotal || 0 |
+                    currency:'INR':'symbol':'1.0-0':'en-IN'}}
+                  </td>
+                </tr>
 
-            <tr class="grand-total-row">
-              <td><strong>Final Total</strong></td>
-              <td>
-                <strong>
-                  {{ selectedProposal.financial_breakdown?.finalTotal || 0 | currency:'INR':'symbol':'1.0-0':'en-IN'}}
-                </strong>
-              </td>
-            </tr>
+                <tr class="grand-total-row">
+                  <td><strong>Final Total</strong></td>
+                  <td>
+                    <strong>
+                      {{ selectedProposal.financial_breakdown?.finalTotal || 0 |
+                      currency:'INR':'symbol':'1.0-0':'en-IN'}}
+                    </strong>
+                  </td>
+                </tr>
 
-          </tbody>
+              </tbody>
 
-        </table>
+            </table>
 
-      </div>
+          </div>
 
-    </div>
+        </div>
 
       </div>
 
