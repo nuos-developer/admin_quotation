@@ -13,6 +13,11 @@ export class AdminService {
         return this.http.get(`${environment.apiUrl}/admin/dashboard`);
     }
 
+    dashboardGraph(graph: string) {
+        return this.http.get(
+            `${environment.apiUrl}/admin/dashboard/graph?graph=${graph}`
+        );
+    }
     getUsers() {
         return this.http.get<ApiResponse<any[]>>(
             `${environment.apiUrl}/admin/getUsers`

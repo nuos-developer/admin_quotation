@@ -1,341 +1,476 @@
 <div class="sticky-bar">
+    <!-- ================= HEADER ================= -->
     <div class="page-header">
-
-        <h2>Products</h2>
-
+        <h3>Products</h3>
     </div>
-
     <!-- ================= TABS ================= -->
     <div class="tabs">
         <button type="button" class="tab" [class.active]="activeTab === 'ACTIVE'" (click)="switchTab('ACTIVE')">
             Active Products
-        </button>
 
+        </button>
         <button type="button" class="tab" [class.active]="activeTab === 'INACTIVE'" (click)="switchTab('INACTIVE')">
             Inactive Products
+
         </button>
     </div>
+    <!-- ================= SEARCH ================= -->
     <div class="search-box">
-
         <div class="search-filter-group">
-
             <input type="text" placeholder="🔍 Search Product..." [(ngModel)]="searchText" (input)="filterProducts()">
-
             <select class="category-filter" [(ngModel)]="selectedCategoryId" (change)="filterCategory()">
-
-                <option [ngValue]="null">Select Product Category</option>
-
+                <option [ngValue]="null">
+                    Select Product Category
+                </option>
                 <option *ngFor="let c of categories" [ngValue]="c.id">
                     {{ c.category_type }}
                 </option>
-
             </select>
         </div>
-
-        <button type="button" class="btn primary" *ngIf="activeTab === 'ACTIVE'" (click)="openAdd()">
+        <button *ngIf="activeTab === 'ACTIVE'" type="button" class="btn primary" (click)="openAdd()">
             ➕ Add Product
+
         </button>
-
     </div>
+    <!-- ===================================================== -->
+    <!-- ACTIVE PRODUCTS -->
+    <!-- ===================================================== -->
+ <div *ngIf="activeTab === 'ACTIVE'" class="table-wrapper">
 
-    <!-- ================= ACTIVE ================= -->
-    <div *ngIf="activeTab === 'ACTIVE'">
-        <table class="table">
+  <table class="table">
+
+    <thead>
+      <tr>
+        <th width="70">Sr. No.</th>
+        <th>Name</th>
+        <th>Category</th>
+
+        <th class="sortable" (click)="sortByCategory()">
+          Product Type
+          <span *ngIf="categorySortOrder==='asc'">▲</span>
+          <span *ngIf="categorySortOrder==='desc'">▼</span>
+        </th>
+
+        <th width="120">Price</th>
+
+        <th class="action-column">
+          Action
+        </th>
+      </tr>
+    </thead>
+
+    <tbody>
+
+      <tr *ngFor="let p of filteredActiveProducts; let i=index">
+
+        <td width="70">{{i+1}}</td>
+
+        <td>{{p.product_name}}</td>
+
+        <td>{{p.category_type}}</td>
+
+        <td>{{p.category}}</td>
+
+        <td>
+          {{ p.price | currency:'INR':'symbol':'1.0-0':'en-IN' }}
+        </td>
+
+        <td class="action-column">
+
+          <div class="action-group">
+
+            <button
+              type="button"
+              class="icon-btn view-btn"
+              (click)="viewProduct(p)">
+
+              👁
+
+              <span class="tooltip-text">
+                View
+              </span>
+
+            </button>
+
+            <button
+              type="button"
+              class="icon-btn edit-btn"
+              (click)="editProduct(p)">
+
+              ✏️
+
+              <span class="tooltip-text">
+                Edit
+              </span>
+
+            </button>
+
+            <button
+              type="button"
+              class="icon-btn delete-btn"
+              (click)="openConfirm('DEACTIVATE',p.id)">
+
+              🚫
+
+              <span class="tooltip-text">
+                Deactivate
+              </span>
+
+            </button>
+
+          </div>
+
+        </td>
+
+      </tr>
+
+    </tbody>
+
+  </table>
+
+</div>
+    <!-- ===================================================== -->
+    <!-- INACTIVE PRODUCTS -->
+    <!-- ===================================================== -->
+    <div *ngIf="activeTab==='INACTIVE'">
+        <table class="table inactive">
             <thead>
                 <tr>
-                    <th>Sr. No.</th>
-                    <th>Name</th>
-                    <th>Product Category</th>
-                    <th (click)="sortByCategory()" class="sortable">
-                        Product Type
-                        <span *ngIf="categorySortOrder === 'asc'">▲</span>
-                        <span *ngIf="categorySortOrder === 'desc'">▼</span>
+                    <th width="70">
+                        Sr. No.
                     </th>
-                    <th>Price</th>
-                    <th>Action</th>
+                    <th>
+                        Name
+                    </th>
+                    <th class="sortable" (click)="sortByCategory()">
+                        Product Type
+
+                        <span *ngIf="categorySortOrder==='asc'">
+                            ▲
+                        </span>
+                        <span *ngIf="categorySortOrder==='desc'">
+                            ▼
+                        </span>
+                    </th>
+                    <th width="120">
+                        Price
+                    </th>
+                    <th class="action-column">
+                        Action
+                    </th>
                 </tr>
             </thead>
             <tbody>
-                <tr *ngFor="let p of filteredActiveProducts; let i = index">
-                    <td>{{ i + 1 }}</td>
-                    <td>{{ p.product_name }}</td>
-                    <td>{{p.category_type}}</td>
-                    <td>{{ p.category }}</td>
-
-                    <td>{{ p.price | currency:'INR':'symbol':'1.0-0':'en-IN' }}</td>
+                <tr *ngFor="let p of filteredInactiveProducts; let i=index">
                     <td>
+                        {{i+1}}
+                    </td>
+                    <td>
+                        {{p.product_name}}
+                    </td>
+                    <td>
+                        {{p.category}}
+                    </td>
+                    <td>
+                        {{ p.price | currency:'INR':'symbol':'1.0-0':'en-IN' }}
+                    </td>
+                    <td class="action-column">
                         <div class="action-group">
-                            <button type="button" class="icon-btn" (click)="viewProduct(p)">👁</button>
-                            <button type="button" class="icon-btn" (click)="editProduct(p)">✏️</button>
-                            <button type="button" class="icon-btn danger"
-                                (click)="openConfirm('DEACTIVATE', p.id)">🚫</button>
+                            <!-- VIEW -->
+                            <button type="button" class="icon-btn view-btn" (click)="viewProduct(p)">
+                                👁
+
+                                <span class="tooltip-text">
+                                    View
+
+                                </span>
+                            </button>
+                            <!-- ACTIVATE -->
+                            <button type="button" class="icon-btn success-btn" (click)="openConfirm('ACTIVATE',p.id)">
+                                ✅
+
+                                <span class="tooltip-text">
+                                    Activate
+
+                                </span>
+                            </button>
                         </div>
                     </td>
                 </tr>
             </tbody>
         </table>
     </div>
+</div>
+<!-- ===================================================== -->
+<!-- CONFIRM MODAL -->
+<!-- ===================================================== -->
+<div class="modal" *ngIf="showConfirm">
+    <div class="modal-box small">
+        <h3>Confirm Action</h3>
+        <p>{{ confirmMessage }}</p>
+        <div class="modal-footer">
+            <button type="button" class="btn-no" (click)="confirmNo()">
+                No
 
-    <!-- ================= INACTIVE ================= -->
-    <div *ngIf="activeTab === 'INACTIVE'">
-        <table class="table inactive">
-            <thead>
-                <tr>
-                    <th>Sr. No</th>
-                    <th>Name</th>
-                    <th (click)="sortByCategory()" class="sortable">
-                        Product Type
-                        <span *ngIf="categorySortOrder === 'asc'">▲</span>
-                        <span *ngIf="categorySortOrder === 'desc'">▼</span>
-                    </th>
-                    <th>Price</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr *ngFor="let p of filteredInactiveProducts; let i = index">
-                    <td>{{i+1}}
-                    <td>{{ p.product_name }}</td>
-                    <td>{{ p.category }}</td>
-                    <td>{{ p.price | currency:'INR':'symbol':'1.0-0':'en-IN' }}</td>
-                    <td>
-                        <button type="button" (click)="viewProduct(p)">👁</button>
-                        <button type="button" class="success" (click)="openConfirm('ACTIVATE', p.id)">✅</button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+            </button>
+            <button type="button" class="btn-yes" (click)="confirmYes()">
+                Yes
 
-    <!-- ================= CONFIRM MODAL ================= -->
-    <div class="modal" *ngIf="showConfirm">
-        <div class="modal-box small">
-            <h3>Confirm</h3>
-            <p>{{ confirmMessage }}</p>
-            <div class="modal-footer">
-                <button type="button" class="btn-no" (click)="confirmNo()">No</button>
-                <button type="button" class="btn-yes" (click)="confirmYes()">Yes</button>
-            </div>
+            </button>
         </div>
     </div>
+</div>
+<!-- ===================================================== -->
+<!-- VIEW PRODUCT MODAL -->
+<!-- ===================================================== -->
+<div class="modal" *ngIf="showView">
+    <div class="modal-box large">
+        <h2 class="modal-title">
+            Product Details
 
-    <!-- ================= VIEW PRODUCT MODAL ================= -->
-    <div class="modal" *ngIf="showView">
-        <div class="modal-box large">
-
-            <h3>Product Details</h3>
-
-            <!-- READ-ONLY FORM -->
-            <div class="form-grid">
-
-                <div class="form-field">
-                    <label>Product Name</label>
-                    <input [value]="selectedProduct.product_name" disabled>
-                </div>
-
-                <div class="form-field">
-                    <label>Product Type</label>
-                    <input [value]="selectedProduct.category" disabled>
-                </div>
-                <div class="form-field">
-                    <label>Category</label>
-                    <input [value]="getCategoryName(selectedProduct.category_id)" disabled>
-                </div>
-
-                <div class="form-field">
-                    <label>Mod Size</label>
-                    <input [value]="selectedProduct.mod_size" disabled>
-                </div>
-
-                <div class="form-field">
-                    <label>Price</label>
-                    <input [value]="'₹ ' + (selectedProduct.price | number:'1.0-0':'en-IN')" disabled>
-                </div>
-
-                <div class="form-field">
-                    <label>Wiring Type</label>
-                    <input [value]="getWiringName(selectedProduct.wiring_type_id)" disabled>
-                </div>
-                <div class="form-field">
-                    <label>Zigbee Type</label>
-                    <input [value]="selectedProduct.zigbee_type || '-'" disabled>
-                </div>
-                <div class="form-field">
-                    <label>Switch Load</label>
-                    <input [value]="selectedProduct.switch_load_count" disabled>
-                </div>
-                <div class="form-field">
-                    <label>Description</label>
-                    <textarea [value]="selectedProduct.description || '-'" rows="4" disabled>
-                    </textarea>
-                </div>
+        </h2>
+        <div class="form-grid">
+            <div class="form-field">
+                <label>Product Name</label>
+                <input [value]="selectedProduct.product_name" disabled>
             </div>
+            <div class="form-field">
+                <label>Product Type</label>
+                <input [value]="selectedProduct.category" disabled>
+            </div>
+            <div class="form-field">
+                <label>Category</label>
+                <input [value]="getCategoryName(selectedProduct.category_id)" disabled>
+            </div>
+            <div class="form-field">
+                <label>Mod Size</label>
+                <input [value]="selectedProduct.mod_size" disabled>
+            </div>
+            <div class="form-field">
+                <label>Price</label>
+                <input [value]="'₹ ' + (selectedProduct.price | number:'1.0-0':'en-IN')" disabled>
+            </div>
+            <div class="form-field">
+                <label>Wiring Type</label>
+                <input [value]="getWiringName(selectedProduct.wiring_type_id)" disabled>
+            </div>
+            <div class="form-field">
+                <label>Zigbee Type</label>
+                <input [value]="selectedProduct.zigbee_type || '-'" disabled>
+            </div>
+            <div class="form-field">
+                <label>Switch Load</label>
+                <input [value]="selectedProduct.switch_load_count || '-'" disabled>
+            </div>
+            <div class="form-field full-width">
+                <label>Description</label>
+                <textarea rows="4" [value]="selectedProduct.description || '-'" disabled>
+                                </textarea>
+            </div>
+        </div>
+        <!-- ================= PRODUCT IMAGES ================= -->
+        <div class="image-section" *ngIf="selectedProduct.image_urls?.length">
+            <h3>
+                Product Images
 
-            <!-- IMAGES -->
-            <h4>Product Images</h4>
-
+            </h3>
             <div class="image-grid">
-                <img *ngFor="let img of selectedProduct.image_urls" [src]="img" alt="product image"
+                <img *ngFor="let img of selectedProduct.image_urls" [src]="img" alt="Product Image"
                     (click)="openImagePreview(img)">
             </div>
+        </div>
+        <!-- ================= FOOTER ================= -->
+        <div class="modal-footer">
+            <button type="button" class="btn-cancel" (click)="close()">
+                Close
 
-            <div class="modal-footer">
-                <button class="btn-cancel" (click)="close()">Close</button>
-            </div>
-
+            </button>
         </div>
     </div>
-
-    <!-- ================= ADD / EDIT PRODUCT MODAL ================= -->
-    <div class="modal" *ngIf="showAdd || showEdit">
-        <div class="modal-box large">
-            <h3>{{ showAdd ? 'Add Product' : 'Edit Product' }}</h3>
-
-            <div class="form-grid">
-
-                <div class="form-field">
-                    <label>Product Name <span class="required">*</span></label>
-                    <input [(ngModel)]="productForm.product_name">
-                    <div class="error-msg" *ngIf="submitted && !productForm.product_name?.trim()">
-                        Product Name is required
-                    </div>
+</div>
+<!-- ===================================================== -->
+<!-- ADD / EDIT PRODUCT MODAL -->
+<!-- ===================================================== -->
+<div class="modal" *ngIf="showAdd || showEdit">
+    <div class="modal-box large">
+        <h2 class="modal-title">
+            {{ showAdd ? 'Add Product' : 'Edit Product' }}
+        </h2>
+        <div class="form-grid">
+            <!-- Product Name -->
+            <div class="form-field">
+                <label>
+                    Product Name
+                    <span class="required">*</span>
+                </label>
+                <input type="text" [(ngModel)]="productForm.product_name" placeholder="Enter Product Name">
+                <div class="error-msg" *ngIf="submitted && !productForm.product_name?.trim()">
+                    Product Name is required.
                 </div>
-
-                <div class="form-field">
-                    <label>Product Type <span class="required">*</span></label>
-
-                    <select [(ngModel)]="productForm.category">
-
-                        <option value="">
-                            Select Product Type
-                        </option>
-
-                        <option value="NUOS Products">
-                            NUOS Products
-                        </option>
-
-                        <option value="Non-NUOS Products">
-                            Non-NUOS Products
-                        </option>
-
-                    </select>
-                    <div class="error-msg" *ngIf="submitted && !productForm.category">
-                        Product Type is required
-                    </div>
-                </div>
-
-                <div class="form-field">
-                    <label>Mod Size</label>
-
-                    <select [(ngModel)]="productForm.mod_size">
-                        <option [ngValue]="null">Select Mod Size</option>
-                        <option [ngValue]="1">1</option>
-                        <option [ngValue]="2">2</option>
-                    </select>
-                </div>
-
-                <div class="form-field">
-                    <label>Price <span class="required">*</span></label>
-                    <input [(ngModel)]="productForm.price">
-                    <div class="error-msg"
-                        *ngIf="submitted && (productForm.price === '' || productForm.price === null || productForm.price === undefined)">
-                        Price is required
-                    </div>
-                </div>
-
-                <div class="form-field">
-                    <label>Wiring Type <span class="required">*</span></label>
-                    <select [(ngModel)]="productForm.wiring_type_id">
-                        <option [ngValue]="null">Select Wiring Type</option>
-                        <option *ngFor="let w of wiringTypes" [ngValue]="w.id">
-                            {{ w.wiring_name }}
-                        </option>
-                    </select>
-                    <div class="error-msg" *ngIf="submitted && !productForm.wiring_type_id">
-                        Wiring Type is required
-                    </div>
-                </div>
-
-                <div class="form-field">
-                    <label>Category <span class="required">*</span></label>
-
-                    <select [(ngModel)]="productForm.category_id">
-                        <option [ngValue]="null" selected>Select Category</option>
-
-                        <option *ngFor="let c of categories" [ngValue]="c.id">
-                            {{ c.category_type }}
-                        </option>
-                    </select>
-
-                    <div class="error-msg" *ngIf="submitted && !productForm.category_id">
-                        Category is required
-                    </div>
-                </div>
-
-
-
-                <div class="form-field">
-                    <label>Zigbee Type</label>
-                    <input [(ngModel)]="productForm.zigbee_type">
-                </div>
-                <div class="form-field">
-                    <label>Switch Load</label>
-                    <select [(ngModel)]="productForm.switch_load_count">
-                        {{productForm.switch_load_count | json}}
-                        <option [ngValue]="null">Select Switch Load</option>
-                        <option [ngValue]="1">1</option>
-                        <option [ngValue]="2">2</option>
-                        <option [ngValue]="3">3</option>
-                        <option [ngValue]="4">4</option>
-                    </select>
-                </div>
-
-
-                <div class="form-field">
-                    <label>Description</label>
-                    <textarea [(ngModel)]="productForm.description" name="description" rows="4"
-                        placeholder="Enter product description">
-                    </textarea>
-                </div>
-
-
-                <div class="form-field full">
-                    <label>Product Images</label>
-                    <input type="file" multiple (change)="onFileChange($event)">
-                </div>
-                <div class="form-field full" *ngIf="showEdit && productForm.image_urls?.length">
-
-                    <label>Product Image</label>
-
-                    <div class="image-grid">
-
-                        <img *ngFor="let img of productForm.image_urls" [src]="img" alt="Product Image"
-                            (click)="openImagePreview(img)">
-
-                    </div>
-
-                </div>
-
             </div>
+            <!-- Product Type -->
+            <div class="form-field">
+                <label>
+                    Product Type
+                    <span class="required">*</span>
+                </label>
+                <select [(ngModel)]="productForm.category">
+                    <option value="">
+                        Select Product Type
+                    </option>
+                    <option value="NUOS Products">
+                        NUOS Products
+                    </option>
+                    <option value="Non-NUOS Products">
+                        Non-NUOS Products
+                    </option>
+                </select>
+                <div class="error-msg" *ngIf="submitted && !productForm.category">
+                    Product Type is required.
+                </div>
+            </div>
+            <!-- Category -->
+            <div class="form-field">
+                <label>
+                    Category
+                    <span class="required">*</span>
+                </label>
+                <select [(ngModel)]="productForm.category_id">
+                    <option [ngValue]="null">
+                        Select Category
+                    </option>
+                    <option *ngFor="let c of categories" [ngValue]="c.id">
+                        {{ c.category_type }}
+                    </option>
+                </select>
+                <div class="error-msg" *ngIf="submitted && !productForm.category_id">
+                    Category is required.
+                </div>
+            </div>
+            <!-- Mod Size -->
+            <div class="form-field">
+                <label>
+                    Mod Size
 
+                </label>
+                <select [(ngModel)]="productForm.mod_size">
+                    <option [ngValue]="null">
+                        Select Mod Size
 
-            <div class="modal-footer">
-                <button class="btn-cancel" (click)="close()">Close</button>
-                <button type="button" [ngClass]="showAdd ? 'btn-submit' : 'btn-update'"
-                    (click)="showAdd ? addProduct() : updateProduct()">
+                    </option>
+                    <option [ngValue]="1">1</option>
+                    <option [ngValue]="2">2</option>
+                </select>
+            </div>
+            <!-- Price -->
+            <div class="form-field">
+                <label>
+                    Price
 
-                    {{ showAdd ? 'Save' : 'Update' }}
-                </button>
+                    <span class="required">*</span>
+                </label>
+                <input type="number" [(ngModel)]="productForm.price" placeholder="Enter Price">
+                <div class="error-msg" *ngIf="submitted &&
+                                        (productForm.price === '' ||
+                                         productForm.price === null ||
+                                         productForm.price === undefined)">
+                    Price is required.
+                </div>
+            </div>
+            <!-- Wiring Type -->
+            <div class="form-field">
+                <label>
+                    Wiring Type
+
+                    <span class="required">*</span>
+                </label>
+                <select [(ngModel)]="productForm.wiring_type_id">
+                    <option [ngValue]="null">
+                        Select Wiring Type
+
+                    </option>
+                    <option *ngFor="let w of wiringTypes" [ngValue]="w.id">
+                        {{ w.wiring_name }}
+                    </option>
+                </select>
+                <div class="error-msg" *ngIf="submitted && !productForm.wiring_type_id">
+                    Wiring Type is required.
+                </div>
+            </div>
+            <!-- Zigbee -->
+            <div class="form-field">
+                <label>
+                    Zigbee Type
+
+                </label>
+                <input type="text" [(ngModel)]="productForm.zigbee_type" placeholder="Enter Zigbee Type">
+            </div>
+            <!-- Switch Load -->
+            <div class="form-field">
+                <label>
+                    Switch Load
+
+                </label>
+                <select [(ngModel)]="productForm.switch_load_count">
+                    <option [ngValue]="1">1</option>
+                    <option [ngValue]="2">2</option>
+                    <option [ngValue]="3">3</option>
+                    <option [ngValue]="4">4</option>
+                </select>
+            </div>
+            <!-- Description -->
+            <div class="form-field full-width">
+                <label>
+                    Description
+
+                </label>
+                <textarea rows="4" [(ngModel)]="productForm.description" placeholder="Enter Product Description">
+                                </textarea>
+            </div>
+            <!-- Upload Images -->
+            <div class="form-field full-width">
+                <label>
+                    Product Images
+
+                </label>
+                <input type="file" multiple (change)="onFileChange($event)">
+            </div>
+            <!-- Existing Images -->
+            <div class="form-field full-width" *ngIf="showEdit && productForm.image_urls?.length">
+                <label>
+                    Existing Images
+
+                </label>
+                <div class="image-grid">
+                    <img *ngFor="let img of productForm.image_urls" [src]="img" alt="Product Image"
+                        (click)="openImagePreview(img)">
+                </div>
             </div>
         </div>
-    </div>
+        <!-- Footer -->
+        <div class="modal-footer">
+            <button type="button" class="btn-cancel" (click)="close()">
+                Close
 
-
-
-    <!-- ================= IMAGE PREVIEW ================= -->
-    <div class="modal" *ngIf="previewImage" (click)="closeImagePreview()">
-        <div class="image-preview-box" (click)="$event.stopPropagation()">
-            <img [src]="previewImage">
-            <button class="image-close" (click)="closeImagePreview()">✕</button>
+            </button>
+            <button type="button" [ngClass]="showAdd ? 'btn-submit' : 'btn-update'"
+                (click)="showAdd ? addProduct() : updateProduct()">
+                {{ showAdd ? 'Save Product' : 'Update Product' }}
+            </button>
         </div>
     </div>
+</div>
+<!-- ===================================================== -->
+<!-- IMAGE PREVIEW MODAL -->
+<!-- ===================================================== -->
+<div class="modal image-modal" *ngIf="previewImage" (click)="closeImagePreview()">
+    <div class="image-preview-box" (click)="$event.stopPropagation()">
+        <!-- Close Button -->
+        <button type="button" class="image-close" (click)="closeImagePreview()">
+            ✕
+
+        </button>
+        <!-- Preview Image -->
+        <img [src]="previewImage" alt="Product Image">
+    </div>
+</div>

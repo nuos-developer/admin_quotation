@@ -1,40 +1,114 @@
 <div class="container">
 
   <!-- ================= LIST ================= -->
-  <div *ngIf="!selectedProposal">
-    <h2>Proposal List</h2>
-    <div class="search-box">
-      <input type="text" placeholder="🔍 Search by client name..." [(ngModel)]="searchText"
-        (input)="filterProposals()" />
+ <div *ngIf="!selectedProposal" class="sticky-bar">
+
+    <!-- Header -->
+    <div class="page-header">
+        <h2>Proposal List</h2>
     </div>
 
-    <table class="table">
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Proposal ID</th>
-          <th>Proposal Type</th>
-          <th>Client Name</th>
-          <th>Created By</th>
-          <th>Action</th>
-        </tr>
-      </thead>
+    <!-- Search -->
+    <div class="search-box">
+        <input
+            type="text"
+            class="search-input"
+            placeholder="🔍 Search by Client Name..."
+            [(ngModel)]="searchText"
+            (input)="filterProposals()">
+    </div>
 
-      <tbody>
-        <tr *ngFor="let p of filteredProposals; index as i">
-          <td>{{ i + 1 }}</td>
-          <td>{{ p.id || '-' }}</td>
-          <td>{{ p.proposal_type || '-' }}</td>
-          <td>{{ p.client_details?.first_name }} {{ p.client_details?.last_name }}</td>
-          <td>{{ p.created_by?.user_name }}</td>
-          <td>
-            <button (click)="viewProposal(p)">👁</button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+    <!-- Table -->
+    <div class="table-container table-scroll">
 
+        <table class="table">
+
+            <thead>
+
+                <tr>
+
+                    <th width="70">Sr. No.</th>
+
+                    <th width="130">Proposal ID</th>
+
+                    <th>Proposal Type</th>
+
+                    <th>Client Name</th>
+
+                    <th>Created By</th>
+
+                    <th class="action-column">Action</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                <tr *ngFor="let p of filteredProposals; let i=index">
+
+                    <td>{{i+1}}</td>
+
+                    <td>{{p.id || '-'}}</td>
+
+                    <td>{{p.proposal_type || '-'}}</td>
+
+                    <td>
+
+                        {{p.client_details?.first_name}}
+
+                        {{p.client_details?.last_name}}
+
+                    </td>
+
+                    <td>
+
+                        {{p.created_by?.user_name}}
+
+                    </td>
+
+                    <td class="action-column">
+
+                        <div class="action-group">
+
+                            <button
+                                type="button"
+                                class="icon-btn view-btn"
+                                (click)="viewProposal(p)">
+
+                                👁
+
+                                <span class="tooltip-text">
+
+                                    View Proposal
+
+                                </span>
+
+                            </button>
+
+                        </div>
+
+                    </td>
+
+                </tr>
+
+                <tr *ngIf="filteredProposals.length===0">
+
+                    <td colspan="6" class="no-data">
+
+                        No Proposal Found
+
+                    </td>
+
+                </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
 
   <!-- ================= VIEW ================= -->
   <div id="proposal-pdf">

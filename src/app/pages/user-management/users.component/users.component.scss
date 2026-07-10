@@ -1,314 +1,581 @@
-/* ===============================
-   TABLE
-================================ */
-.table {
-  width: 100%;
-  border-collapse: collapse;
+/*=====================================================
+  USERS PAGE
+=====================================================*/
+* {
+    box-sizing: border-box;
 }
-
-th, td {
-  padding: 10px;
-  border-bottom: 1px solid #e5e7eb;
+:host {
+    display: block;
+    padding: 20px;
+    background: #f6f8fb;
 }
-
-button {
-  margin-right: 6px;
-  cursor: pointer;
-}
-
-button.danger {
-  color: red;
-}
-
-/* ===============================
-   MODAL BASE
-================================ */
-.modal {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.45);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-.modal-box {
-  background: #fff;
-  padding: 20px;
-  border-radius: 10px;
-  width: 700px;
-
-  &.small {
-    width: 400px;
-    text-align: center;
-  }
-}
-
-.modal-box.xlarge {
-  max-width: 1100px;
-}
-
-/* ===============================
-   MODAL SECTIONS
-================================ */
-.modal-header {
-  padding: 16px 24px;
-  border-bottom: 1px solid #e5e7eb;
-}
-
-.modal-body {
-  padding: 20px 24px;
-  overflow-y: auto;
-}
-
-.modal-footer {
-  padding: 16px 24px;
-  border-top: 1px solid #e5e7eb;
-  display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-}
-
-.sub-title {
-  font-size: 13px;
-  color: #6b7280;
-}
-
-/* ===============================
-   FORM SECTIONS
-================================ */
-.section-title {
-  font-weight: 600;
-  margin: 20px 0 10px;
-  color: #374151;
-}
-
-/* 3-column grid */
-.form-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
-}
-
-/* Labels & Inputs */
-label {
-  font-size: 15px;
-  color: #374151;
-  margin-bottom: 4px;
-  display: block;
-}
-
-input,
-select {
-  width: 80%;
-  padding: 12px 14px;
-  border: 1px solid #39393a;
-  border-radius: 6px;
-  font-size: 14px;
-}
-
-input:focus,
-select:focus {
-  outline: none;
-  border-color: #2563eb;
-  box-shadow: 0 0 0 1px #2563eb33;
-}
-
-/* ===============================
-   ROLE SECTION
-================================ */
-.role-section {
-  max-width: 300px;
-  margin-bottom: 20px;
-}
-
-/* ===============================
-   PERMISSION GRID
-================================ */
-.permission-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 16px;
-}
-
-.permission-card {
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  padding: 14px;
-  background: #f9fafb;
-}
-
-.card-header {
-  font-weight: 600;
-  margin-bottom: 10px;
-  color: #1f2937;
-}
-
-.checkbox-group {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 6px;
-  font-size: 14px;
-}
-
-.checkbox-group label {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-/* ===============================
-   BUTTONS
-================================ */
-button.primary {
-  background: #2563eb;
-  color: #fff;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 6px;
-}
-
-button.secondary {
-  background: #e5e7eb;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 6px;
-}
-
-.save-btn {
-  margin-top: 10px;
-  width: 100%;
-  background: #2563eb;
-  color: #fff;
-  border: none;
-  padding: 6px;
-  border-radius: 6px;
-}
-
-button:hover {
-  opacity: 0.9;
-}
-
-/* ===============================
-   RESPONSIVE
-================================ */
-@media (max-width: 900px) {
-  .form-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (max-width: 600px) {
-  .form-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 768px) {
-  .permission-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-
-.table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 10px;
-  font-size: 16px;
-}
-
-.table th {
-  background: #f4f6f9;
-  padding: 10px;
-  text-align: left;
-  font-weight: 800;
-}
-
-.table td {
-  padding: 10px;
-  border-bottom: 1px solid #eee;
-}
-
-/* Hover */
-.table tr:hover {
-  background: #fafafa;
-}
-
+/*=====================================================
+  PAGE HEADER
+=====================================================*/
 .page-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
 }
-
+.page-header h2 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 700;
+    color: #222;
+}
+/*=====================================================
+  STICKY CONTAINER
+=====================================================*/
+.sticky-bar {
+    background: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, .08);
+}
+/*=====================================================
+  SEARCH
+=====================================================*/
+.search-box {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    margin-bottom: 20px;
+}
 .search-input {
-  padding: 8px 12px;
-  border-radius: 6px;
-  border: 1px solid #ffffff;
-  width: 250px;
+    width: 320px;
+    height: 42px;
+    border: 1px solid #d9d9d9;
+    border-radius: 8px;
+    padding: 0 14px;
+    font-size: 14px;
+    transition: .25s;
 }
-
 .search-input:focus {
-  border-color: #1976d2;
-  outline: none;
+    outline: none;
+    border-color: #4f46e5;
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, .15);
 }
-
-.user-card {
-  background: #f8fafc;
-  padding: 12px 15px;
-  border-radius: 8px;
-  display: flex;
-  justify-content: unset;
-  font-size: 16px;
+/*=====================================================
+  TABLE CONTAINER
+=====================================================*/
+.table-container {
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, .06);
 }
-
-.user-info div {
-  margin-bottom: 6px;
-  font-size: 16px;
-   padding: 2px 15px;
+/*=====================================================
+  TABLE
+=====================================================*/
+.table {
+    width: 100%;
+    border-collapse: collapse;
 }
-
-.sticky-header {
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  background: #fff;
-  margin: 0;
-  padding: 10px 0;
+.table thead {
+    background: #f8fafc;
 }
-
-.sticky-search {
-  position: sticky;
-  top: 50px;
-  z-index: 99;
-  background: #fff;
-  padding: 10px 0;
+.table th {
+    padding: 15px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 600;
+    color: #374151;
+    border-bottom: 1px solid #e5e7eb;
 }
-
-
-.btn-no {
-  background: #e5e7eb;
-  /* light gray */
-  color: #333;
-  padding: 8px 14px;
-  border-radius: 6px;
-  border: none;
+.table td {
+    padding: 15px;
+    text-align: center;
+    font-size: 14px;
+    color: #4b5563;
+    border-bottom: 1px solid #f1f5f9;
 }
-
-.btn-no:hover {
-  background: #d1d5db;
+.table tbody tr {
+    transition: .25s;
 }
-
-/* YES (Confirm) */
+.table tbody tr:hover {
+    background: #f9fbff;
+}
+/*=====================================================
+  NO DATA
+=====================================================*/
+.no-data {
+    padding: 30px;
+    color: #6b7280;
+    font-size: 15px;
+    text-align: center;
+}
+/*=====================================================
+  ACTION COLUMN
+=====================================================*/
+.action-column {
+    width: 180px;
+    text-align: center;
+}
+.action-group {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+}
+/*=====================================================
+  ICON BUTTON
+=====================================================*/
+.icon-btn {
+    position: relative;
+    width: 38px;
+    height: 38px;
+    border: none;
+    border-radius: 50%;
+    background: #f3f4f6;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: .25s;
+    font-size: 18px;
+}
+.icon-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, .12);
+}
+/*=====================================================
+  ICON COLORS
+=====================================================*/
+.view-btn {
+    color: #2563eb;
+}
+.view-btn:hover {
+    background: #dbeafe;
+}
+.permission-btn {
+    color: #7c3aed;
+}
+.permission-btn:hover {
+    background: #ede9fe;
+}
+.delete-btn {
+    color: #dc2626;
+}
+.delete-btn:hover {
+    background: #fee2e2;
+}
+/*=====================================================
+  TOOLTIP
+=====================================================*/
+.tooltip-text {
+    position: absolute;
+    left: 50%;
+    bottom: 125%;
+    transform: translateX(-50%);
+    background: #222;
+    color: #fff;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    white-space: nowrap;
+    visibility: hidden;
+    opacity: 0;
+    transition: .25s;
+    pointer-events: none;
+    z-index: 9999;
+}
+.tooltip-text::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 5px;
+    border-style: solid;
+    border-color: #222 transparent transparent transparent;
+}
+.icon-btn:hover .tooltip-text {
+    visibility: visible;
+    opacity: 1;
+    bottom: 135%;
+}
+/*=====================================================
+  MODAL
+=====================================================*/
+.modal {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgba(0, 0, 0, .45);
+    z-index: 9999;
+    animation: fadeIn .25s ease;
+}
+@keyframes fadeIn {
+    from {
+      opacity: 0;
+  }
+  to {
+      opacity: 1;
+  }
+}
+/*=====================================================
+  MODAL BOX
+=====================================================*/
+.modal-box {
+    background: #fff;
+    border-radius: 12px;
+    width: 750px;
+    max-width: 95%;
+    max-height: 90vh;
+    overflow: auto;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, .18);
+    animation: popup .25s ease;
+}
+@keyframes popup {
+    from {
+      opacity: 0;
+      transform: scale(.9);
+  }
+  to {
+      opacity: 1;
+      transform: scale(1);
+  }
+}
+.modal-box.large {
+    width: 900px;
+}
+.modal-box.xlarge {
+    width: 1150px;
+}
+.modal-box.small {
+    width: 420px;
+    text-align: center;
+}
+/*=====================================================
+  MODAL HEADER
+=====================================================*/
+.modal-header {
+    padding: 22px 24px;
+    border-bottom: 1px solid #ececec;
+}
+.modal-title {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 700;
+    color: #222;
+}
+/*=====================================================
+  MODAL BODY
+=====================================================*/
+.modal-body {
+    padding: 25px;
+}
+/*=====================================================
+  MODAL FOOTER
+=====================================================*/
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 20px 24px;
+    border-top: 1px solid #ececec;
+}
+/*=====================================================
+  FORM GRID
+=====================================================*/
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px;
+}
+.full-width {
+    grid-column: 1/-1;
+}
+/*=====================================================
+  FORM FIELD
+=====================================================*/
+.form-field {
+    display: flex;
+    flex-direction: column;
+}
+.form-field label {
+    margin-bottom: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #444;
+}
+/*=====================================================
+  INPUT
+=====================================================*/
+.form-field input,
+.form-field textarea,
+.role-section select {
+    width: 100%;
+    border: 1px solid #d9d9d9;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 14px;
+    transition: .25s;
+    background: #fff;
+}
+.form-field input {
+    height: 42px;
+}
+.form-field textarea {
+    resize: none;
+    min-height: 90px;
+}
+.form-field input:focus,
+.form-field textarea:focus,
+.role-section select:focus {
+    outline: none;
+    border-color: #4f46e5;
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, .15);
+}
+.form-field input:disabled,
+.form-field textarea:disabled {
+    background: #f8f9fa;
+}
+/*=====================================================
+ USER INFO CARD
+=====================================================*/
+.user-info-card {
+    margin-top: 20px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+}
+.info-item {
+    background: #f8fafc;
+    padding: 15px;
+    border-radius: 10px;
+    border: 1px solid #e5e7eb;
+}
+.info-item .title {
+    display: block;
+    font-size: 13px;
+    color: #6b7280;
+    margin-bottom: 6px;
+}
+.info-item .value {
+    font-size: 15px;
+    font-weight: 600;
+    color: #111827;
+}
+/*=====================================================
+ ROLE
+=====================================================*/
+.role-section {
+    max-width: 320px;
+    margin-bottom: 25px;
+}
+.role-section label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+/*=====================================================
+ PERMISSION GRID
+=====================================================*/
+.permission-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 18px;
+}
+/*=====================================================
+ PERMISSION CARD
+=====================================================*/
+.permission-card {
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    background: #fff;
+    padding: 18px;
+    transition: .25s;
+}
+.permission-card:hover {
+    box-shadow: 0 6px 18px rgba(0, 0, 0, .08);
+    transform: translateY(-2px);
+}
+.card-header {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 15px;
+    color: #111827;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #ececec;
+}
+/*=====================================================
+ CHECKBOX
+=====================================================*/
+.checkbox-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+.checkbox-group label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 14px;
+}
+.checkbox-group input {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+}
+/*=====================================================
+ BUTTONS
+=====================================================*/
+.btn-cancel,
+.btn-submit,
+.btn-update,
+.btn-no,
 .btn-yes {
-  background: #16a34a;
-  /* green */
-  color: #fff;
-  padding: 8px 14px;
-  border-radius: 6px;
-  border: none;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: .25s;
 }
-
+/* Cancel */
+.btn-cancel,
+.btn-no {
+    background: #e5e7eb;
+    color: #333;
+}
+.btn-cancel:hover,
+.btn-no:hover {
+    background: #d1d5db;
+}
+/* Save */
+.btn-submit {
+    background: #16a34a;
+    color: #fff;
+}
+.btn-submit:hover {
+    background: #15803d;
+}
+/* Update */
+.btn-update {
+    background: #2563eb;
+    color: #fff;
+}
+.btn-update:hover {
+    background: #1d4ed8;
+}
+/* Yes */
+.btn-yes {
+    background: #16a34a;
+    color: #fff;
+}
 .btn-yes:hover {
-  background: #15803d;
+    background: #15803d;
+}
+/*=====================================================
+ DELETE MODAL
+=====================================================*/
+.confirm-icon {
+    width: 70px;
+    height: 70px;
+    margin: 10px auto 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #fee2e2;
+    color: #dc2626;
+    font-size: 34px;
+    border-radius: 50%;
+}
+.confirm-title {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 700;
+    text-align: center;
+}
+.confirm-message {
+    margin: 20px 0;
+    text-align: center;
+    line-height: 1.7;
+    font-size: 15px;
+    color: #555;
+}
+/*=====================================================
+ RESPONSIVE
+=====================================================*/
+@media(max-width:992px) {
+    .form-grid {
+      grid-template-columns: 1fr;
+  }
+  .user-info-card {
+      grid-template-columns: 1fr;
+  }
+  .permission-grid {
+      grid-template-columns: 1fr 1fr;
+  }
+}
+@media(max-width:768px) {
+    .permission-grid {
+      grid-template-columns: 1fr;
+  }
+  .modal-footer {
+      flex-direction: column;
+  }
+  .modal-footer button {
+      width: 100%;
+  }
+  .search-input {
+      width: 100%;
+  }
+}
+/*=========================================
+  TABLE SCROLL
+=========================================*/
+
+.table-scroll{
+
+    max-height: calc(100vh - 220px);
+
+    overflow-y: auto;
+
+    overflow-x: hidden;
+
 }
 
+/* Sticky Header */
+
+.table-scroll .table thead th{
+
+    position: sticky;
+
+    top: 0;
+
+    z-index: 100;
+
+    background: #f8fafc;
+
+    box-shadow: 0 1px 0 #e5e7eb;
+
+}
+
+/* Scrollbar */
+
+.table-scroll::-webkit-scrollbar{
+
+    width:8px;
+
+}
+
+.table-scroll::-webkit-scrollbar-thumb{
+
+    background:#cbd5e1;
+
+    border-radius:10px;
+
+}
+
+.table-scroll::-webkit-scrollbar-thumb:hover{
+
+    background:#94a3b8;
+
+}

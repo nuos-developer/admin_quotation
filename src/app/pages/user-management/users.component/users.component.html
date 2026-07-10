@@ -1,237 +1,360 @@
-<h2>Users</h2>
-<div class="page-header">
-  <input type="text" placeholder="🔍 Search user..." [(ngModel)]="searchText" (input)="filterUsers()"
-    class="search-input" />
-</div>
+<!-- ===================================================== -->
+<!-- PAGE HEADER -->
+<!-- ===================================================== -->
+<div class="sticky-bar">
+  <div class="page-header">
+    <h2>Users</h2>
+  </div>
+  <!-- ================= SEARCH ================= -->
+  <div class="search-box">
+    <input type="text" class="search-input" placeholder="🔍 Search User..." [(ngModel)]="searchText"
+      (input)="filterUsers()">
+  </div>
+  <!-- ===================================================== -->
+  <!-- USERS TABLE -->
+  <!-- ===================================================== -->
+  <div class="table-container table-scroll">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Mobile</th>
+          <th>Status</th>
+          <th class="action-column">
+            Action
 
-<div class="table-container">
-  <table class="table">
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Email</th>
-        <th>Mobile</th>
-        <th>Status</th>
-        <!-- <th>Approved At</th> -->
-        <th>Action</th>
-      </tr>
-    </thead>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let u of filteredUsers">
+          <td>
+            {{u.user_name}}
+          </td>
+          <td>
+            {{u.email_id}}
+          </td>
+          <td>
+            {{u.mobile_number}}
+          </td>
+          <td>
+            {{u.is_admin_approve}}
+          </td>
+          <!-- ================= ACTION ================= -->
+          <td class="action-column">
+            <div class="action-group">
+              <!-- VIEW -->
+              <button type="button" class="icon-btn view-btn" (click)="viewUser(u)">
+                👁
 
-    <tbody>
-      <tr *ngFor="let u of filteredUsers">
-        <td>{{ u.user_name }}</td>
-        <td>{{ u.email_id }}</td>
-        <td>{{ u.mobile_number }}</td>
-        <td>{{ u.is_admin_approve }}</td>
-        <!-- <td>{{u.approved_at | date:'dd-MM-yyyy HH:mm:ss'}}</td> -->
-        <td>
-          <button (click)="viewUser(u)">👁</button>
-          <button (click)="openPermission(u)">🔑</button>
-          <button class="delete-btn" (click)="openDeleteConfirm(u)">
-            🗑️</button>
-        </td>
-      </tr>
-    </tbody>
-  </table>
-</div>
+                <span class="tooltip-text">
+                  View
 
-<!-- ================= VIEW USER MODAL ================= -->
-<div class="modal" *ngIf="showView">
-  <div class="modal-box large">
+                </span>
+              </button>
+              <!-- PERMISSION -->
+              <button type="button" class="icon-btn permission-btn" (click)="openPermission(u)">
+                🔑
 
-    <div class="modal-header">
-      <h3>User Details</h3>
-    </div>
+                <span class="tooltip-text">
+                  Manage Permission
 
-    <div class="modal-body">
+                </span>
+              </button>
+              <!-- DELETE -->
+              <button type="button" class="icon-btn delete-btn" (click)="openDeleteConfirm(u)">
+                🗑️
 
-      <div class="form-grid">
-        <div>
-          <label>User Name</label>
-          <input [(ngModel)]="selectedUser.user_name" disabled>
-        </div>
+                <span class="tooltip-text">
+                  Delete
 
-        <div> <label>First Name</label>
-          <input [(ngModel)]="selectedUser.first_name" disabled>
-        </div>
-        <div> <label>Last Name</label>
-          <input [(ngModel)]="selectedUser.last_name" disabled>
-        </div>
+                </span>
+              </button>
+            </div>
+          </td>
+        </tr>
+        <!-- Empty Record -->
+        <tr *ngIf="filteredUsers.length === 0">
+          <td colspan="5" class="no-data">
+            No Users Found
 
-        <div>
-          <label>Email</label>
-          <input [(ngModel)]="selectedUser.email_id" disabled>
-        </div>
-
-        <div>
-          <label>Mobile</label>
-          <input [(ngModel)]="selectedUser.mobile_number" disabled>
-        </div>
-
-        <div>
-          <label>Status</label>
-          <input [(ngModel)]="selectedUser.is_admin_approve" disabled>
-        </div>
-        <div>
-          <label>Address</label>
-          <input [(ngModel)]="selectedUser.address" disabled>
-        </div>
-        <div>
-          <label>Pin code</label>
-          <input [(ngModel)]="selectedUser.pin_code" disabled>
-        </div>
-        <div>
-          <label>Country</label>
-          <input [(ngModel)]="selectedUser.country" disabled>
-        </div>
-        <div>
-          <label>State</label>
-          <input [(ngModel)]="selectedUser.state" disabled>
-        </div>
-        <div>
-          <label>District</label>
-          <input [(ngModel)]="selectedUser.district" disabled>
-        </div>
-        <div>
-          <label>Taluk</label>
-          <input [(ngModel)]="selectedUser.taluk" disabled>
-        </div>
-        <div>
-          <label>Division</label>
-          <input [(ngModel)]="selectedUser.division" disabled>
-        </div>
-        <div>
-          <label>Region</label>
-          <input [(ngModel)]="selectedUser.region" disabled>
-        </div>
-        <div>
-          <label>Company Name</label>
-          <input [(ngModel)]="selectedUser.company_name" disabled>
-        </div>
-        <div>
-          <label>Company Address</label>
-          <input [(ngModel)]="selectedUser.company_address" disabled>
-        </div>
-        <div>
-          <label>Gst Name</label>
-          <input [(ngModel)]="selectedUser.gst_name" disabled>
-        </div>
-        <div>
-          <label>Role Name</label>
-          <input [(ngModel)]="selectedUser.role_name" disabled>
-        </div>
-        <div>
-          <label>Registered Date And Time</label>
-          <input [value]="selectedUser?.registed_at | date:'dd-MM-yyyy HH:mm:ss'" disabled>
-        </div>
-
-        <div>
-          <label>Approved Date And Time</label>
-          <input [value]="selectedUser?.approved_at | date:'dd-MM-yyyy HH:mm:ss'" disabled>
-        </div>
-
-      </div>
-
-    </div>
-
-    <div class="modal-footer">
-      <button class="secondary" (click)="close()">Close</button>
-    </div>
-
+          </td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 </div>
-
-<!-- ================= PERMISSION MODAL ================= -->
-<div class="modal" *ngIf="showPermission">
-  <div class="modal-box xlarge">
-
+<!-- ===================================================== -->
+<!-- VIEW USER MODAL -->
+<!-- ===================================================== -->
+<div class="modal" *ngIf="showView">
+  <div class="modal-box large">
+    <!-- ================= HEADER ================= -->
     <div class="modal-header">
-      <h3>Manage Permissions</h3>
-      <div class="user-info">
-        <div><strong>User Name:</strong> {{ selectedUser.user_name }}</div>
-        <div><strong>Email:</strong> {{ selectedUser.email_id }}</div>
-        <div><strong>Request Role:</strong> {{ selectedUser.role_name }}</div>
+      <h2 class="modal-title">
+        User Details
+
+      </h2>
+    </div>
+    <!-- ================= BODY ================= -->
+    <div class="modal-body">
+      <div class="form-grid">
+        <!-- User Name -->
+        <div class="form-field">
+          <label>User Name</label>
+          <input [value]="selectedUser.user_name" disabled>
+        </div>
+        <!-- First Name -->
+        <div class="form-field">
+          <label>First Name</label>
+          <input [value]="selectedUser.first_name" disabled>
+        </div>
+        <!-- Last Name -->
+        <div class="form-field">
+          <label>Last Name</label>
+          <input [value]="selectedUser.last_name" disabled>
+        </div>
+        <!-- Email -->
+        <div class="form-field">
+          <label>Email Address</label>
+          <input [value]="selectedUser.email_id" disabled>
+        </div>
+        <!-- Mobile -->
+        <div class="form-field">
+          <label>Mobile Number</label>
+          <input [value]="selectedUser.mobile_number" disabled>
+        </div>
+        <!-- Status -->
+        <div class="form-field">
+          <label>Status</label>
+          <input [value]="selectedUser.is_admin_approve" disabled>
+        </div>
+        <!-- Address -->
+        <div class="form-field full-width">
+          <label>Address</label>
+          <textarea rows="3" [value]="selectedUser.address" disabled>
+                            </textarea>
+        </div>
+        <!-- Pincode -->
+        <div class="form-field">
+          <label>Pin Code</label>
+          <input [value]="selectedUser.pin_code" disabled>
+        </div>
+        <!-- Country -->
+        <div class="form-field">
+          <label>Country</label>
+          <input [value]="selectedUser.country" disabled>
+        </div>
+        <!-- State -->
+        <div class="form-field">
+          <label>State</label>
+          <input [value]="selectedUser.state" disabled>
+        </div>
+        <!-- District -->
+        <div class="form-field">
+          <label>District</label>
+          <input [value]="selectedUser.district" disabled>
+        </div>
+        <!-- Taluk -->
+        <div class="form-field">
+          <label>Taluk</label>
+          <input [value]="selectedUser.taluk" disabled>
+        </div>
+        <!-- Division -->
+        <div class="form-field">
+          <label>Division</label>
+          <input [value]="selectedUser.division" disabled>
+        </div>
+        <!-- Region -->
+        <div class="form-field">
+          <label>Region</label>
+          <input [value]="selectedUser.region" disabled>
+        </div>
+        <!-- Company Name -->
+        <div class="form-field">
+          <label>Company Name</label>
+          <input [value]="selectedUser.company_name" disabled>
+        </div>
+        <!-- Company Address -->
+        <div class="form-field full-width">
+          <label>Company Address</label>
+          <textarea rows="3" [value]="selectedUser.company_address" disabled>
+                            </textarea>
+        </div>
+        <!-- GST Name -->
+        <div class="form-field">
+          <label>GST Name</label>
+          <input [value]="selectedUser.gst_name" disabled>
+        </div>
+        <!-- Role -->
+        <div class="form-field">
+          <label>Role Name</label>
+          <input [value]="selectedUser.role_name" disabled>
+        </div>
+        <!-- Registered -->
+        <div class="form-field">
+          <label>Registered Date & Time</label>
+          <input [value]="selectedUser?.registed_at | date:'dd-MM-yyyy HH:mm:ss'" disabled>
+        </div>
+        <!-- Approved -->
+        <div class="form-field">
+          <label>Approved Date & Time</label>
+          <input [value]="selectedUser?.approved_at | date:'dd-MM-yyyy HH:mm:ss'" disabled>
+        </div>
       </div>
     </div>
+    <!-- ================= FOOTER ================= -->
+    <div class="modal-footer">
+      <button type="button" class="btn-cancel" (click)="close()">
+        Close
 
+      </button>
+    </div>
+  </div>
+</div>
+<!-- ===================================================== -->
+<!-- PERMISSION MODAL -->
+<!-- ===================================================== -->
+<div class="modal" *ngIf="showPermission">
+  <div class="modal-box xlarge">
+    <!-- ================= HEADER ================= -->
+    <div class="modal-header">
+      <h2 class="modal-title">
+        Manage User Permissions
+
+      </h2>
+      <!-- User Information -->
+      <div class="user-info-card">
+        <div class="info-item">
+          <span class="title">
+            User Name
+
+          </span>
+          <span class="value">
+            {{ selectedUser.user_name }}
+          </span>
+        </div>
+        <div class="info-item">
+          <span class="title">
+            Email
+
+          </span>
+          <span class="value">
+            {{ selectedUser.email_id }}
+          </span>
+        </div>
+        <div class="info-item">
+          <span class="title">
+            Requested Role
+
+          </span>
+          <span class="value">
+            {{ selectedUser.role_name }}
+          </span>
+        </div>
+      </div>
+    </div>
+    <!-- ================= BODY ================= -->
     <div class="modal-body">
-
-      <!-- ROLE -->
+      <!-- Role Selection -->
       <div class="role-section">
-        <label>Assign Role</label>
+        <label>
+          Assign Role
+
+        </label>
         <select [(ngModel)]="selectedRoleId">
-          <option [ngValue]="null">Select Role</option>
+          <option [ngValue]="null">
+            Select Role
+
+          </option>
           <option *ngFor="let role of roles" [ngValue]="role.id">
             {{ role.role_name }}
           </option>
         </select>
       </div>
-
-      <!-- MODULE PERMISSIONS -->
+      <!-- Permission Cards -->
       <div class="permission-grid">
         <div class="permission-card" *ngFor="let module of modules">
-
+          <!-- Card Header -->
           <div class="card-header">
             {{ module.module_name | titlecase }}
           </div>
-
+          <!-- Card Body -->
           <div class="checkbox-group">
             <label>
               <input type="checkbox" [(ngModel)]="permissionsMap[module.id].can_create" (change)="onPermissionChange()">
               Create
-            </label>
 
+            </label>
             <label>
               <input type="checkbox" [(ngModel)]="permissionsMap[module.id].can_view" (change)="onPermissionChange()">
               View
-            </label>
 
+            </label>
             <label>
               <input type="checkbox" [(ngModel)]="permissionsMap[module.id].can_update" (change)="onPermissionChange()">
               Update
-            </label>
 
+            </label>
             <label>
               <input type="checkbox" [(ngModel)]="permissionsMap[module.id].can_delete" (change)="onPermissionChange()">
               Delete
+
             </label>
           </div>
-
         </div>
       </div>
-
     </div>
-
+    <!-- ================= FOOTER ================= -->
     <div class="modal-footer">
-      <button class="secondary" (click)="close()">Cancel</button>
-      <button class="primary" [disabled]="!hasPermissionSelected" (click)="saveAllPermissions()">
+      <button type="button" class="btn-cancel" (click)="close()">
+        Cancel
+
+      </button>
+      <button type="button" class="btn-submit" [disabled]="!hasPermissionSelected" (click)="saveAllPermissions()">
         Save Permissions
+
       </button>
     </div>
-
   </div>
 </div>
-
-<!-- DELETE CONFIRM MODAL -->
+<!-- ===================================================== -->
+<!-- DELETE USER CONFIRMATION MODAL -->
+<!-- ===================================================== -->
 <div class="modal" *ngIf="showDeleteConfirm">
   <div class="modal-box small">
+    <!-- ================= ICON ================= -->
+    <div class="confirm-icon">
+      🗑️
 
-    <h3>Confirm Delete</h3>
+    </div>
+    <!-- ================= TITLE ================= -->
+    <h2 class="confirm-title">
+      Delete User
 
-    <p>
+    </h2>
+    <!-- ================= MESSAGE ================= -->
+    <p class="confirm-message">
       Are you sure you want to delete
-      <strong>{{ selectedUser?.user_name }}</strong>?
-    </p>
 
+      <strong>
+        {{ selectedUser?.user_name }}
+      </strong>
+      ?
+      <br><br>
+      This action cannot be undone.
+    </p>
+    <!-- ================= FOOTER ================= -->
     <div class="modal-footer">
       <button type="button" class="btn-no" (click)="cancelDelete()">
-        No
-      </button>
+        Cancel
 
+      </button>
       <button type="button" class="btn-yes" (click)="deleteUser()">
         Delete
+
       </button>
     </div>
-
   </div>
 </div>

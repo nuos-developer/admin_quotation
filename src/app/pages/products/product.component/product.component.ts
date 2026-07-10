@@ -1,15 +1,16 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
+// import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
 import { AdminService } from '../../../core/services/admin.service';
 import { LoaderService } from '../../../core/services/loader.service';
 import { ToastService } from '../../../core/services/toast.service';
 
+
 @Component({
   selector: 'app-product',
   standalone: true,
-  imports: [CommonModule, FormsModule, NgMultiSelectDropDownModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './product.component.html',
   styleUrl: './product.component.scss',
 })
@@ -48,7 +49,7 @@ export class ProductComponent implements OnInit {
     wiring_type_id: null,
     category_id: null,
     zigbee_type: null,
-    switch_load_count: null,
+    switch_load_count: 1,
     description: null,
     images: []
   };
@@ -385,7 +386,7 @@ export class ProductComponent implements OnInit {
       wiring_type_id: null,
       category_id: null,
       zigbee_type: null,
-      switch_load_count: null,
+      switch_load_count: 1,
       description: null,
       images: []
     };
