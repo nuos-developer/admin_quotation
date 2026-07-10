@@ -137,7 +137,6 @@ export class ProductComponent implements OnInit {
 
     const fd = new FormData();
 
-    console.log('WIRING TYPE ID:', this.productForm.wiring_type_id);
 
     Object.keys(this.productForm).forEach(key => {
       if (key !== 'images') {

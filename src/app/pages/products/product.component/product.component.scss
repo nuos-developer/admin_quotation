@@ -568,13 +568,15 @@ width:100%;
 
 .table-wrapper{
 
-    background:#fff;
+    max-height:650px;
+
+    overflow-y:auto;
+
+    overflow-x:auto;
 
     border-radius:12px;
 
-    overflow:hidden;
-
-    box-shadow:0 2px 10px rgba(0,0,0,.08);
+    border:1px solid #e5e7eb;
 
 }
 
@@ -602,7 +604,13 @@ width:100%;
 
 .table thead th{
 
+    position:sticky;
+
+    top:0;
+
     background:#f8fafc;
+
+    z-index:100;
 
     padding:14px;
 
@@ -610,10 +618,8 @@ width:100%;
 
     border-bottom:1px solid #ddd;
 
-    font-weight:600;
-
-    z-index:5;
 }
+
 
 /* Scroll Body */
 
@@ -646,6 +652,7 @@ width:100%;
     text-align:center;
 
     border-bottom:1px solid #eee;
+
 }
 
 .table tbody tr:hover{

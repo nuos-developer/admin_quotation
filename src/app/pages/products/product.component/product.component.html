@@ -35,100 +35,91 @@
     <!-- ===================================================== -->
     <!-- ACTIVE PRODUCTS -->
     <!-- ===================================================== -->
- <div *ngIf="activeTab === 'ACTIVE'" class="table-wrapper">
+    <div *ngIf="activeTab === 'ACTIVE'" class="table-wrapper">
 
-  <table class="table">
+        <table class="table">
 
-    <thead>
-      <tr>
-        <th width="70">Sr. No.</th>
-        <th>Name</th>
-        <th>Category</th>
+            <thead>
+                <tr>
+                    <th style="width:70px">Sr. No.</th>
+                    <th>Name</th>
+                    <th style="width:220px">Category</th>
 
-        <th class="sortable" (click)="sortByCategory()">
-          Product Type
-          <span *ngIf="categorySortOrder==='asc'">▲</span>
-          <span *ngIf="categorySortOrder==='desc'">▼</span>
-        </th>
+                    <th style="width:220px" class="sortable" (click)="sortByCategory()">
+                        Product Type
+                        <span *ngIf="categorySortOrder==='asc'">▲</span>
+                        <span *ngIf="categorySortOrder==='desc'">▼</span>
+                    </th>
 
-        <th width="120">Price</th>
+                    <th style="width:140px">Price</th>
 
-        <th class="action-column">
-          Action
-        </th>
-      </tr>
-    </thead>
+                    <th style="width:180px" class="action-column">
+                        Action
+                    </th>
+                </tr>
+            </thead>
 
-    <tbody>
+            <tbody>
 
-      <tr *ngFor="let p of filteredActiveProducts; let i=index">
+                <tr *ngFor="let p of filteredActiveProducts; let i=index">
 
-        <td width="70">{{i+1}}</td>
+                    <td style="width:70px">{{i+1}}</td>
 
-        <td>{{p.product_name}}</td>
+                    <td>{{p.product_name}}</td>
 
-        <td>{{p.category_type}}</td>
+                    <td style="width:220px">{{p.category_type}}</td>
 
-        <td>{{p.category}}</td>
+                    <td style="width:220px">{{p.category}}</td>
 
-        <td>
-          {{ p.price | currency:'INR':'symbol':'1.0-0':'en-IN' }}
-        </td>
+                    <td style="width:140px">
+                        {{ p.price | currency:'INR':'symbol':'1.0-0':'en-IN' }}
+                    </td>
 
-        <td class="action-column">
+                    <td style="width:180px" class="action-column">
 
-          <div class="action-group">
+                        <div class="action-group">
 
-            <button
-              type="button"
-              class="icon-btn view-btn"
-              (click)="viewProduct(p)">
+                            <button type="button" class="icon-btn view-btn" (click)="viewProduct(p)">
 
-              👁
+                                👁
 
-              <span class="tooltip-text">
-                View
-              </span>
+                                <span class="tooltip-text">
+                                    View
+                                </span>
 
-            </button>
+                            </button>
 
-            <button
-              type="button"
-              class="icon-btn edit-btn"
-              (click)="editProduct(p)">
+                            <button type="button" class="icon-btn edit-btn" (click)="editProduct(p)">
 
-              ✏️
+                                ✏️
 
-              <span class="tooltip-text">
-                Edit
-              </span>
+                                <span class="tooltip-text">
+                                    Edit
+                                </span>
 
-            </button>
+                            </button>
 
-            <button
-              type="button"
-              class="icon-btn delete-btn"
-              (click)="openConfirm('DEACTIVATE',p.id)">
+                            <button type="button" class="icon-btn delete-btn" (click)="openConfirm('DEACTIVATE',p.id)">
 
-              🚫
+                                🚫
 
-              <span class="tooltip-text">
-                Deactivate
-              </span>
+                                <span class="tooltip-text">
+                                    Deactivate
+                                </span>
 
-            </button>
+                            </button>
 
-          </div>
+                        </div>
 
-        </td>
+                    </td>
 
-      </tr>
+                </tr>
 
-    </tbody>
+            </tbody>
 
-  </table>
+        </table>
 
-</div>
+    </div>
     <!-- ===================================================== -->
     <!-- INACTIVE PRODUCTS -->
     <!-- ===================================================== -->
@@ -136,13 +127,12 @@
         <table class="table inactive">
             <thead>
                 <tr>
-                    <th width="70">
-                        Sr. No.
-                    </th>
+                   <th style="width:70px">Sr. No.</th>
                     <th>
                         Name
                     </th>
-                    <th class="sortable" (click)="sortByCategory()">
+                    <th style="width:220px">Category</th>
+                    <th style="width:220px" class="sortable" (click)="sortByCategory()">
                         Product Type
 
                         <span *ngIf="categorySortOrder==='asc'">
@@ -152,29 +142,22 @@
                             ▼
                         </span>
                     </th>
-                    <th width="120">
-                        Price
-                    </th>
-                    <th class="action-column">
-                        Action
-                    </th>
+                    <th style="width:140px">Price</th>
+                   <th style="width:180px">Action</th>
                 </tr>
             </thead>
             <tbody>
                 <tr *ngFor="let p of filteredInactiveProducts; let i=index">
-                    <td>
-                        {{i+1}}
-                    </td>
-                    <td>
-                        {{p.product_name}}
-                    </td>
-                    <td>
+                    <td style="width:70px">{{i+1}}</td>
+                    <td>{{p.product_name}}</td>
+                    <td style="width:220px">{{p.category_type}}</td>
+                    <td style="width:220px">
                         {{p.category}}
                     </td>
-                    <td>
+                    <td style="width:140px">
                         {{ p.price | currency:'INR':'symbol':'1.0-0':'en-IN' }}
                     </td>
-                    <td class="action-column">
+                    <td style="width:180px" class="action-column">
                         <div class="action-group">
                             <!-- VIEW -->
                             <button type="button" class="icon-btn view-btn" (click)="viewProduct(p)">

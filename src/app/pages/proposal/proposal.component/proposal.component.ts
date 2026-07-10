@@ -58,7 +58,6 @@ export class ProposalComponent implements OnInit {
 
 
   getFloors() {
-    console.log(this.selectedProposal?.floor);
     return this.toArray(this.selectedProposal?.floor);
   }
 
