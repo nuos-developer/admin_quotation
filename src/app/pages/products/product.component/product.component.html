@@ -127,7 +127,7 @@
         <table class="table inactive">
             <thead>
                 <tr>
-                   <th style="width:70px">Sr. No.</th>
+                    <th style="width:70px">Sr. No.</th>
                     <th>
                         Name
                     </th>
@@ -143,7 +143,7 @@
                         </span>
                     </th>
                     <th style="width:140px">Price</th>
-                   <th style="width:180px">Action</th>
+                    <th style="width:180px">Action</th>
                 </tr>
             </thead>
             <tbody>
@@ -229,6 +229,16 @@
                 <label>Mod Size</label>
                 <input [value]="selectedProduct.mod_size" disabled>
             </div>
+            <div class="form-field">
+                <label>MRP Price</label>
+                <input [value]="'₹ ' + (selectedProduct.mrp_price | number:'1.0-0':'en-IN')" disabled>
+            </div>
+
+            <div class="form-field">
+                <label>Discount (%)</label>
+                <input [value]="selectedProduct.discount_percentage + ' %'" disabled>
+            </div>
+
             <div class="form-field">
                 <label>Price</label>
                 <input [value]="'₹ ' + (selectedProduct.price | number:'1.0-0':'en-IN')" disabled>
@@ -346,19 +356,33 @@
                 </select>
             </div>
             <!-- Price -->
+            <!-- MRP Price -->
+            <div class="form-field">
+                <label>
+                    MRP Price
+                    <span class="required">*</span>
+                </label>
+
+                <input type="number" [(ngModel)]="productForm.mrp_price" (input)="calculatePrice()"
+                    placeholder="Enter MRP Price">
+            </div>
+
+            <!-- Discount -->
+            <div class="form-field">
+                <label>Discount (%)</label>
+
+                <input type="number" min="0" max="100" [(ngModel)]="productForm.discount_percentage"
+                    (input)="calculatePrice()" placeholder="Enter Discount">
+            </div>
+
+            <!-- Final Price -->
             <div class="form-field">
                 <label>
                     Price
-
                     <span class="required">*</span>
                 </label>
-                <input type="number" [(ngModel)]="productForm.price" placeholder="Enter Price">
-                <div class="error-msg" *ngIf="submitted &&
-                                        (productForm.price === '' ||
-                                         productForm.price === null ||
-                                         productForm.price === undefined)">
-                    Price is required.
-                </div>
+
+                <input type="number" [(ngModel)]="productForm.price" readonly>
             </div>
             <!-- Wiring Type -->
             <div class="form-field">
@@ -392,7 +416,7 @@
             <div class="form-field">
                 <label>
                     Switch Load
-
+                      <span class="required">*</span>
                 </label>
                 <select [(ngModel)]="productForm.switch_load_count">
                     <option [ngValue]="1">1</option>

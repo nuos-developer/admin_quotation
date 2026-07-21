@@ -45,7 +45,11 @@ export class ProductComponent implements OnInit {
     product_name: '',
     category: '',
     mod_size: null,
+
+    mrp_price: '',
+    discount_percentage: '',
     price: '',
+
     wiring_type_id: null,
     category_id: null,
     zigbee_type: null,
@@ -176,6 +180,8 @@ export class ProductComponent implements OnInit {
     fd.append('product_name', this.productForm.product_name);
     fd.append('category', this.productForm.category);
     fd.append('mod_size', this.productForm.mod_size || '');
+    fd.append('mrp_price', this.productForm.mrp_price);
+    fd.append('discount_percentage', this.productForm.discount_percentage);
     fd.append('price', this.productForm.price);
     fd.append('wiring_type_id', this.productForm.wiring_type_id);
     fd.append('category_id', this.productForm.category_id);
@@ -301,22 +307,26 @@ export class ProductComponent implements OnInit {
   editProduct(p: any): void {
 
     this.productForm = {
+
       id: p.id,
+
       product_name: p.product_name,
       category: p.category,
       mod_size: p.mod_size,
+
+      mrp_price: p.mrp_price,
+      discount_percentage: p.discount_percentage,
       price: p.price,
+
       wiring_type_id: p.wiring_type_id,
       category_id: p.category_id,
       zigbee_type: p.zigbee_type,
       switch_load_count: p.switch_load_count,
       description: p.description,
 
-      // New images selected by user
       images: [],
-
-      // Existing images
       image_urls: p.image_urls || []
+
     };
 
     this.showModal = true;
@@ -381,7 +391,11 @@ export class ProductComponent implements OnInit {
       product_name: '',
       category: '',
       mod_size: null,
+
+      mrp_price: '',
+      discount_percentage: '',
       price: '',
+
       wiring_type_id: null,
       category_id: null,
       zigbee_type: null,
@@ -484,26 +498,35 @@ export class ProductComponent implements OnInit {
 
   filterCategory(): void {
 
-  const search = this.searchText.toLowerCase().trim();
+    const search = this.searchText.toLowerCase().trim();
 
-  const filter = (products: any[]) =>
-    products.filter((p: any) => {
+    const filter = (products: any[]) =>
+      products.filter((p: any) => {
 
-      // Search by product name
-      const matchesSearch =
-        !search ||
-        (p.product_name || '').toLowerCase().includes(search);
+        // Search by product name
+        const matchesSearch =
+          !search ||
+          (p.product_name || '').toLowerCase().includes(search);
 
-      // Filter by selected category
-      const matchesCategory =
-        this.selectedCategoryId === null ||
-        p.category_id === this.selectedCategoryId;
+        // Filter by selected category
+        const matchesCategory =
+          this.selectedCategoryId === null ||
+          p.category_id === this.selectedCategoryId;
 
-      return matchesSearch && matchesCategory;
-    });
+        return matchesSearch && matchesCategory;
+      });
 
-  this.filteredActiveProducts = filter(this.activeProducts);
-  this.filteredInactiveProducts = filter(this.inactiveProducts);
-}
+    this.filteredActiveProducts = filter(this.activeProducts);
+    this.filteredInactiveProducts = filter(this.inactiveProducts);
+  }
 
+  calculatePrice(): void {
+
+    const mrp = Number(this.productForm.mrp_price) || 0;
+    const discount = Number(this.productForm.discount_percentage) || 0;
+
+    this.productForm.price =
+      mrp - (mrp * discount / 100);
+
+  }
 }
