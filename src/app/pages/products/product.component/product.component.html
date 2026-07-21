@@ -235,7 +235,7 @@
             </div>
 
             <div class="form-field">
-                <label>Discount (%)</label>
+                <label>Markup(%)</label>
                 <input [value]="selectedProduct.discount_percentage + ' %'" disabled>
             </div>
 
@@ -369,7 +369,7 @@
 
             <!-- Discount -->
             <div class="form-field">
-                <label>Discount (%)</label>
+                <label>Markup (%)</label>
 
                 <input type="number" min="0" max="100" [(ngModel)]="productForm.discount_percentage"
                     (input)="calculatePrice()" placeholder="Enter Discount">

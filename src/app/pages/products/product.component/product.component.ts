@@ -526,7 +526,7 @@ export class ProductComponent implements OnInit {
     const discount = Number(this.productForm.discount_percentage) || 0;
 
     this.productForm.price =
-      mrp - (mrp * discount / 100);
+      mrp + (mrp * discount / 100);
 
   }
 }
