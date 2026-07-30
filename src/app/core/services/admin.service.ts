@@ -18,6 +18,7 @@ export class AdminService {
             `${environment.apiUrl}/admin/dashboard/graph?graph=${graph}`
         );
     }
+
     getUsers() {
         return this.http.get<ApiResponse<any[]>>(
             `${environment.apiUrl}/admin/getUsers`
@@ -94,12 +95,38 @@ export class AdminService {
             `${environment.apiUrl}/admin/product/wire_type`
         );
     }
+
+    getPackages() {
+        return this.http.get<ApiResponse<any[]>>(
+            `${environment.apiUrl}/admin/product/get_package`
+        );
+    }
+
+    getProductName() {
+        return this.http.get<ApiResponse<any[]>>(
+            `${environment.apiUrl}/admin/product/get_product_name`
+        );
+    }
+
+    getRoomPackages() {
+        return this.http.get<any>(
+            `${environment.apiUrl}/admin/get_room_product_packages`
+        );
+    }
+
+    createRoomPackage(data: any) {
+        return this.http.post<any>(
+            `${environment.apiUrl}/admin/create_room_product_package`,
+            data
+        );
+    }
+
     getCategories() {
         return this.http.get<ApiResponse<any[]>>(
             `${environment.apiUrl}/admin/product/category_type`
         );
     }
-    
+
     getProposals() {
         return this.http.get<ApiResponse<any[]>>(
             `${environment.apiUrl}/admin/product/getproposal`
@@ -113,6 +140,19 @@ export class AdminService {
     deleteProposal(productId: number) {
         return this.http.delete<ApiResponse<any[]>>(
             `${environment.apiUrl}/admin/product/delete_proposal/${productId}`
+        );
+    }
+
+    updateRoomPackage(id: number, data: any) {
+        return this.http.put<any>(
+            `${environment.apiUrl}/admin/update_room_package/${id}`,
+            data
+        );
+    }
+
+    deleteRoomPackage(id: number) {
+        return this.http.delete<any>(
+            `${environment.apiUrl}/admin/delete_room_package/${id}`
         );
     }
 

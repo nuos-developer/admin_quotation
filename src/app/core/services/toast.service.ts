@@ -8,6 +8,12 @@ export interface Toast {
 
 @Injectable({ providedIn: 'root' })
 export class ToastService {
+  success(arg0: any) {
+    throw new Error('Method not implemented.');
+  }
+  error(message: any) {
+    throw new Error('Method not implemented.');
+  }
 
   private toastSubject = new BehaviorSubject<Toast | null>(null);
   toast$ = this.toastSubject.asObservable();
