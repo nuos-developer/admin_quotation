@@ -6,13 +6,21 @@ import { AdminService } from '../../core/services/admin.service';
 import { LoaderService } from '../../core/services/loader.service';
 import { ToastService } from '../../core/services/toast.service';
 
+interface SwitchboardForm {
+  switchboard_name: string;
+  panel_mod: number | null;
+  switch_board_product_id: number[];
+  // UI-only state, never sent to the API
+  _dropdownOpen?: boolean;
+  _search?: string;
+}
+
 interface PackageForm {
   id: number | null;
   package_id: number | null;
   room_name: string;
-  panel_mod: number | null;
-  switch_board_product_id: number[];
   room_product_id: number[];
+  switchboards: SwitchboardForm[];
 }
 
 @Component({
@@ -29,23 +37,21 @@ export class PackagesComponant implements OnInit {
 
   wiringTypes: any[] = [];
 
-  switchDropdownOpen = false;
   roomDropdownOpen = false;
-
   searchText: string = '';
 
   packageList: any[] = [];
   productList: any[] = [];
   panelModOptions: number[] = [2, 4, 6, 8, 10, 12];
-  switchSearch = '';
-roomSearch = '';
+
+  roomSearch = '';
 
   showAdd = false;
   showEdit = false;
   showView = false;
   submitted = false;
 
-   showConfirm = false;
+  showConfirm = false;
   confirmPackageId: number | null = null;
   confirmMessage = '';
 
@@ -67,7 +73,6 @@ roomSearch = '';
   /* ================= LOAD ================= */
 
   loadPackages(): void {
-
     this.loader.show();
 
     this.admin.getRoomPackages().subscribe({
@@ -81,11 +86,9 @@ roomSearch = '';
         this.loader.hide();
       }
     });
-
   }
 
- loadDropdowns(): void {
-
+  loadDropdowns(): void {
     this.admin.getPackages().subscribe({
       next: (res: any) => {
         this.packageList = res.data || [];
@@ -103,13 +106,11 @@ roomSearch = '';
         this.wiringTypes = res.data || res.resp?.data || [];
       }
     });
-
   }
 
   /* ================= SEARCH ================= */
 
   filterPackages(): void {
-
     const search = this.searchText.toLowerCase().trim();
 
     if (!search) {
@@ -121,7 +122,6 @@ roomSearch = '';
       (item.package_name || '').toLowerCase().includes(search) ||
       (item.room_name || '').toLowerCase().includes(search)
     );
-
   }
 
   /* ================= ADD ================= */
@@ -142,82 +142,49 @@ roomSearch = '';
   /* ================= EDIT ================= */
 
   editPackage(item: any): void {
-
     this.submitted = false;
 
     this.form = {
       id: item.id,
       package_id: item.package_id,
       room_name: item.room_name,
-      panel_mod: item.panel_mod,
-      switch_board_product_id:
-        (item.switch_board_products || []).map((x: any) => x.id),
-      room_product_id:
-        (item.room_products || []).map((x: any) => x.id)
+      room_product_id: (item.room_products || []).map((p: any) => p.id),
+      switchboards: (item.switchboards || []).map((sb: any) => ({
+        switchboard_name: sb.switchboard_name,
+        panel_mod: sb.panel_mod,
+        switch_board_product_id: (sb.products || []).map((p: any) => p.id),
+        _dropdownOpen: false,
+        _search: ''
+      }))
     };
 
     this.showEdit = true;
-
-    // Preselect multi-select options once the modal has rendered
-    setTimeout(() => {
-
-      const switchSelect =
-        document.getElementById('switchBoardSelect') as HTMLSelectElement | null;
-
-      const roomSelect =
-        document.getElementById('roomProductSelect') as HTMLSelectElement | null;
-
-      if (switchSelect) {
-        Array.from(switchSelect.options).forEach((o) => {
-          o.selected = this.form.switch_board_product_id.includes(Number(o.value));
-        });
-      }
-
-      if (roomSelect) {
-        Array.from(roomSelect.options).forEach((o) => {
-          o.selected = this.form.room_product_id.includes(Number(o.value));
-        });
-      }
-
-    });
-
-  }
-
-  onSwitchBoardChange(event: any): void {
-    this.form.switch_board_product_id = Array
-      .from(event.target.selectedOptions)
-      .map((x: any) => Number(x.value));
-  }
-
-  onRoomProductChange(event: any): void {
-    this.form.room_product_id = Array
-      .from(event.target.selectedOptions)
-      .map((x: any) => Number(x.value));
   }
 
   /* ================= SAVE ================= */
 
   savePackage(): void {
-
     this.submitted = true;
 
     if (!this.validateForm()) {
       return;
     }
 
+    // payload matches the API contract exactly - strip UI-only fields
     const payload = {
       package_id: this.form.package_id,
       room_name: this.form.room_name,
-      panel_mod: this.form.panel_mod,
-      created_by: 1,
-      switch_board_product_id: this.form.switch_board_product_id,
-      room_product_id: this.form.room_product_id
+      room_products: this.form.room_product_id,
+      switchboards: this.form.switchboards.map(sb => ({
+        switchboard_name: sb.switchboard_name,
+        panel_mod: sb.panel_mod,
+        switch_board_product_id: sb.switch_board_product_id
+      }))
     };
 
     this.loader.show();
 
     if (this.showAdd) {
-
       this.admin.createRoomPackage(payload).subscribe({
         next: () => {
           this.toast.show('Package created successfully.', 'success');
@@ -226,22 +193,14 @@ roomSearch = '';
           this.loadPackages();
         },
         error: (err: any) => {
-          this.toast.show(
-            err?.error?.message || 'Unable to create package.',
-            'error'
-          );
+          this.toast.show(err?.error?.message || 'Unable to create package.', 'error');
           this.loader.hide();
         }
       });
-
     } else {
-
-      // form.id is guaranteed to be set here because showEdit
-      // is only true after editPackage() has populated it.
-      this.admin.updateRoomPackage(
-        this.form.id as number,
-        payload
-      ).subscribe({
+      // form.id is guaranteed here because showEdit is only true
+      // after editPackage() has populated it.
+      this.admin.updateRoomPackage(this.form.id as number, payload).subscribe({
         next: () => {
           this.toast.show('Package updated successfully.', 'success');
           this.loader.hide();
@@ -249,20 +208,14 @@ roomSearch = '';
           this.loadPackages();
         },
         error: (err: any) => {
-          this.toast.show(
-            err?.error?.message || 'Unable to update package.',
-            'error'
-          );
+          this.toast.show(err?.error?.message || 'Unable to update package.', 'error');
           this.loader.hide();
         }
       });
-
     }
-
   }
 
   validateForm(): boolean {
-
     if (!this.form.package_id) {
       return false;
     }
@@ -271,12 +224,16 @@ roomSearch = '';
       return false;
     }
 
-    if (this.form.panel_mod === null || this.form.panel_mod === undefined) {
-      return false;
+    for (const sb of this.form.switchboards) {
+      if (!sb.switchboard_name?.trim()) {
+        return false;
+      }
+      if (sb.panel_mod === null || sb.panel_mod === undefined) {
+        return false;
+      }
     }
 
     return true;
-
   }
 
   /* ================= HELPERS ================= */
@@ -299,9 +256,8 @@ roomSearch = '';
       id: null,
       package_id: null,
       room_name: '',
-      panel_mod: null,
-      switch_board_product_id: [],
-      room_product_id: []
+      room_product_id: [],
+      switchboards: []
     };
   }
 
@@ -316,45 +272,218 @@ roomSearch = '';
   }
 
   onImageError(event: any): void {
-    console.log('Image failed to load:', event.target.src);
-
-    // Optional fallback image
     event.target.src = 'assets/images/no-image.png';
   }
 
-  /* ================= DROPDOWN CONTROL ================= */
+  /* ================= SWITCHBOARD ROWS ================= */
 
- toggleSwitchDropdown() {
+  addSwitchboard(): void {
+    this.form.switchboards.push({
+      switchboard_name: '',
+      panel_mod: null,
+      switch_board_product_id: [],
+      _dropdownOpen: false,
+      _search: ''
+    });
+  }
 
-    this.switchDropdownOpen = !this.switchDropdownOpen;
+  removeSwitchboard(index: number): void {
+    this.form.switchboards.splice(index, 1);
+  }
 
-    if (this.switchDropdownOpen) {
+  toggleSwitchboardDropdown(index: number): void {
+    const wasOpen = !!this.form.switchboards[index]._dropdownOpen;
 
-        this.roomDropdownOpen = false;
+    // Only one dropdown open at a time (room dropdown + all switchboard dropdowns)
+    this.roomDropdownOpen = false;
+    this.form.switchboards.forEach((sb, i) => {
+      sb._dropdownOpen = i === index ? !wasOpen : false;
+    });
 
-        this.switchSearch = '';
-
+    if (!wasOpen) {
+      this.form.switchboards[index]._search = '';
     }
-
-}
-
-  toggleRoomDropdown() {
-
-    this.roomDropdownOpen = !this.roomDropdownOpen;
-
-    if (this.roomDropdownOpen) {
-
-        this.switchDropdownOpen = false;
-
-        this.roomSearch = '';
-
-    }
-
-}
+  }
 
   closeDropdowns(): void {
-    this.switchDropdownOpen = false;
     this.roomDropdownOpen = false;
+    this.form.switchboards.forEach(sb => sb._dropdownOpen = false);
+  }
+
+  filteredSwitchProducts(index: number): any[] {
+    const search = (this.form.switchboards[index]._search || '').toLowerCase().trim();
+
+    if (!search) {
+      return this.switchBoardProductOptions;
+    }
+
+    return this.switchBoardProductOptions.filter((p: any) =>
+      p.product_name.toLowerCase().includes(search)
+    );
+  }
+
+  selectedSwitchProducts(index: number): any[] {
+    const ids = this.form.switchboards[index].switch_board_product_id;
+    return this.productList.filter((p: any) =>
+      p.category === 'NUOS Products' && ids.includes(p.id)
+    );
+  }
+
+  toggleSwitchProductSelection(index: number, productId: number): void {
+    const sb = this.form.switchboards[index];
+    const product = this.productList.find((p: any) => p.id === productId);
+
+    if (!product) {
+      return;
+    }
+
+    const alreadySelected = this.isSelected(productId, sb.switch_board_product_id);
+
+    // Removing a product is always allowed
+    if (alreadySelected) {
+      this.toggleSelection(productId, sb.switch_board_product_id);
+      return;
+    }
+
+    if (sb.panel_mod === null || sb.panel_mod === undefined) {
+      this.toast.show('Please select a Panel Mod before adding products.', 'error');
+      return;
+    }
+
+    if (!this.canSelectProduct(index, product)) {
+      this.toast.show(
+        `Panel Mod ${sb.panel_mod} has a capacity of ${sb.panel_mod} mod. Only ${this.getRemainingModSize(index)} mod remaining, this product needs ${product.mod_size}.`,
+        'error'
+      );
+      return;
+    }
+
+    this.toggleSelection(productId, sb.switch_board_product_id);
+  }
+
+  /**
+   * Capacity rule: total mod_size of selected products for a switchboard
+   * cannot exceed its panel_mod.
+   * panel_mod 2 -> 1 product (mod_size 2), 4 -> 2 products, 8 -> 4 products ...
+   */
+  getUsedModSize(index: number): number {
+    return this.selectedSwitchProducts(index)
+      .reduce((sum: number, p: any) => sum + (p.mod_size || 0), 0);
+  }
+
+  getRemainingModSize(index: number): number {
+    const sb = this.form.switchboards[index];
+
+    if (sb.panel_mod === null || sb.panel_mod === undefined) {
+      return 0;
+    }
+
+    return sb.panel_mod - this.getUsedModSize(index);
+  }
+
+  getMaxProductCount(index: number): number {
+    const sb = this.form.switchboards[index];
+
+    if (sb.panel_mod === null || sb.panel_mod === undefined) {
+      return 0;
+    }
+
+    // Assumes standard mod_size of 2 per product, matching panel_mod / 2
+    return Math.floor(sb.panel_mod / 2);
+  }
+
+  canSelectProduct(index: number, product: any): boolean {
+    const sb = this.form.switchboards[index];
+
+    if (sb.panel_mod === null || sb.panel_mod === undefined) {
+      return false;
+    }
+
+    if (this.isSelected(product.id, sb.switch_board_product_id)) {
+      return true;
+    }
+
+    return this.getRemainingModSize(index) >= (product.mod_size || 0);
+  }
+
+  isProductDisabled(index: number, product: any): boolean {
+    const sb = this.form.switchboards[index];
+
+    if (sb.panel_mod === null || sb.panel_mod === undefined) {
+      return true;
+    }
+
+    if (this.isSelected(product.id, sb.switch_board_product_id)) {
+      return false;
+    }
+
+    return this.getRemainingModSize(index) < (product.mod_size || 0);
+  }
+
+  /**
+   * When panel_mod changes, drop already-selected products that no
+   * longer fit the new (smaller) capacity, keeping earlier selections first.
+   */
+  onPanelModChange(index: number): void {
+    const sb = this.form.switchboards[index];
+
+    if (sb.panel_mod === null || sb.panel_mod === undefined) {
+      if (sb.switch_board_product_id.length) {
+        sb.switch_board_product_id = [];
+      }
+      return;
+    }
+
+    let used = 0;
+    const kept: number[] = [];
+
+    for (const id of sb.switch_board_product_id) {
+      const product = this.productList.find((p: any) => p.id === id);
+      const modSize = product?.mod_size || 0;
+
+      if (used + modSize <= sb.panel_mod) {
+        kept.push(id);
+        used += modSize;
+      }
+    }
+
+    if (kept.length !== sb.switch_board_product_id.length) {
+      this.toast.show(
+        'Some selected products were removed because they no longer fit the new Panel Mod.',
+        'error'
+      );
+    }
+
+    sb.switch_board_product_id = kept;
+  }
+
+  /* ================= ROOM PRODUCTS (Non-NUOS) DROPDOWN ================= */
+
+  toggleRoomDropdown(): void {
+    const wasOpen = this.roomDropdownOpen;
+
+    this.form.switchboards.forEach(sb => sb._dropdownOpen = false);
+    this.roomDropdownOpen = !wasOpen;
+
+    if (!wasOpen) {
+      this.roomSearch = '';
+    }
+  }
+
+  get filteredRoomProducts() {
+    if (!this.roomSearch) {
+      return this.roomProductOptions;
+    }
+
+    return this.roomProductOptions.filter((product: any) =>
+      product.product_name.toLowerCase().includes(this.roomSearch.toLowerCase())
+    );
+  }
+
+  get selectedRoomProducts(): any[] {
+    return this.productList.filter((p: any) =>
+      p.category === 'Non-NUOS Products' && this.form.room_product_id.includes(p.id)
+    );
   }
 
   /* ================= SELECTION ================= */
@@ -364,7 +493,6 @@ roomSearch = '';
   }
 
   toggleSelection(id: number, selectedIds: number[]): void {
-
     const index = selectedIds.indexOf(id);
 
     if (index > -1) {
@@ -372,39 +500,16 @@ roomSearch = '';
     } else {
       selectedIds.push(id);
     }
-
   }
 
-  /* ================= SELECTED PRODUCT LOOKUPS ================= */
-
-/* ================= DROPDOWN OPTIONS (filtered by category) ================= */
+  /* ================= PRODUCT OPTIONS (filtered by category) ================= */
 
   get switchBoardProductOptions(): any[] {
-    return this.productList.filter((p: any) =>
-      p.category === 'NUOS Products'
-    );
+    return this.productList.filter((p: any) => p.category === 'NUOS Products');
   }
 
   get roomProductOptions(): any[] {
-    return this.productList.filter((p: any) =>
-      p.category === 'Non-NUOS Products'
-    );
-  }
-
-  /* ================= SELECTED PRODUCT LOOKUPS ================= */
-
-  get selectedSwitchProducts(): any[] {
-    return this.productList.filter((p: any) =>
-      p.category === 'NUOS Products' &&
-      this.form.switch_board_product_id.includes(p.id)
-    );
-  }
-
-  get selectedRoomProducts(): any[] {
-    return this.productList.filter((p: any) =>
-      p.category === 'Non-NUOS Products' &&
-      this.form.room_product_id.includes(p.id)
-    );
+    return this.productList.filter((p: any) => p.category === 'Non-NUOS Products');
   }
 
   getWiringName(id: number): string {
@@ -412,86 +517,7 @@ roomSearch = '';
     return wiring ? wiring.wiring_name : '-';
   }
 
- get filteredSwitchBoardProducts() {
-
-    if (!this.switchSearch) {
-
-        return this.switchBoardProductOptions;
-
-    }
-
-    return this.switchBoardProductOptions.filter((product: any) =>
-
-        product.product_name
-            .toLowerCase()
-            .includes(this.switchSearch.toLowerCase())
-
-    );
-
-}
-
-get filteredRoomProducts() {
-
-    if (!this.roomSearch) {
-
-        return this.roomProductOptions;
-
-    }
-
-    return this.roomProductOptions.filter((product: any) =>
-
-        product.product_name
-            .toLowerCase()
-            .includes(this.roomSearch.toLowerCase())
-
-    );
-
-}
-
-deletePackage(item: any): void {
-
-  const confirmed = confirm(
-    `Are you sure you want to delete "${item.room_name}"?`
-  );
-
-  if (!confirmed) {
-    return;
-  }
-
-  // this.isLoading = true;
-
-  this.admin.deleteRoomPackage(item.id).subscribe({
-
-    next: (res: any) => {
-
-      // this.isLoading = false;
-
-      alert(res.message || 'Package deleted successfully.');
-
-      // Reload package list
-      this.loadPackages();
-
-    },
-
-    error: (err) => {
-
-      // this.isLoading = false;
-
-      console.error(err);
-
-      alert(
-        err?.error?.message || 'Something went wrong.'
-      );
-
-    }
-
-  });
-
-  
-
-}
-
-/* ================= DELETE ================= */
+  /* ================= DELETE ================= */
 
   openConfirm(id: number): void {
     this.confirmPackageId = id;
@@ -504,7 +530,6 @@ deletePackage(item: any): void {
   }
 
   confirmYes(): void {
-
     if (!this.confirmPackageId) {
       return;
     }
@@ -520,14 +545,10 @@ deletePackage(item: any): void {
         this.loadPackages();
       },
       error: (err: any) => {
-        this.toast.show(
-          err?.error?.message || 'Unable to delete package.',
-          'error'
-        );
+        this.toast.show(err?.error?.message || 'Unable to delete package.', 'error');
         this.loader.hide();
       }
     });
-
   }
 
   resetConfirm(): void {
@@ -535,6 +556,4 @@ deletePackage(item: any): void {
     this.confirmPackageId = null;
     this.confirmMessage = '';
   }
-
- 
 }

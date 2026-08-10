@@ -627,3 +627,128 @@ SCROLLBAR
     border-radius:10px;
 
 }
+/* ================= ORIGINAL IMAGE (Non-NUOS Products) ================= */
+.img-box.original-image {
+  background: #ffffff !important;
+}
+
+.img-box.original-image img {
+  filter: none !important; /* cancels the global brightness(0) invert(1) */
+}
+
+/* ================= STATUS DROPDOWN ================= */
+.status-dropdown {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.status-dropdown label {
+  font-size: 13px;
+  color: #555;
+}
+
+.status-dropdown select {
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  outline: none;
+  background: #fff;
+  transition: 0.2s ease;
+}
+
+.status-dropdown select:focus {
+  border-color: #1976d2;
+  box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.1);
+}
+
+.status-pending {
+  color: #b45309;
+  background: #fef3c7 !important;
+}
+
+.status-completed {
+  color: #16a34a;
+  background: #e6f4ea !important;
+}
+
+.status-rejected {
+  color: #dc2626;
+  background: #fee2e2 !important;
+}
+/* ================= STATUS CONFIRM MODAL ================= */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-box {
+  background: #fff;
+  border-radius: 10px;
+  padding: 24px 28px;
+  width: 340px;
+  max-width: 90vw;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+  text-align: center;
+}
+
+.modal-box h3 {
+  margin: 0 0 10px;
+  font-size: 17px;
+  color: #111;
+}
+
+.modal-box p {
+  margin: 0 0 20px;
+  font-size: 14px;
+  color: #555;
+}
+
+.modal-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.modal-actions .btn {
+  width: 100%;
+  padding: 10px 0;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.modal-no {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.modal-no:hover {
+  background: #e5e7eb;
+}
+
+.modal-yes {
+  background: #1976d2;
+  color: #fff;
+}
+
+.modal-yes:hover {
+  background: #1565c0;
+}
+
+.modal-yes-mail {
+  background: #16a34a;
+  color: #fff;
+}
+
+.modal-yes-mail:hover {
+  background: #15803d;
+}

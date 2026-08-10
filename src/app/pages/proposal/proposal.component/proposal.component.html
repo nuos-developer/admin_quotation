@@ -1,127 +1,108 @@
 <div class="container">
 
-  <!-- ================= LIST ================= -->
- <div *ngIf="!selectedProposal" class="sticky-bar">
+  <!-- ================= LIST VIEW ================= -->
+  <div *ngIf="!selectedProposal">
 
-    <!-- Header -->
-    <div class="page-header">
-        <h2>Proposal List</h2>
+    <div class="header">
+      <h2>📋 Proposals</h2>
     </div>
 
-    <!-- Search -->
+    <!-- SEARCH -->
     <div class="search-box">
-        <input
-            type="text"
-            class="search-input"
-            placeholder="🔍 Search by Client Name..."
-            [(ngModel)]="searchText"
-            (input)="filterProposals()">
+      <input type="text" placeholder="Search by client name..." [(ngModel)]="searchText"
+        (ngModelChange)="filterProposals()" />
     </div>
 
-    <!-- Table -->
-    <div class="table-container table-scroll">
-
+    <!-- TABLE -->
+    <div class="table-container">
+      <div class="table-scroll">
         <table class="table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Client Name</th>
+              <th>Mobile</th>
+              <th>Proposal type</th>
+              <th>Created By</th>
+              <th>Status</th>
+              <th class="action-column">Action</th>
+            </tr>
+          </thead>
 
-            <thead>
+          <tbody>
+            <tr *ngFor="let p of filteredProposals; let i = index">
+              <td>{{ i + 1 }}</td>
 
-                <tr>
+              <td>
+                {{ p.client_details?.first_name }}
+                {{ p.client_details?.last_name }}
+              </td>
 
-                    <th width="70">Sr. No.</th>
+              <td>{{ p.client_details?.mobile || '-' }}</td>
 
-                    <th width="130">Proposal ID</th>
+              <td>{{ p.proposal_type || '-' }}</td>
 
-                    <th>Proposal Type</th>
+              <td>{{ p.created_by?.user_name || '-' }}</td>
 
-                    <th>Client Name</th>
+              <td>
+                <span class="badge" [ngClass]="getStatusClass(p.proposal_status)">
+                  {{ p.proposal_status || 'Pending' }}
+                </span>
+              </td>
 
-                    <th>Created By</th>
+              <td class="action-column">
+                <div class="action-group">
+                  <button class="icon-btn view-btn" (click)="viewProposal(p)">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                      <circle cx="12" cy="12" r="3"></circle>
+                    </svg>
+                    <span class="tooltip-text">View Proposal</span>
+                  </button>
+                </div>
+              </td>
+            </tr>
 
-                    <th class="action-column">Action</th>
-
-                </tr>
-
-            </thead>
-
-            <tbody>
-
-                <tr *ngFor="let p of filteredProposals; let i=index">
-
-                    <td>{{i+1}}</td>
-
-                    <td>{{p.id || '-'}}</td>
-
-                    <td>{{p.proposal_type || '-'}}</td>
-
-                    <td>
-
-                        {{p.client_details?.first_name}}
-
-                        {{p.client_details?.last_name}}
-
-                    </td>
-
-                    <td>
-
-                        {{p.created_by?.user_name}}
-
-                    </td>
-
-                    <td class="action-column">
-
-                        <div class="action-group">
-
-                            <button
-                                type="button"
-                                class="icon-btn view-btn"
-                                (click)="viewProposal(p)">
-
-                                👁
-
-                                <span class="tooltip-text">
-
-                                    View Proposal
-
-                                </span>
-
-                            </button>
-
-                        </div>
-
-                    </td>
-
-                </tr>
-
-                <tr *ngIf="filteredProposals.length===0">
-
-                    <td colspan="6" class="no-data">
-
-                        No Proposal Found
-
-                    </td>
-
-                </tr>
-
-            </tbody>
-
+            <tr *ngIf="!filteredProposals.length">
+              <td colspan="7" class="no-data">No proposals found</td>
+            </tr>
+          </tbody>
         </table>
-
+      </div>
     </div>
 
-</div>
+  </div>
 
-  <!-- ================= VIEW ================= -->
+  <!-- ================= DETAIL / PDF VIEW ================= -->
   <div id="proposal-pdf">
     <div *ngIf="selectedProposal" class="proposal-view">
 
       <!-- HEADER -->
+      <!-- HEADER -->
       <div class="header">
         <div>
           <h2>📄 Proposal</h2>
-          <!-- <p class="muted">ID: {{ selectedProposal.proposal_id || selectedProposal.id }}</p> -->
         </div>
 
         <div class="actions">
+
+          <!-- 🔥 STATUS DROPDOWN — one-way bound, change goes through confirmation first -->
+          <div class="status-dropdown">
+            <label>Status:</label>
+
+            <select [ngModel]="selectedProposal.proposal_status"
+              [ngClass]="getStatusClass(selectedProposal.proposal_status)" (ngModelChange)="onStatusChange($event)">
+
+              <option [ngValue]="null" disabled>Select Status</option>
+
+              <option *ngFor="let s of statusOptions" [ngValue]="s">
+                {{ s }}
+              </option>
+
+            </select>
+          </div>
+
           <button class="btn back" (click)="backToList()">← Back</button>
           <button class="btn pdf" (click)="generatePDF()">Download PDF</button>
         </div>
@@ -436,8 +417,9 @@
         <div class="product-grid no-break">
           <div class="product-card" *ngFor="let p of selectedProposal.products_wise_items">
 
-            <div class="img-box">
-              <img *ngIf="p.images?.length" [src]="p.images[0]" />
+            <!-- 🔥 original-image class skips the white-invert filter for Non-NUOS Products -->
+            <div class="img-box" [class.original-image]="isOriginalImage(p.category)">
+              <img *ngIf="p.images?.length" [src]="p.images[0]" [attr.data-category]="p.category" />
 
               <div *ngIf="!p.images?.length" class="no-img">
                 No Image
@@ -484,10 +466,11 @@
 
                   <div *ngFor="let p of room.products" class="product-card">
 
-                    <!-- 🔥 COLOR APPLIED -->
-                    <div class="img-box" [style.background]="getColor(room.colorValue || floor.colorValue)">
+                    <!-- 🔥 COLOR APPLIED (skipped for Non-NUOS Products) -->
+                    <div class="img-box" [class.original-image]="isOriginalImage(p.category)"
+                      [style.background]="isOriginalImage(p.category) ? '#ffffff' : getColor(room.colorValue || floor.colorValue)">
 
-                      <img *ngIf="p.images?.length" [src]="p.images[0]" />
+                      <img *ngIf="p.images?.length" [src]="p.images[0]" [attr.data-category]="p.category" />
 
                       <div *ngIf="!p.images?.length" class="no-img">
                         No Image
@@ -536,11 +519,11 @@
 
                         <div *ngFor="let p of sb.products" class="product-card">
 
-                          <!-- 🔥 COLOR APPLIED -->
-                          <div class="img-box"
-                            [style.background]="getColor(sb.colorValue || room.colorValue || floor.colorValue)">
+                          <!-- 🔥 COLOR APPLIED (skipped for Non-NUOS Products) -->
+                          <div class="img-box" [class.original-image]="isOriginalImage(p.category)"
+                            [style.background]="isOriginalImage(p.category) ? '#ffffff' : getColor(sb.colorValue || room.colorValue || floor.colorValue)">
 
-                            <img *ngIf="p.images?.length" [src]="p.images[0]" />
+                            <img *ngIf="p.images?.length" [src]="p.images[0]" [attr.data-category]="p.category" />
 
                             <div *ngIf="!p.images?.length" class="no-img">
                               No Image
@@ -581,4 +564,28 @@
 
     </div>
   </div>
+
+
+  <!-- ================= STATUS CONFIRMATION MODAL ================= -->
+  <div class="modal-overlay" *ngIf="showStatusConfirm">
+    <div class="modal-box">
+
+      <h3>Confirm Status Change</h3>
+
+      <p>
+        Change status to
+        <strong>{{ statusToConfirm }}</strong>?
+      </p>
+
+      <div class="modal-actions">
+        <button class="btn modal-no" (click)="cancelStatusChange()">No</button>
+        <button class="btn modal-yes" (click)="confirmStatusChange(false)">Yes</button>
+        <button class="btn modal-yes-mail" (click)="confirmStatusChange(true)">
+          Yes, Send Mail
+        </button>
+      </div>
+
+    </div>
+  </div>
+
 </div>

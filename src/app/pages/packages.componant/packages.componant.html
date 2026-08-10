@@ -28,7 +28,6 @@
                     <th style="width:70px">Sr No</th>
                     <th>Package Name</th>
                     <th>Room Name</th>
-                    <th style="width:120px">Panel</th>
                     <th style="width:140px">Switch Boards</th>
                     <th style="width:140px">Room Products</th>
                     <th style="width:140px" class="action-column">Action</th>
@@ -45,11 +44,9 @@
 
                     <td>{{ item.room_name }}</td>
 
-                    <td style="width:120px">{{ item.panel_mod }}</td>
-
                     <td style="width:140px">
                         <span class="count-badge blue">
-                            {{ item.switch_board_products?.length || 0 }}
+                            {{ item.switchboards?.length || 0 }}
                         </span>
                     </td>
 
@@ -84,7 +81,7 @@
                 </tr>
 
                 <tr *ngIf="filteredPackages.length === 0">
-                    <td colspan="7" class="empty-row">No Package Found</td>
+                    <td colspan="6" class="empty-row">No Package Found</td>
                 </tr>
 
             </tbody>
@@ -113,7 +110,7 @@
                     Package
                     <span class="required">*</span>
                 </label>
-                <select [(ngModel)]="form.package_id">
+                <select [(ngModel)]="form.package_id" [ngModelOptions]="{standalone: true}">
                     <option [ngValue]="null">Select Package</option>
                     <option *ngFor="let item of packageList" [ngValue]="item.id">
                         {{ item.package_name }}
@@ -130,188 +127,13 @@
                     Room Name
                     <span class="required">*</span>
                 </label>
-                <input type="text" [(ngModel)]="form.room_name" placeholder="Enter Room Name">
+                <input type="text" [(ngModel)]="form.room_name" [ngModelOptions]="{standalone: true}" placeholder="Enter Room Name">
                 <div class="error-msg" *ngIf="submitted && !form.room_name">
                     Room Name is required.
                 </div>
             </div>
 
-            <!-- Panel Mod -->
-            <div class="form-field">
-                <label>
-                    Panel Mod
-                    <span class="required">*</span>
-                </label>
-
-                <select [(ngModel)]="form.panel_mod">
-
-                    <option [ngValue]="null">
-                        Select Panel Mod
-                    </option>
-
-                    <option *ngFor="let mod of panelModOptions" [ngValue]="mod">
-                        {{ mod }}
-                    </option>
-
-                </select>
-
-                <div class="error-msg" *ngIf="submitted && (form.panel_mod === null || form.panel_mod === undefined)">
-                    Panel Mod is required.
-                </div>
-            </div>
-
-            <!-- ================= Switch Board Products ================= -->
-            <!-- ================= Switch Board Products ================= -->
-
-            <div class="form-field full-width">
-
-                <label>
-                    Switch Board Products
-                </label>
-
-                <div class="dropdown-wrapper" (click)="$event.stopPropagation()">
-
-                    <!-- Dropdown Button -->
-
-                    <button type="button" class="dropdown-toggle" (click)="toggleSwitchDropdown()">
-
-                        <span>
-
-                            {{
-                            form.switch_board_product_id.length
-                            ? form.switch_board_product_id.length + ' Product(s) Selected'
-                            : 'Select Switch Board Products'
-                            }}
-
-                        </span>
-
-                        <span class="dropdown-arrow" [class.open]="switchDropdownOpen">
-
-                            ▼
-
-                        </span>
-
-                    </button>
-
-                    <!-- Dropdown -->
-
-                    <div class="dropdown-panel" *ngIf="switchDropdownOpen">
-
-                        <!-- Search -->
-
-                        <div class="dropdown-search">
-
-                            <input type="text" [(ngModel)]="switchSearch" placeholder="Search product..."
-                                (click)="$event.stopPropagation()">
-
-                        </div>
-
-                        <!-- Product List -->
-
-                        <div class="dropdown-list">
-
-                            <label class="dropdown-item" *ngFor="let product of filteredSwitchBoardProducts">
-
-                                <input type="checkbox" [checked]="isSelected(product.id, form.switch_board_product_id)"
-                                    (change)="toggleSelection(product.id, form.switch_board_product_id)">
-
-                                <span>
-
-                                    {{ product.product_name }}
-
-                                </span>
-
-                            </label>
-
-                        </div>
-
-                        <div class="dropdown-empty" *ngIf="filteredSwitchBoardProducts.length==0">
-
-                            No Product Found
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-                <!-- Selected Products -->
-
-                <div class="selected-product-grid" *ngIf="selectedSwitchProducts.length">
-
-                    <div class="selected-product-card" *ngFor="let product of selectedSwitchProducts">
-
-                        <button type="button" class="remove-chip"
-                            (click)="toggleSelection(product.id, form.switch_board_product_id)">
-
-                            ✕
-
-                        </button>
-
-                        <div class="card-content">
-
-                            <!-- Details -->
-
-                            <div class="card-details">
-
-                                <div class="product-title">
-
-                                    {{ product.product_name }}
-
-                                </div>
-
-                                <div class="product-info">
-
-                                    <strong>Price :</strong>
-
-                                    ₹ {{ product.price }}
-
-                                </div>
-
-                                <div class="product-info">
-
-                                    <strong>Category :</strong>
-
-                                    {{ product.category }}
-
-                                </div>
-
-                                <div class="product-info">
-
-                                    <strong>Mod :</strong>
-
-                                    {{ product.mod_size }}
-
-                                </div>
-
-                                <div class="product-info">
-
-                                    <strong>Wiring :</strong>
-
-                                    {{ product.wiring_name }}
-
-                                </div>
-
-                            </div>
-
-                            <!-- Image -->
-
-                            <div class="card-image" *ngIf="product.image_url">
-
-                                <img [src]="product.image_url" [alt]="product.product_name"
-                                    (click)="openImagePreview(product.image_url)" (error)="onImageError($event)">
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-            <!-- ================= Room Products ================= -->
+            <!-- ================= Room Products (Non-NUOS) ================= -->
 
             <div class="form-field full-width">
 
@@ -321,136 +143,64 @@
 
                 <div class="dropdown-wrapper" (click)="$event.stopPropagation()">
 
-                    <!-- Dropdown Button -->
-
                     <button type="button" class="dropdown-toggle" (click)="toggleRoomDropdown()">
 
                         <span>
-
                             {{
                             form.room_product_id.length
                             ? form.room_product_id.length + ' Product(s) Selected'
                             : 'Select Room Products'
                             }}
-
                         </span>
 
-                        <span class="dropdown-arrow" [class.open]="roomDropdownOpen">
-
-                            ▼
-
-                        </span>
+                        <span class="dropdown-arrow" [class.open]="roomDropdownOpen">▼</span>
 
                     </button>
 
-                    <!-- Dropdown -->
-
                     <div class="dropdown-panel" *ngIf="roomDropdownOpen">
 
-                        <!-- Search -->
-
                         <div class="dropdown-search">
-
-                            <input type="text" [(ngModel)]="roomSearch" placeholder="Search room product..."
-                                (click)="$event.stopPropagation()">
-
+                            <input type="text" [(ngModel)]="roomSearch" [ngModelOptions]="{standalone: true}"
+                                placeholder="Search product..." (click)="$event.stopPropagation()">
                         </div>
 
-                        <!-- Product List -->
-
                         <div class="dropdown-list">
-
                             <label class="dropdown-item" *ngFor="let product of filteredRoomProducts">
-
                                 <input type="checkbox" [checked]="isSelected(product.id, form.room_product_id)"
                                     (change)="toggleSelection(product.id, form.room_product_id)">
-
-                                <span>
-
-                                    {{ product.product_name }}
-
-                                </span>
-
+                                <span>{{ product.product_name }}</span>
                             </label>
-
                         </div>
 
                         <div class="dropdown-empty" *ngIf="filteredRoomProducts.length === 0">
-
                             No Product Found
-
                         </div>
 
                     </div>
 
                 </div>
 
-                <!-- Selected Product Cards -->
-
+                <!-- Selected Room Products -->
                 <div class="selected-product-grid" *ngIf="selectedRoomProducts.length">
 
                     <div class="selected-product-card" *ngFor="let product of selectedRoomProducts">
 
                         <button type="button" class="remove-chip"
-                            (click)="toggleSelection(product.id, form.room_product_id)">
-
-                            ✕
-
-                        </button>
+                            (click)="toggleSelection(product.id, form.room_product_id)">✕</button>
 
                         <div class="card-content">
 
-                            <!-- Left -->
-
                             <div class="card-details">
-
-                                <div class="product-title">
-
-                                    {{ product.product_name }}
-
-                                </div>
-
-                                <div class="product-info">
-
-                                    <strong>Price :</strong>
-
-                                    ₹ {{ product.price }}
-
-                                </div>
-
-                                <div class="product-info">
-
-                                    <strong>Category :</strong>
-
-                                    {{ product.category }}
-
-                                </div>
-
-                                <div class="product-info">
-
-                                    <strong>Mod :</strong>
-
-                                    {{ product.mod_size }}
-
-                                </div>
-
-                                <div class="product-info">
-
-                                    <strong>Wiring :</strong>
-
-                                    {{ product.wiring_name }}
-
-                                </div>
-
+                                <div class="product-title">{{ product.product_name }}</div>
+                                <div class="product-info"><strong>Price :</strong> ₹ {{ product.price }}</div>
+                                <div class="product-info"><strong>Category :</strong> {{ product.category }}</div>
+                                <div class="product-info"><strong>Mod :</strong> {{ product.mod_size }}</div>
+                                <div class="product-info"><strong>Wiring :</strong> {{ product.wiring_name }}</div>
                             </div>
 
-                            <!-- Right -->
-
                             <div class="card-image" *ngIf="product.image_url">
-
                                 <img [src]="product.image_url" [alt]="product.product_name"
                                     (click)="openImagePreview(product.image_url)" (error)="onImageError($event)">
-
                             </div>
 
                         </div>
@@ -458,6 +208,157 @@
                     </div>
 
                 </div>
+
+            </div>
+
+            <!-- ================= Switchboards ================= -->
+
+            <div class="form-field full-width">
+
+                <label>Switchboards</label>
+
+                <div class="switchboard-list">
+
+                    <div class="switchboard-card" *ngFor="let sb of form.switchboards; let sbIndex = index"
+                        (click)="$event.stopPropagation()">
+
+                        <div class="switchboard-card-header">
+                            <span class="switchboard-index">Switchboard {{ sbIndex + 1 }}</span>
+                            <button type="button" class="remove-switchboard-btn" (click)="removeSwitchboard(sbIndex)">
+                                🗑 Remove
+                            </button>
+                        </div>
+
+                        <div class="switchboard-fields">
+
+                            <div class="form-field">
+                                <label>
+                                    Switchboard Name
+                                    <span class="required">*</span>
+                                </label>
+                                <input type="text" [(ngModel)]="sb.switchboard_name" [ngModelOptions]="{standalone: true}"
+                                    placeholder="Enter Switchboard Name">
+                                <div class="error-msg" *ngIf="submitted && !sb.switchboard_name">
+                                    Switchboard name is required.
+                                </div>
+                            </div>
+
+                            <div class="form-field">
+                                <label>
+                                    Panel Mod
+                                    <span class="required">*</span>
+                                </label>
+                                <select [(ngModel)]="sb.panel_mod" [ngModelOptions]="{standalone: true}"
+                                    (ngModelChange)="onPanelModChange(sbIndex)">
+                                    <option [ngValue]="null">Select Panel Mod</option>
+                                    <option *ngFor="let mod of panelModOptions" [ngValue]="mod">{{ mod }}</option>
+                                </select>
+                                <div class="error-msg" *ngIf="submitted && (sb.panel_mod === null || sb.panel_mod === undefined)">
+                                    Panel Mod is required.
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <!-- Switch Board Products (NUOS) for this switchboard -->
+                        <div class="form-field">
+                            <label>
+                                Switch Board Products
+                                <span class="capacity-hint" *ngIf="sb.panel_mod !== null && sb.panel_mod !== undefined">
+                                    ({{ getUsedModSize(sbIndex) }} / {{ sb.panel_mod }} mod used · max {{ getMaxProductCount(sbIndex) }} product(s))
+                                </span>
+                            </label>
+
+                            <div class="dropdown-wrapper" (click)="$event.stopPropagation()">
+
+                                <button type="button" class="dropdown-toggle"
+                                    [class.disabled]="sb.panel_mod === null || sb.panel_mod === undefined"
+                                    [disabled]="sb.panel_mod === null || sb.panel_mod === undefined"
+                                    (click)="toggleSwitchboardDropdown(sbIndex)">
+                                    <span>
+                                        {{
+                                        sb.panel_mod === null || sb.panel_mod === undefined
+                                        ? 'Select Panel Mod first'
+                                        : (sb.switch_board_product_id.length
+                                            ? sb.switch_board_product_id.length + ' Product(s) Selected'
+                                            : 'Select Switch Board Products')
+                                        }}
+                                    </span>
+                                    <span class="dropdown-arrow" [class.open]="sb._dropdownOpen">▼</span>
+                                </button>
+
+                                <div class="dropdown-panel" *ngIf="sb._dropdownOpen">
+
+                                    <div class="dropdown-search">
+                                        <input type="text" [(ngModel)]="sb._search" [ngModelOptions]="{standalone: true}"
+                                            placeholder="Search product..." (click)="$event.stopPropagation()">
+                                    </div>
+
+                                    <div class="dropdown-list">
+                                        <label class="dropdown-item"
+                                            *ngFor="let product of filteredSwitchProducts(sbIndex)"
+                                            [class.item-disabled]="isProductDisabled(sbIndex, product)">
+                                            <input type="checkbox"
+                                                [checked]="isSelected(product.id, sb.switch_board_product_id)"
+                                                [disabled]="isProductDisabled(sbIndex, product)"
+                                                (change)="toggleSwitchProductSelection(sbIndex, product.id)">
+                                            <span>
+                                                {{ product.product_name }}
+                                                <small class="mod-badge">Mod {{ product.mod_size }}</small>
+                                            </span>
+                                        </label>
+                                    </div>
+
+                                    <div class="dropdown-empty" *ngIf="filteredSwitchProducts(sbIndex).length === 0">
+                                        No Product Found
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                            <!-- Selected Switch Board Products -->
+                            <div class="selected-product-grid" *ngIf="selectedSwitchProducts(sbIndex).length">
+
+                                <div class="selected-product-card" *ngFor="let product of selectedSwitchProducts(sbIndex)">
+
+                                    <button type="button" class="remove-chip"
+                                        (click)="toggleSwitchProductSelection(sbIndex, product.id)">✕</button>
+
+                                    <div class="card-content">
+
+                                        <div class="card-details">
+                                            <div class="product-title">{{ product.product_name }}</div>
+                                            <div class="product-info"><strong>Price :</strong> ₹ {{ product.price }}</div>
+                                            <div class="product-info"><strong>Category :</strong> {{ product.category }}</div>
+                                            <div class="product-info"><strong>Mod :</strong> {{ product.mod_size }}</div>
+                                            <div class="product-info"><strong>Wiring :</strong> {{ product.wiring_name }}</div>
+                                        </div>
+
+                                        <div class="card-image" *ngIf="product.image_url">
+                                            <img [src]="product.image_url" [alt]="product.product_name"
+                                                (click)="openImagePreview(product.image_url)" (error)="onImageError($event)">
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <p class="empty-text" *ngIf="form.switchboards.length === 0">
+                        No switchboards added yet.
+                    </p>
+
+                </div>
+
+                <button type="button" class="btn-add-switchboard" (click)="addSwitchboard()">
+                    ➕ Add Switchboard
+                </button>
 
             </div>
 
@@ -493,67 +394,6 @@
                 <input [value]="selectedPackage.room_name" disabled>
             </div>
 
-            <div class="form-field">
-                <label>Panel Mod</label>
-                <input [value]="selectedPackage.panel_mod" disabled>
-            </div>
-
-        </div>
-
-        <!-- Switch Board Products -->
-        <div class="product-section" *ngIf="selectedPackage">
-
-            <h3>Switch Board Products</h3>
-
-            <div class="product-grid" *ngIf="selectedPackage.switch_board_products?.length; else noSwitch">
-
-                <div class="product-card" *ngFor="let item of selectedPackage.switch_board_products">
-
-                    <div class="product-content">
-
-                        <!-- Left Side -->
-                        <div class="product-details">
-
-                            <div class="product-title">
-                                {{ item.product_name }}
-                            </div>
-
-                            <div class="product-info">
-                                <strong>Price :</strong> ₹ {{ item.price }}
-                            </div>
-
-                            <div class="product-info">
-                                <strong>Category :</strong> {{ item.category }}
-                            </div>
-
-                            <div class="product-info">
-                                <strong>Mod :</strong> {{ item.mod_size }}
-                            </div>
-
-                            <div class="product-info">
-                                <strong>Wiring :</strong> {{ item.wiring_type }}
-                            </div>
-
-                        </div>
-
-                        <!-- Right Side Image -->
-                        <div class="product-image" *ngIf="item.image_url">
-
-                            <img [src]="item.image_url" [alt]="item.product_name"
-                                (click)="openImagePreview(item.image_url)" (error)="onImageError($event)">
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-            <ng-template #noSwitch>
-                <p class="empty-text">No Switch Board Products Found</p>
-            </ng-template>
-
         </div>
 
         <!-- Room Products -->
@@ -567,37 +407,17 @@
 
                     <div class="product-content">
 
-                        <!-- Left Side -->
                         <div class="product-details">
-
-                            <div class="product-title">
-                                {{ item.product_name }}
-                            </div>
-
-                            <div class="product-info">
-                                <strong>Price :</strong> ₹ {{ item.price }}
-                            </div>
-
-                            <div class="product-info">
-                                <strong>Category :</strong> {{ item.category }}
-                            </div>
-
-                            <div class="product-info">
-                                <strong>Mod :</strong> {{ item.mod_size }}
-                            </div>
-
-                            <div class="product-info">
-                                <strong>Wiring :</strong> {{ item.wiring_type }}
-                            </div>
-
+                            <div class="product-title">{{ item.product_name }}</div>
+                            <div class="product-info"><strong>Price :</strong> ₹ {{ item.price }}</div>
+                            <div class="product-info"><strong>Category :</strong> {{ item.category }}</div>
+                            <div class="product-info"><strong>Mod :</strong> {{ item.mod_size }}</div>
+                            <div class="product-info"><strong>Wiring :</strong> {{ item.wiring_type }}</div>
                         </div>
 
-                        <!-- Right Side Image -->
                         <div class="product-image" *ngIf="item.image_url">
-
                             <img [src]="item.image_url" [alt]="item.product_name"
                                 (click)="openImagePreview(item.image_url)" (error)="onImageError($event)">
-
                         </div>
 
                     </div>
@@ -608,6 +428,59 @@
 
             <ng-template #noRoom>
                 <p class="empty-text">No Room Products Found</p>
+            </ng-template>
+
+        </div>
+
+        <!-- Switchboards -->
+        <div class="product-section" *ngIf="selectedPackage">
+
+            <h3>Switchboards</h3>
+
+            <div class="switchboard-view-list" *ngIf="selectedPackage.switchboards?.length; else noSwitchboard">
+
+                <div class="switchboard-view-card" *ngFor="let sb of selectedPackage.switchboards">
+
+                    <div class="switchboard-view-header">
+                        <span class="switchboard-view-name">{{ sb.switchboard_name }}</span>
+                        <span class="count-badge blue">Panel Mod : {{ sb.panel_mod }}</span>
+                    </div>
+
+                    <div class="product-grid" *ngIf="sb.products?.length; else noSbProducts">
+
+                        <div class="product-card" *ngFor="let item of sb.products">
+
+                            <div class="product-content">
+
+                                <div class="product-details">
+                                    <div class="product-title">{{ item.product_name }}</div>
+                                    <div class="product-info"><strong>Price :</strong> ₹ {{ item.price }}</div>
+                                    <div class="product-info"><strong>Category :</strong> {{ item.category }}</div>
+                                    <div class="product-info"><strong>Mod :</strong> {{ item.mod_size }}</div>
+                                    <div class="product-info"><strong>Wiring :</strong> {{ item.wiring_type }}</div>
+                                </div>
+
+                                <div class="product-image" *ngIf="item.image_url">
+                                    <img [src]="item.image_url" [alt]="item.product_name"
+                                        (click)="openImagePreview(item.image_url)" (error)="onImageError($event)">
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <ng-template #noSbProducts>
+                        <p class="empty-text">No Products Found</p>
+                    </ng-template>
+
+                </div>
+
+            </div>
+
+            <ng-template #noSwitchboard>
+                <p class="empty-text">No Switchboards Found</p>
             </ng-template>
 
         </div>
@@ -625,9 +498,7 @@
 <div class="modal image-modal" *ngIf="previewImage" (click)="closeImagePreview()">
     <div class="image-preview-box" (click)="$event.stopPropagation()">
 
-        <button type="button" class="image-close" (click)="closeImagePreview()">
-            ✕
-        </button>
+        <button type="button" class="image-close" (click)="closeImagePreview()">✕</button>
 
         <img [src]="previewImage" alt="Product Image">
 
@@ -642,12 +513,8 @@
         <h3>Confirm Action</h3>
         <p>{{ confirmMessage }}</p>
         <div class="modal-footer">
-            <button type="button" class="btn-no" (click)="confirmNo()">
-                No
-            </button>
-            <button type="button" class="btn-yes" (click)="confirmYes()">
-                Yes
-            </button>
+            <button type="button" class="btn-no" (click)="confirmNo()">No</button>
+            <button type="button" class="btn-yes" (click)="confirmYes()">Yes</button>
         </div>
     </div>
 </div>

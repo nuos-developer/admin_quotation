@@ -76,7 +76,7 @@
 .modal-box {
     background: #fff; border-radius: 12px; width: 700px; max-width: 95%; max-height: 90vh;
     overflow-y: auto; padding: 24px; box-shadow: 0 12px 40px rgba(0,0,0,.18); animation: modalScale .25s ease;
-    &.large { width: 850px; }
+    &.large { width: 900px; }
     &.small { width: 400px; text-align: center; }
 }
 @keyframes modalScale { from { opacity: 0; transform: scale(.9); } to { opacity: 1; transform: scale(1); } }
@@ -158,6 +158,21 @@
 }
 .dropdown-empty { padding: 12px 14px; font-size: 13px; color: #999; text-align: center; }
 
+.dropdown-toggle.disabled, .dropdown-toggle:disabled {
+    background: #f8f9fa; color: #999; cursor: not-allowed;
+    &:hover { border-color: #d9d9d9; }
+}
+.dropdown-item.item-disabled {
+    opacity: .45; cursor: not-allowed;
+    &:hover { background: transparent; }
+    input[type="checkbox"] { cursor: not-allowed; }
+}
+.capacity-hint { font-weight: 500; color: #6b7280; font-size: 12px; margin-left: 6px; }
+.mod-badge {
+    display: inline-block; margin-left: 8px; padding: 1px 7px; border-radius: 20px;
+    background: #eef2ff; color: #4f46e5; font-size: 11px; font-weight: 600;
+}
+
 /* Selected product preview */
 .selected-product-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 15px; }
 .selected-product-card {
@@ -175,6 +190,38 @@
     width: 170px; min-width: 170px; display: flex; justify-content: center; align-items: center;
     img { width: 150px; height: 150px; object-fit: contain; border: 1px solid #ddd; border-radius: 10px; background: #fff; cursor: pointer; transition: .3s; &:hover { transform: scale(1.05); } }
 }
+
+/* ================= Switchboards (Add/Edit) ================= */
+.switchboard-list { display: flex; flex-direction: column; gap: 16px; margin-top: 8px; }
+.switchboard-card {
+    border: 1px solid #e5e7eb; border-radius: 12px; padding: 18px; background: #fafbff;
+    display: flex; flex-direction: column; gap: 14px;
+}
+.switchboard-card-header {
+    display: flex; justify-content: space-between; align-items: center;
+}
+.switchboard-index { font-size: 14px; font-weight: 700; color: #4f46e5; }
+.remove-switchboard-btn {
+    display: flex; align-items: center; gap: 6px; border: none; background: #fee2e2; color: #dc2626;
+    padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; transition: .2s;
+    &:hover { background: #dc2626; color: #fff; }
+}
+.switchboard-fields { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+.btn-add-switchboard {
+    margin-top: 14px; width: 100%; border: 1.5px dashed #4f46e5; background: #fff; color: #4f46e5;
+    padding: 11px 18px; border-radius: 8px; font-weight: 600; font-size: 14px; cursor: pointer; transition: .25s;
+    &:hover { background: #eef2ff; }
+}
+
+/* ================= Switchboards (View) ================= */
+.switchboard-view-list { display: flex; flex-direction: column; gap: 20px; }
+.switchboard-view-card {
+    border: 1px solid #e5e7eb; border-radius: 12px; padding: 18px; background: #fafbff;
+}
+.switchboard-view-header {
+    display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;
+}
+.switchboard-view-name { font-size: 15px; font-weight: 700; color: #1f2937; }
 
 /* Image preview modal */
 .image-modal { background: rgba(0,0,0,.75); }
@@ -194,7 +241,7 @@
     .search-filter-group, .search-box input, .btn.primary { width: 100%; }
 }
 @media (max-width: 768px) {
-    .form-grid, .product-grid, .selected-product-grid { grid-template-columns: 1fr; }
+    .form-grid, .product-grid, .selected-product-grid, .switchboard-fields { grid-template-columns: 1fr; }
     .modal-box.large { width: 95%; }
     .modal-footer { flex-direction: column; }
     .modal-footer button { width: 100%; }

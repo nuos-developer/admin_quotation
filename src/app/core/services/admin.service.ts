@@ -110,13 +110,13 @@ export class AdminService {
 
     getRoomPackages() {
         return this.http.get<any>(
-            `${environment.apiUrl}/admin/get_room_product_packages`
+            `${environment.apiUrl}/admin/get_room_packages`
         );
     }
 
     createRoomPackage(data: any) {
         return this.http.post<any>(
-            `${environment.apiUrl}/admin/create_room_product_package`,
+            `${environment.apiUrl}/admin/create_room_package`,
             data
         );
     }
@@ -146,6 +146,13 @@ export class AdminService {
     updateRoomPackage(id: number, data: any) {
         return this.http.put<any>(
             `${environment.apiUrl}/admin/update_room_package/${id}`,
+            data
+        );
+    }
+
+    updateProposalStatus(id: number, data: any) {
+        return this.http.put<any>(
+            `${environment.apiUrl}/admin/product/update_proposal_status/${id}`,
             data
         );
     }
