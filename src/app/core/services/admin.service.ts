@@ -37,6 +37,17 @@ export class AdminService {
         );
     }
 
+    getLeads() {
+        return this.http.get<ApiResponse<any[]>>(
+            `${environment.apiUrl}/admin/get_lead_status`
+        );
+    }
+    getReference() {
+        return this.http.get<ApiResponse<any[]>>(
+            `${environment.apiUrl}/admin/get_reference`
+        );
+    }
+
     getModules() {
         return this.http.get<ApiResponse<any[]>>(
             `${environment.apiUrl}/admin/getModule`
@@ -121,6 +132,13 @@ export class AdminService {
         );
     }
 
+    createClient(data: any) {
+        return this.http.post<any>(
+            `${environment.apiUrl}/users/create_client`,
+            data
+        );
+    }
+
     getCategories() {
         return this.http.get<ApiResponse<any[]>>(
             `${environment.apiUrl}/admin/product/category_type`
@@ -146,6 +164,12 @@ export class AdminService {
     updateRoomPackage(id: number, data: any) {
         return this.http.put<any>(
             `${environment.apiUrl}/admin/update_room_package/${id}`,
+            data
+        );
+    }
+    updateClient(id: number, data: any) {
+        return this.http.put<any>(
+            `${environment.apiUrl}/users/update_cleint/${id}`,
             data
         );
     }

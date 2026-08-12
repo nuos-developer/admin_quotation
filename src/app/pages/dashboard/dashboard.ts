@@ -31,7 +31,7 @@ export class Dashboard implements OnInit {
 
   isLoading = false;
 
-  graphType = "month";
+  graphType = "day";
    @ViewChild(BaseChartDirective)
   chart?: BaseChartDirective;
 

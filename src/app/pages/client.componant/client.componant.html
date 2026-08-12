@@ -1,15 +1,85 @@
 <!-- ===================================================== -->
-<!-- CLIENT PAGE -->
+<!-- CLIENT LIST PAGE -->
 <!-- ===================================================== -->
-<div class="sticky-bar">
+<div class="sticky-bar" *ngIf="!showAdd && !showEdit && !showView" (click)="closeFilterDropdowns()">
     <!-- ================= HEADER ================= -->
     <div class="page-header">
         <h2>Clients</h2>
     </div>
-    <!-- ================= SEARCH ================= -->
+    <!-- ================= SEARCH + FILTERS ================= -->
     <div class="search-box">
         <input type="text" class="search-input" placeholder="🔍 Search Client..." [(ngModel)]="searchText"
             (input)="filterClients()">
+
+        <!-- Lead Status filter (scrollable) -->
+        <div class="filter-dropdown-wrapper" (click)="$event.stopPropagation()">
+
+            <button type="button" class="filter-toggle" (click)="toggleLeadStatusFilter()">
+                <span>{{ getLeadStatusFilterLabel() }}</span>
+                <span class="dropdown-arrow" [class.open]="leadStatusFilterOpen">▼</span>
+            </button>
+
+            <div class="filter-panel" *ngIf="leadStatusFilterOpen">
+                <div class="filter-list">
+
+                    <div class="filter-item" [class.active]="selectedLeadStatusFilter === null"
+                        (click)="selectLeadStatusFilter(null)">
+                        All Lead Status
+                    </div>
+
+                    <div class="filter-item" *ngFor="let item of leadStatusList"
+                        [class.active]="selectedLeadStatusFilter === item.id"
+                        (click)="selectLeadStatusFilter(item.id)">
+                        {{ item.lead_status || item.name || item.status_name }}
+                    </div>
+
+                    <div class="filter-empty" *ngIf="leadStatusList.length === 0">
+                        No Lead Status Found
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Reference filter (scrollable) -->
+        <div class="filter-dropdown-wrapper" (click)="$event.stopPropagation()">
+
+            <button type="button" class="filter-toggle" (click)="toggleReferenceFilter()">
+                <span>{{ getReferenceFilterLabel() }}</span>
+                <span class="dropdown-arrow" [class.open]="referenceFilterOpen">▼</span>
+            </button>
+
+            <div class="filter-panel" *ngIf="referenceFilterOpen">
+                <div class="filter-list">
+
+                    <div class="filter-item" [class.active]="selectedReferenceFilter === null"
+                        (click)="selectReferenceFilter(null)">
+                        All Reference
+                    </div>
+
+                    <div class="filter-item" *ngFor="let item of referenceList"
+                        [class.active]="selectedReferenceFilter === item.id"
+                        (click)="selectReferenceFilter(item.id)">
+                        {{ item.lead_reference || item.name }}
+                    </div>
+
+                    <div class="filter-empty" *ngIf="referenceList.length === 0">
+                        No Reference Found
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+        <button type="button" class="btn-clear-filter" *ngIf="hasActiveFilters" (click)="resetFilters()">
+            ✕ Clear
+        </button>
+
+        <button type="button" class="btn primary" (click)="openAdd()">
+            ➕ Add Client
+        </button>
     </div>
     <!-- ================= LOADER ================= -->
     <div *ngIf="loading" class="loader-container">
@@ -26,21 +96,23 @@
 
             <tr>
 
-                <th width="70">Sr. No.</th>
+                <th width="60">Sr. No.</th>
 
-                <th width="120">Client Id</th>
+                <th width="110">Client Id</th>
 
-                <th>Client Name</th>
+                <!-- <th>Client Name</th> -->
 
                 <th>Email</th>
 
-                <th width="140">Mobile</th>
+                <th width="130">Mobile</th>
 
-                <th>Created By</th>
+                <th width="140">Lead Status</th>
+
+                <th width="140">Reference</th>
 
                 <th width="160">Role Name</th>
 
-                <th width="120">Action</th>
+                <th width="110">Action</th>
 
             </tr>
 
@@ -50,21 +122,23 @@
 
             <tr *ngFor="let client of filteredClients; let i=index">
 
-                <td width="70">{{i+1}}</td>
+                <td width="60">{{i+1}}</td>
 
-                <td width="120">{{client.client_id}}</td>
+                <td width="110">{{client.client_id}}</td>
 
-                <td>{{client.first_name}} {{client.last_name}}</td>
+                <!-- <td>{{client.first_name}} {{client.last_name}}</td> -->
 
                 <td>{{client.email_id}}</td>
 
-                <td width="140">{{client.mobile_number}}</td>
+                <td width="130">{{client.mobile_number}}</td>
 
-                <td>{{client.user_name}}</td>
+                <td width="140">{{ getLeadStatusName(client) }}</td>
+
+                <td width="140">{{ getReferenceName(client) }}</td>
 
                 <td width="160">{{client.role_name}}</td>
 
-                <td width="120">
+                <td width="110">
 
                     <div class="action-group">
 
@@ -77,6 +151,20 @@
                             <span class="tooltip-text">
 
                                 View Client
+
+                            </span>
+
+                        </button>
+
+                        <button
+                            class="icon-btn edit-btn"
+                            (click)="editClient(client)">
+
+                            ✏️
+
+                            <span class="tooltip-text">
+
+                                Edit Client
 
                             </span>
 
@@ -99,24 +187,258 @@
 
     </div>
 </div>
-<!-- ===================================================== -->
-<!-- VIEW CLIENT MODAL -->
-<!-- ===================================================== -->
-<div class="modal" *ngIf="showModal">
-    <div class="modal-box xlarge">
-        <!-- ================= HEADER ================= -->
-        <div class="modal-header">
-            <h2 class="modal-title">
-                Client Details
 
-            </h2>
-            <button type="button" class="close-btn" (click)="closeModal()">
-                ✕
+<!-- ===================================================== -->
+<!-- ADD / EDIT CLIENT PAGE -->
+<!-- ===================================================== -->
+<div class="page-box" *ngIf="showAdd || showEdit">
 
-            </button>
-        </div>
-        <!-- ================= BODY ================= -->
-        <div class="modal-body" *ngIf="selectedClient">
+    <!-- ================= HEADER ================= -->
+    <div class="page-header-bar">
+        <button type="button" class="back-btn" (click)="closeModal()">
+            ← Back
+        </button>
+        <h2 class="page-title">
+            {{ showAdd ? 'Add Client' : 'Edit Client' }}
+        </h2>
+    </div>
+
+    <!-- ================= BODY ================= -->
+    <div class="page-body">
+            <div class="form-grid">
+
+                <!-- First Name -->
+                <div class="form-field">
+                    <label>
+                        First Name
+                        <span class="required">*</span>
+                    </label>
+                    <input type="text" [(ngModel)]="form.first_name" [ngModelOptions]="{standalone:true}"
+                        placeholder="Enter First Name">
+                    <div class="error-msg" *ngIf="submitted && !form.first_name">
+                        First Name is required.
+                    </div>
+                </div>
+
+                <!-- Last Name -->
+                <div class="form-field">
+                    <label>
+                        Last Name
+                        <span class="required">*</span>
+                    </label>
+                    <input type="text" [(ngModel)]="form.last_name" [ngModelOptions]="{standalone:true}"
+                        placeholder="Enter Last Name">
+                    <div class="error-msg" *ngIf="submitted && !form.last_name">
+                        Last Name is required.
+                    </div>
+                </div>
+
+                <!-- Email -->
+                <div class="form-field">
+                    <label>
+                        Email
+                        <span class="required">*</span>
+                    </label>
+                    <input type="email" [(ngModel)]="form.email_id" [ngModelOptions]="{standalone:true}"
+                        placeholder="Enter Email">
+                    <div class="error-msg" *ngIf="submitted && !form.email_id">
+                        Email is required.
+                    </div>
+                </div>
+
+                <!-- Mobile -->
+                <div class="form-field">
+                    <label>
+                        Mobile Number
+                        <span class="required">*</span>
+                    </label>
+                    <input type="text" [(ngModel)]="form.mobile_number" [ngModelOptions]="{standalone:true}"
+                        placeholder="Enter Mobile Number">
+                    <div class="error-msg" *ngIf="submitted && !form.mobile_number">
+                        Mobile Number is required.
+                    </div>
+                </div>
+
+                <!-- Lead Status -->
+                <div class="form-field">
+                    <label>
+                        Lead Status
+                        <span class="required">*</span>
+                    </label>
+                    <select [(ngModel)]="form.lead_status_id" [ngModelOptions]="{standalone:true}">
+                        <option [ngValue]="null">Select Lead Status</option>
+                        <option *ngFor="let item of leadStatusList" [ngValue]="item.id">
+                            {{ item.lead_status || item.name || item.status_name }}
+                        </option>
+                    </select>
+                    <div class="error-msg" *ngIf="submitted && (form.lead_status_id === null || form.lead_status_id === undefined)">
+                        Lead Status is required.
+                    </div>
+                </div>
+
+                <!-- Reference -->
+                <div class="form-field">
+                    <label>
+                        Reference
+                        <span class="required">*</span>
+                    </label>
+                    <select [(ngModel)]="form.reference_id" [ngModelOptions]="{standalone:true}">
+                        <option [ngValue]="null">Select Reference</option>
+                        <option *ngFor="let item of referenceList" [ngValue]="item.id">
+                            {{ item.lead_reference || item.name }}
+                        </option>
+                    </select>
+                    <div class="error-msg" *ngIf="submitted && (form.reference_id === null || form.reference_id === undefined)">
+                        Reference is required.
+                    </div>
+                </div>
+
+                <!-- Address 1 -->
+                <div class="form-field">
+                    <label>Address Line 1</label>
+                    <input type="text" [(ngModel)]="form.address_line_one" [ngModelOptions]="{standalone:true}"
+                        placeholder="Enter Address Line 1">
+                </div>
+
+                <!-- Address 2 -->
+                <div class="form-field">
+                    <label>Address Line 2</label>
+                    <input type="text" [(ngModel)]="form.address_line_two" [ngModelOptions]="{standalone:true}"
+                        placeholder="Enter Address Line 2">
+                </div>
+
+                <!-- Country -->
+                <div class="form-field">
+                    <label>Country</label>
+                    <input type="text" [(ngModel)]="form.country" [ngModelOptions]="{standalone:true}"
+                        placeholder="Enter Country">
+                </div>
+
+                <!-- State -->
+                <div class="form-field">
+                    <label>State</label>
+                    <input type="text" [(ngModel)]="form.state" [ngModelOptions]="{standalone:true}"
+                        placeholder="Enter State">
+                </div>
+
+                <!-- District -->
+                <div class="form-field">
+                    <label>District</label>
+                    <input type="text" [(ngModel)]="form.district" [ngModelOptions]="{standalone:true}"
+                        placeholder="Enter District">
+                </div>
+
+                <!-- Pin Code -->
+                <div class="form-field">
+                    <label>Pin Code</label>
+                    <input type="text" [(ngModel)]="form.pin_code" [ngModelOptions]="{standalone:true}"
+                        placeholder="Enter Pin Code">
+                </div>
+
+                <!-- Company Name -->
+                <div class="form-field">
+                    <label>Company Name</label>
+                    <input type="text" [(ngModel)]="form.company_name" [ngModelOptions]="{standalone:true}"
+                        placeholder="Enter Company Name">
+                </div>
+
+                <!-- GST -->
+                <div class="form-field">
+                    <label>GST Number</label>
+                    <input type="text" [(ngModel)]="form.gst" [ngModelOptions]="{standalone:true}"
+                        placeholder="Enter GST Number">
+                </div>
+
+                <!-- Company Address -->
+                <div class="form-field full-width">
+                    <label>Company Address</label>
+                    <textarea rows="3" [(ngModel)]="form.company_address" [ngModelOptions]="{standalone:true}"
+                        placeholder="Enter Company Address"></textarea>
+                </div>
+
+                <!-- Sales Rep -->
+                <div class="form-field">
+                    <label>Sales Representative</label>
+                    <input type="text" [(ngModel)]="form.salesrepincharge" [ngModelOptions]="{standalone:true}"
+                        placeholder="Enter Sales Representative">
+                </div>
+
+                <!-- Installation Rep -->
+                <div class="form-field">
+                    <label>Installation Representative</label>
+                    <input type="text" [(ngModel)]="form.installation_rep_in_charge" [ngModelOptions]="{standalone:true}"
+                        placeholder="Enter Installation Representative">
+                </div>
+
+                <!-- Installation Date -->
+                <div class="form-field">
+                    <label>Installation Date</label>
+                    <input type="date" [(ngModel)]="form.date_of_installation" [ngModelOptions]="{standalone:true}">
+                </div>
+
+                <!-- Lead Source -->
+                <div class="form-field">
+                    <label>Lead Source</label>
+                    <input type="text" [(ngModel)]="form.lead_source" [ngModelOptions]="{standalone:true}"
+                        placeholder="Enter Lead Source">
+                </div>
+
+                <!-- Site Contractor -->
+                <div class="form-field">
+                    <label>Site Contractor</label>
+                    <input type="text" [(ngModel)]="form.site_contractor_name" [ngModelOptions]="{standalone:true}"
+                        placeholder="Enter Site Contractor Name">
+                </div>
+
+                <!-- Contractor Phone -->
+                <div class="form-field">
+                    <label>Contractor Phone</label>
+                    <input type="text" [(ngModel)]="form.site_contractor_phone" [ngModelOptions]="{standalone:true}"
+                        placeholder="Enter Contractor Phone">
+                </div>
+
+                <!-- Architect -->
+                <div class="form-field">
+                    <label>Architect Name</label>
+                    <input type="text" [(ngModel)]="form.architect_name" [ngModelOptions]="{standalone:true}"
+                        placeholder="Enter Architect Name">
+                </div>
+
+                <!-- Architect Phone -->
+                <div class="form-field">
+                    <label>Architect Phone</label>
+                    <input type="text" [(ngModel)]="form.architect_phone" [ngModelOptions]="{standalone:true}"
+                        placeholder="Enter Architect Phone">
+                </div>
+
+            </div>
+    </div>
+    <!-- ================= FOOTER ================= -->
+    <div class="page-footer">
+        <button type="button" class="btn-cancel" (click)="closeModal()">
+            Cancel
+        </button>
+        <button type="button" [ngClass]="showAdd ? 'btn-submit' : 'btn-update'" (click)="saveClient()">
+            {{ showAdd ? 'Save Client' : 'Update Client' }}
+        </button>
+    </div>
+</div>
+
+<!-- ===================================================== -->
+<!-- VIEW CLIENT PAGE -->
+<!-- ===================================================== -->
+<div class="page-box" *ngIf="showView">
+    <!-- ================= HEADER ================= -->
+    <div class="page-header-bar">
+        <button type="button" class="back-btn" (click)="closeModal()">
+            ← Back
+        </button>
+        <h2 class="page-title">
+            Client Details
+        </h2>
+    </div>
+    <!-- ================= BODY ================= -->
+    <div class="page-body" *ngIf="selectedClient">
             <div class="form-grid">
                 <!-- Client ID -->
                 <div class="form-field">
@@ -137,6 +459,16 @@
                 <div class="form-field">
                     <label>Mobile Number</label>
                     <input [value]="selectedClient.mobile_number" readonly>
+                </div>
+                <!-- Lead Status -->
+                <div class="form-field">
+                    <label>Lead Status</label>
+                    <input [value]="getLeadStatusName(selectedClient)" readonly>
+                </div>
+                <!-- Reference -->
+                <div class="form-field">
+                    <label>Reference</label>
+                    <input [value]="getReferenceName(selectedClient)" readonly>
                 </div>
                 <!-- Address 1 -->
                 <div class="form-field">
@@ -196,7 +528,7 @@
                 <!-- Installation Date -->
                 <div class="form-field">
                     <label>Installation Date</label>
-                    <input [value]="selectedClient.date_of_installation | date:'dd-MM-yyyy'" readonly>
+                    <input [value]="formatDisplayDate(selectedClient.date_of_installation)" readonly>
                 </div>
                 <!-- Lead Source -->
                 <div class="form-field">
@@ -234,13 +566,11 @@
                     <input [value]="selectedClient.role_name" readonly>
                 </div>
             </div>
-        </div>
-        <!-- ================= FOOTER ================= -->
-        <div class="modal-footer">
-            <button type="button" class="btn-cancel" (click)="closeModal()">
-                Close
-
-            </button>
-        </div>
+    </div>
+    <!-- ================= FOOTER ================= -->
+    <div class="page-footer">
+        <button type="button" class="btn-cancel" (click)="closeModal()">
+            Back to List
+        </button>
     </div>
 </div>
