@@ -19,6 +19,25 @@ export class AdminService {
         );
     }
 
+
+    getProductsList() {
+        return this.http.get(`${environment.apiUrl}/admin/dashboard/list`);
+    }
+
+    getProductUsageTrend(productId: string | number, period: string) {
+        return this.http.get(
+            `${environment.apiUrl}/admin/dashboard/usage-trend?product_id=${productId}&period=${period}`
+        );
+    }
+
+    productUsageStats(period?: string) {
+        let url = `${environment.apiUrl}/admin/dashboard/usage-stats`;
+        if (period) {
+            url += `?period=${period}`;
+        }
+        return this.http.get(url);
+    }
+
     getUsers() {
         return this.http.get<ApiResponse<any[]>>(
             `${environment.apiUrl}/admin/getUsers`

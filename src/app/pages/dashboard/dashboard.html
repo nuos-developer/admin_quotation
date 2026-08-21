@@ -1,11 +1,11 @@
 <div class="dashboard">
 
-  <!-- 🔥 LOADER -->
+  <!-- LOADER -->
   <div *ngIf="isLoading" class="page-loader">
     <div class="spinner"></div>
   </div>
 
-  <!-- 🔥 CONTENT -->
+  <!-- CONTENT -->
   <div *ngIf="!isLoading">
 
     <h2 class="page-title">Admin Dashboard</h2>
@@ -38,30 +38,24 @@
       </div>
     </div>
 
-  <div class="chart-card">
-
+    <!-- Proposal Graph -->
+    <div class="chart-card">
       <div class="chart-header">
-
         <h3>Proposal Graph</h3>
 
         <select [(ngModel)]="graphType" (change)="onGraphChange()" class="graph-select">
-
           <option value="day">Day</option>
           <option value="week">Week</option>
           <option value="month">Month</option>
           <option value="year">Year</option>
-
         </select>
-
       </div>
 
       <div class="chart-container">
-
-        <canvas baseChart [data]="barChartData" [options]="barChartOptions" [type]="'bar'">
+        <canvas baseChart #proposalChartRef="base-chart" [data]="barChartData" [options]="barChartOptions"
+          [type]="'bar'">
         </canvas>
-
       </div>
-
     </div>
 
     <!-- Role Wise Users -->
@@ -92,31 +86,56 @@
         </tbody>
       </table>
     </div>
-    <!-- <div class="chart-card">
 
+    <!-- Product Usage Graph -->
+    <div class="chart-card">
       <div class="chart-header">
+        <h3>Product Usage</h3>
 
-        <h3>Proposal Graph</h3>
+        <div class="filter-group">
 
-        <select [(ngModel)]="graphType" (change)="onGraphChange()" class="graph-select">
+          <div class="custom-dropdown">
+            <button type="button" class="dropdown-toggle" (click)="toggleProductDropdown()">
+              <span>{{ selectedProductName }}</span>
+              <i class="arrow" [class.open]="isProductDropdownOpen"></i>
+            </button>
 
-          <option value="day">Day</option>
-          <option value="week">Week</option>
-          <option value="month">Month</option>
-          <option value="year">Year</option>
+            <ul class="dropdown-menu" *ngIf="isProductDropdownOpen">
+              <li [class.active]="!selectedProductId" (click)="selectProduct(null)">
+                All Products
+              </li>
+              <li *ngFor="let p of productsList" [class.active]="selectedProductId === p.id" (click)="selectProduct(p)">
+                {{ p.product_name }}
+              </li>
+            </ul>
+          </div>
 
-        </select>
+          <select [(ngModel)]="usagePeriod" (ngModelChange)="onUsagePeriodChange()" class="graph-select">
+            <option value="">All time</option>
+            <option value="day">Day</option>
+            <option value="week">Week</option>
+            <option value="month">Month</option>
+            <option value="year">Year</option>
+          </select>
 
+          <button type="button" class="toggle-btn" *ngIf="rawUsageLabels.length > usageTopN" (click)="toggleShowAll()">
+            {{ showAllUsage ? 'Show Top ' + usageTopN : 'Show All (' + rawUsageLabels.length + ')' }}
+          </button>
+        </div>
       </div>
 
-      <div class="chart-container">
+      <!-- <p *ngIf="usageChartLabels.length === 0" class="no-data">
+    No product usage data available
+  </p> -->
 
-        <canvas baseChart [data]="barChartData" [options]="barChartOptions" [type]="'bar'">
-        </canvas>
-
+      <div class="chart-scroll-wrapper" *ngIf="usageChartLabels.length > 0">
+        <div class="chart-inner" [style.min-width.px]="usageChartLabels.length * 55">
+          <canvas baseChart #usageChartRef="base-chart" [data]="usageChartData" [options]="usageChartOptions"
+            [type]="'bar'">
+          </canvas>
+        </div>
       </div>
-
-    </div> -->
+    </div>
 
   </div>
 </div>

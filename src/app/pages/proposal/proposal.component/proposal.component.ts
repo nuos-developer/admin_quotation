@@ -43,7 +43,10 @@ export class ProposalComponent implements OnInit {
 
     this.adminService.getProposals().subscribe({
       next: (res: any) => {
+        console.log(res?.data);
         this.proposals = this.toArray(res?.data?.data);
+
+
         this.filteredProposals = [...this.proposals];
         setTimeout(() => this.loader.hide());
       },

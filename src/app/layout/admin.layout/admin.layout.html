@@ -1,93 +1,239 @@
 <div class="admin-container" [class.collapsed]="!sidebarOpen">
 
-  <!-- Sidebar -->
+  <!-- ========================================================= -->
+  <!-- SIDEBAR -->
+  <!-- ========================================================= -->
+
   <aside class="sidebar">
 
+    <!-- ======================================================= -->
     <!-- LOGO + TOGGLE -->
-    <div class="logo">
-      <img
-        *ngIf="sidebarOpen"
-        src="https://nuos.in/wp-content/uploads/2023/06/logo.png"
-        alt="NUOS Logo"
-        class="sidebar-logo"
-      />
+    <!-- ======================================================= -->
 
-      <button class="toggle-btn" (click)="toggleSidebar()">
+    <div class="logo">
+
+      <!-- Full Logo -->
+      <img *ngIf="sidebarOpen" src="https://nuos.in/wp-content/uploads/2023/06/logo.png" alt="NUOS Logo"
+        class="sidebar-logo" />
+
+      <!-- Toggle Button -->
+      <button type="button" class="toggle-btn" (click)="toggleSidebar()"
+        [attr.title]="sidebarOpen ? 'Collapse Sidebar' : 'Expand Sidebar'">
         ☰
       </button>
+
     </div>
+
+
+    <!-- ======================================================= -->
+    <!-- NAVIGATION -->
+    <!-- ======================================================= -->
 
     <nav>
 
-      <!-- Dashboard -->
-      <a routerLink="/dashboard" routerLinkActive="active">
-        <span class="icon">📊</span>
-        <span class="text" *ngIf="sidebarOpen">Dashboard</span>
+
+      <!-- ===================================================== -->
+      <!-- DASHBOARD -->
+      <!-- ===================================================== -->
+
+      <a routerLink="/dashboard" routerLinkActive="active" class="menu-item">
+
+        <span class="icon">
+          📊
+        </span>
+
+        <span class="text" *ngIf="sidebarOpen">
+          Dashboard
+        </span>
+
+        <!-- Tooltip -->
+        <span class="tooltip-text" *ngIf="!sidebarOpen">
+          Dashboard
+        </span>
+
       </a>
 
-      <!-- User Management -->
-      <div
-        class="menu-parent"
-        (click)="sidebarOpen && toggleUserMgmt()"
-      >
-        <span class="icon">👥</span>
-        <span class="text" *ngIf="sidebarOpen">User Management</span>
+
+      <!-- ===================================================== -->
+      <!-- USER MANAGEMENT -->
+      <!-- ===================================================== -->
+
+      <div class="menu-parent menu-item" (click)="sidebarOpen && toggleUserMgmt()">
+
+        <span class="icon">
+          👥
+        </span>
+
+        <span class="text" *ngIf="sidebarOpen">
+          User Management
+        </span>
+
         <span class="arrow" *ngIf="sidebarOpen">
           {{ userMgmtOpen ? '▾' : '▸' }}
         </span>
+
+        <!-- Tooltip -->
+        <span class="tooltip-text" *ngIf="!sidebarOpen">
+          User Management
+        </span>
+
       </div>
 
-      <!-- Submenu -->
+
+      <!-- ===================================================== -->
+      <!-- USER SUBMENU -->
+      <!-- ===================================================== -->
+
       <div class="submenu" *ngIf="sidebarOpen && userMgmtOpen">
-        <a routerLink="/users" routerLinkActive="active">
-          <span class="icon">👤</span>
-          <span class="text">Users</span>
+
+        <a routerLink="/users" routerLinkActive="active" class="menu-item">
+
+          <span class="icon">
+            👤
+          </span>
+
+          <span class="text">
+            Users
+          </span>
+
         </a>
+
       </div>
 
-      <!-- Products -->
-      <a routerLink="/product" routerLinkActive="active">
-        <span class="icon">📦</span>
-        <span class="text" *ngIf="sidebarOpen">Products</span>
+
+      <!-- ===================================================== -->
+      <!-- PRODUCTS -->
+      <!-- ===================================================== -->
+
+      <a routerLink="/product" routerLinkActive="active" class="menu-item">
+
+        <span class="icon">
+          📦
+        </span>
+
+        <span class="text" *ngIf="sidebarOpen">
+          Products
+        </span>
+
+        <!-- Tooltip -->
+        <span class="tooltip-text" *ngIf="!sidebarOpen">
+          Products
+        </span>
+
       </a>
 
-      <!-- Proposals -->
-      <a routerLink="/proposal" routerLinkActive="active">
-        <span class="icon">📑</span>
-        <span class="text" *ngIf="sidebarOpen">Proposals</span>
-      </a>
-      <a routerLink="/client" routerLinkActive="active">
-        <span class="icon">🏢</span>
-        <span class="text" *ngIf="sidebarOpen">Client</span>
-      </a>
-      <a routerLink="/package" routerLinkActive="active">
-        <span class="icon">📦</span>
-        <span class="text" *ngIf="sidebarOpen">Package</span>
+
+      <!-- ===================================================== -->
+      <!-- PROPOSALS -->
+      <!-- ===================================================== -->
+
+      <a routerLink="/proposal" routerLinkActive="active" class="menu-item">
+
+        <span class="icon">
+          📑
+        </span>
+
+        <span class="text" *ngIf="sidebarOpen">
+          Proposals
+        </span>
+
+        <!-- Tooltip -->
+        <span class="tooltip-text" *ngIf="!sidebarOpen">
+          Proposals
+        </span>
+
       </a>
 
-      <!-- Notifications -->
-      <!-- <a routerLink="/notifications" routerLinkActive="active">
-        <span class="icon">🔔</span>
-        <span class="text" *ngIf="sidebarOpen">Notifications</span>
-      </a> -->
 
-      <!-- LOGOUT (CLICK ACTION, NOT ROUTE) -->
-      <div class="menu-parent logout" (click)="logout()">
-        <span class="icon">⏻</span>
-        <span class="text" *ngIf="sidebarOpen">Logout</span>
+      <!-- ===================================================== -->
+      <!-- CLIENT -->
+      <!-- ===================================================== -->
+
+      <a routerLink="/client" routerLinkActive="active" class="menu-item">
+
+        <span class="icon">
+          🏢
+        </span>
+
+        <span class="text" *ngIf="sidebarOpen">
+          Client
+        </span>
+
+        <!-- Tooltip -->
+        <span class="tooltip-text" *ngIf="!sidebarOpen">
+          Client
+        </span>
+
+      </a>
+
+
+      <!-- ===================================================== -->
+      <!-- PACKAGE -->
+      <!-- ===================================================== -->
+
+      <a routerLink="/package" routerLinkActive="active" class="menu-item">
+
+        <span class="icon">
+          📦
+        </span>
+
+        <span class="text" *ngIf="sidebarOpen">
+          Package
+        </span>
+
+        <!-- Tooltip -->
+        <span class="tooltip-text" *ngIf="!sidebarOpen">
+          Package
+        </span>
+
+      </a>
+
+
+      <!-- ===================================================== -->
+      <!-- LOGOUT -->
+      <!-- ===================================================== -->
+
+      <div class="menu-parent logout menu-item" (click)="logout()">
+
+        <span class="icon">
+          ⏻
+        </span>
+
+        <span class="text" *ngIf="sidebarOpen">
+          Logout
+        </span>
+
+        <!-- Tooltip -->
+        <span class="tooltip-text" *ngIf="!sidebarOpen">
+          Logout
+        </span>
+
       </div>
 
     </nav>
+
   </aside>
 
-  <!-- Main Content -->
+
+  <!-- ========================================================= -->
+  <!-- MAIN CONTENT -->
+  <!-- ========================================================= -->
+
   <main class="content">
+
     <router-outlet></router-outlet>
+
   </main>
 
 </div>
 
-<!-- 🔄 GLOBAL LOADER -->
+
+<!-- ============================================================= -->
+<!-- GLOBAL LOADER -->
+<!-- ============================================================= -->
+
 <div *ngIf="loader.loading$ | async" class="loader-container">
+
   <div class="spinner"></div>
+
 </div>
