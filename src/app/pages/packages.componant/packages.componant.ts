@@ -1,6 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { SelectModule } from 'primeng/select';
+import { ButtonModule } from 'primeng/button';
+import { TableModule } from 'primeng/table';
+import { DialogModule } from 'primeng/dialog';
+import { InputTextModule } from 'primeng/inputtext';
+import { TooltipModule } from 'primeng/tooltip';
 
 import { AdminService } from '../../core/services/admin.service';
 import { LoaderService } from '../../core/services/loader.service';
@@ -26,7 +32,7 @@ interface PackageForm {
 @Component({
   selector: 'app-packages',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, SelectModule, ButtonModule, TableModule, DialogModule, InputTextModule, TooltipModule],
   templateUrl: './packages.componant.html',
   styleUrl: './packages.componant.scss',
 })
@@ -92,18 +98,27 @@ export class PackagesComponant implements OnInit {
     this.admin.getPackages().subscribe({
       next: (res: any) => {
         this.packageList = res.data || [];
+      },
+      error: () => {
+        this.toast.show('Unable to load package options.', 'error');
       }
     });
 
     this.admin.getProductName().subscribe({
       next: (res: any) => {
         this.productList = res.data || [];
+      },
+      error: () => {
+        this.toast.show('Unable to load product list.', 'error');
       }
     });
 
     this.admin.getWire().subscribe({
       next: (res: any) => {
         this.wiringTypes = res.data || res.resp?.data || [];
+      },
+      error: () => {
+        this.toast.show('Unable to load wiring types.', 'error');
       }
     });
   }

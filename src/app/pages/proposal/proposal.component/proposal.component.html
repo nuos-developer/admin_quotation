@@ -9,15 +9,15 @@
 
     <!-- SEARCH -->
     <div class="search-box">
-      <input type="text" placeholder="Search by client name..." [(ngModel)]="searchText"
+      <input type="text" pInputText placeholder="Search by client name..." [(ngModel)]="searchText"
         (ngModelChange)="filterProposals()" />
     </div>
 
     <!-- TABLE -->
     <div class="table-container">
       <div class="table-scroll">
-        <table class="table">
-          <thead>
+        <p-table [value]="filteredProposals">
+          <ng-template #header>
             <tr>
               <th>#</th>
               <th>Client Name</th>
@@ -27,10 +27,10 @@
               <th>Status</th>
               <th class="action-column">Action</th>
             </tr>
-          </thead>
+          </ng-template>
 
-          <tbody>
-            <tr *ngFor="let p of filteredProposals; let i = index">
+          <ng-template #body let-p let-i="rowIndex">
+            <tr>
               <td>{{ i + 1 }}</td>
 
               <td>
@@ -52,23 +52,25 @@
 
               <td class="action-column">
                 <div class="action-group">
-                  <button class="icon-btn view-btn" (click)="viewProposal(p)">
+                  <p-button styleClass="icon-btn view-btn" [text]="true" (onClick)="viewProposal(p)">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
                       stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                       <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                       <circle cx="12" cy="12" r="3"></circle>
                     </svg>
                     <span class="tooltip-text">View Proposal</span>
-                  </button>
+                  </p-button>
                 </div>
               </td>
             </tr>
+          </ng-template>
 
-            <tr *ngIf="!filteredProposals.length">
+          <ng-template #emptymessage>
+            <tr>
               <td colspan="7" class="no-data">No proposals found</td>
             </tr>
-          </tbody>
-        </table>
+          </ng-template>
+        </p-table>
       </div>
     </div>
 
@@ -567,25 +569,21 @@
 
 
   <!-- ================= STATUS CONFIRMATION MODAL ================= -->
-  <div class="modal-overlay" *ngIf="showStatusConfirm">
-    <div class="modal-box">
+  <p-dialog header="Confirm Status Change" [(visible)]="showStatusConfirm" [modal]="true" [closable]="false"
+    [dismissableMask]="false" [style]="{ width: '340px' }" styleClass="modal-box">
 
-      <h3>Confirm Status Change</h3>
+    <p>
+      Change status to
+      <strong>{{ statusToConfirm }}</strong>?
+    </p>
 
-      <p>
-        Change status to
-        <strong>{{ statusToConfirm }}</strong>?
-      </p>
-
+    <ng-template #footer>
       <div class="modal-actions">
-        <button class="btn modal-no" (click)="cancelStatusChange()">No</button>
-        <button class="btn modal-yes" (click)="confirmStatusChange(false)">Yes</button>
-        <button class="btn modal-yes-mail" (click)="confirmStatusChange(true)">
-          Yes, Send Mail
-        </button>
+        <p-button styleClass="modal-no" label="No" (onClick)="cancelStatusChange()"></p-button>
+        <p-button styleClass="modal-yes" label="Yes" (onClick)="confirmStatusChange(false)"></p-button>
+        <p-button styleClass="modal-yes-mail" label="Yes, Send Mail" (onClick)="confirmStatusChange(true)"></p-button>
       </div>
-
-    </div>
-  </div>
+    </ng-template>
+  </p-dialog>
 
 </div>

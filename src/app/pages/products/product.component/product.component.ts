@@ -5,12 +5,19 @@ import { FormsModule } from '@angular/forms';
 import { AdminService } from '../../../core/services/admin.service';
 import { LoaderService } from '../../../core/services/loader.service';
 import { ToastService } from '../../../core/services/toast.service';
+import { SelectModule } from 'primeng/select';
+import { ButtonModule } from 'primeng/button';
+import { TableModule } from 'primeng/table';
+import { DialogModule } from 'primeng/dialog';
+import { InputTextModule } from 'primeng/inputtext';
+import { TooltipModule } from 'primeng/tooltip';
+import { ToggleSwitchModule } from 'primeng/toggleswitch';
 
 
 @Component({
   selector: 'app-product',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, SelectModule, ButtonModule, TableModule, DialogModule, InputTextModule, TooltipModule, ToggleSwitchModule],
   templateUrl: './product.component.html',
   styleUrl: './product.component.scss',
 })
@@ -55,10 +62,33 @@ export class ProductComponent implements OnInit {
     zigbee_type: null,
     switch_load_count: 1,
     description: null,
+    is_price_editable: true,
     images: []
   };
 
   selectedCategories: any[] = [];
+
+  // ===== PrimeNG select option lists =====
+  productTypeOptions = [
+    { label: 'NUOS Products', value: 'NUOS Products' },
+    { label: 'Non-NUOS Products', value: 'Non-NUOS Products' }
+  ];
+
+  modSizeOptions = [
+    { label: '1', value: 1 },
+    { label: '2', value: 2 }
+  ];
+
+  switchLoadOptions = [
+    { label: '1', value: 1 },
+    { label: '2', value: 2 },
+    { label: '3', value: 3 },
+    { label: '4', value: 4 }
+  ];
+
+  get categoryFilterOptions() {
+    return [{ id: null, category_type: 'Select Product Category' }, ...this.categories];
+  }
 
   dropdownSettings = {
     singleSelection: false,
@@ -100,10 +130,16 @@ export class ProductComponent implements OnInit {
             this.filteredInactiveProducts = [...this.inactiveProducts]; // ✅
             this.loader.hide();   // 🔥 END
           },
-          error: () => this.loader.hide()
+          error: () => {
+            this.loader.hide();
+            this.toast.show('Failed to load inactive products', 'error');
+          }
         });
       },
-      error: () => this.loader.hide()
+      error: () => {
+        this.loader.hide();
+        this.toast.show('Failed to load active products', 'error');
+      }
     });
   }
 
@@ -116,7 +152,10 @@ export class ProductComponent implements OnInit {
         this.wiringTypes = res.data || res.resp?.data || [];
         this.loader.hide();
       },
-      error: () => this.loader.hide()
+      error: () => {
+        this.loader.hide();
+        this.toast.show('Failed to load wiring types', 'error');
+      }
     });
   }
 
@@ -128,7 +167,10 @@ export class ProductComponent implements OnInit {
         this.categories = res.data || res.resp?.data || [];
         this.loader.hide();
       },
-      error: () => this.loader.hide()
+      error: () => {
+        this.loader.hide();
+        this.toast.show('Failed to load categories', 'error');
+      }
     });
   }
 
@@ -188,6 +230,7 @@ export class ProductComponent implements OnInit {
     fd.append('zigbee_type', this.productForm.zigbee_type || '');
     fd.append('switch_load_count', this.productForm.switch_load_count);
     fd.append('description', this.productForm.description || '');
+    fd.append('is_price_editable', String(this.productForm.is_price_editable));
 
     if (this.productForm.images?.length) {
 
@@ -195,10 +238,6 @@ export class ProductComponent implements OnInit {
         fd.append('images', file);
       });
     }
-
-    fd.forEach((value, key) => {
-      console.log(key, value);
-    });
 
     this.loader.show();
 
@@ -218,9 +257,7 @@ export class ProductComponent implements OnInit {
         this.loadAllProducts();
       },
 
-      error: (err) => {
-
-        console.log(err);
+      error: () => {
 
         this.toast.show(
           'Failed to Update Product',
@@ -323,6 +360,7 @@ export class ProductComponent implements OnInit {
       zigbee_type: p.zigbee_type,
       switch_load_count: p.switch_load_count,
       description: p.description,
+      is_price_editable: p.is_price_editable ?? true,
 
       images: [],
       image_urls: p.image_urls || []
@@ -332,38 +370,6 @@ export class ProductComponent implements OnInit {
     this.showModal = true;
     this.showEdit = true;
   }
-  // editProduct(p: any): void {
-
-  //   console.log('EDIT PRODUCT:', p);
-
-  //   this.productForm = {
-  //     id: p.id,
-  //     product_name: p.product_name,
-  //     category: p.category,
-  //     mod_size: p.mod_size,
-  //     price: p.price,
-  //     wiring_type_id: p.wiring_type_id,
-  //     category_id: p.category_id,
-  //     zigbee_type: p.zigbee_type,
-  //     switch_load_count: p.switch_load_count,
-  //     description: p.description,
-
-  //     // IMPORTANT
-  //     images: []
-  //   };
-
-  //   console.log(
-  //     'PRODUCT FORM:',
-  //     this.productForm
-  //   );
-
-  //   // OPEN MODAL
-  //   this.showModal = true;
-
-  //   // OPEN EDIT FORM
-  //   this.showEdit = true;
-  // }
-
   openConfirm(action: 'ACTIVATE' | 'DEACTIVATE', id: number): void {
     this.confirmAction = action;
     this.confirmProductId = id;
@@ -401,6 +407,7 @@ export class ProductComponent implements OnInit {
       zigbee_type: null,
       switch_load_count: 1,
       description: null,
+      is_price_editable: false,
       images: []
     };
   }

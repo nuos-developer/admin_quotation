@@ -1,37 +1,24 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
-
-export interface Toast {
-  message: string;
-  type: 'success' | 'error';
-}
+import { MessageService } from 'primeng/api';
 
 @Injectable({ providedIn: 'root' })
 export class ToastService {
-  success(arg0: any) {
-    throw new Error('Method not implemented.');
-  }
-  error(message: any) {
-    throw new Error('Method not implemented.');
-  }
-
-  private toastSubject = new BehaviorSubject<Toast | null>(null);
-  toast$ = this.toastSubject.asObservable();
-
-  private timeoutRef: any; // ✅ store timer
+  constructor(private messageService: MessageService) {}
 
   show(message: string, type: 'success' | 'error' = 'success') {
+    this.messageService.add({
+      severity: type === 'success' ? 'success' : 'error',
+      summary: type === 'success' ? 'Success' : 'Error',
+      detail: message,
+      life: 3000
+    });
+  }
 
-    // ✅ clear old timer
-    if (this.timeoutRef) {
-      clearTimeout(this.timeoutRef);
-    }
+  success(message: string) {
+    this.show(message, 'success');
+  }
 
-    this.toastSubject.next({ message, type });
-
-    // ✅ new timer
-    this.timeoutRef = setTimeout(() => {
-      this.toastSubject.next(null);
-    }, 2000);
+  error(message: string) {
+    this.show(message, 'error');
   }
 }

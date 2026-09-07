@@ -1,6 +1,10 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { SelectModule } from 'primeng/select';
+import { ButtonModule } from 'primeng/button';
+import { TableModule } from 'primeng/table';
+import { TooltipModule } from 'primeng/tooltip';
 
 import { AdminService } from '../../core/services/admin.service';
 import { LoaderService } from '../../core/services/loader.service';
@@ -36,7 +40,7 @@ interface ClientForm {
 @Component({
   selector: 'app-client.componant',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, SelectModule, ButtonModule, TableModule, TooltipModule],
   templateUrl: './client.componant.html',
   styleUrl: './client.componant.scss',
 })
@@ -107,6 +111,7 @@ export class ClientComponant implements OnInit {
       },
       error: () => {
         this.leadStatusList = [];
+        this.toast.show('Unable to load lead status options.', 'error');
       }
     });
 
@@ -116,8 +121,31 @@ export class ClientComponant implements OnInit {
       },
       error: () => {
         this.referenceList = [];
+        this.toast.show('Unable to load reference options.', 'error');
       }
     });
+  }
+
+  /* ================= SELECT OPTIONS (p-select) ================= */
+
+  get leadStatusSelectOptions() {
+    return [
+      { label: 'Select Lead Status', value: null },
+      ...this.leadStatusList.map((item: any) => ({
+        label: item.lead_status || item.name || item.status_name,
+        value: item.id
+      }))
+    ];
+  }
+
+  get referenceSelectOptions() {
+    return [
+      { label: 'Select Reference', value: null },
+      ...this.referenceList.map((item: any) => ({
+        label: item.lead_reference || item.name,
+        value: item.id
+      }))
+    ];
   }
 
   /* ================= SEARCH + FILTER ================= */

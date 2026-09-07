@@ -14,10 +14,10 @@
         <!-- Lead Status filter (scrollable) -->
         <div class="filter-dropdown-wrapper" (click)="$event.stopPropagation()">
 
-            <button type="button" class="filter-toggle" (click)="toggleLeadStatusFilter()">
+            <p-button type="button" styleClass="filter-toggle" (onClick)="toggleLeadStatusFilter()">
                 <span>{{ getLeadStatusFilterLabel() }}</span>
                 <span class="dropdown-arrow" [class.open]="leadStatusFilterOpen">▼</span>
-            </button>
+            </p-button>
 
             <div class="filter-panel" *ngIf="leadStatusFilterOpen">
                 <div class="filter-list">
@@ -45,10 +45,10 @@
         <!-- Reference filter (scrollable) -->
         <div class="filter-dropdown-wrapper" (click)="$event.stopPropagation()">
 
-            <button type="button" class="filter-toggle" (click)="toggleReferenceFilter()">
+            <p-button type="button" styleClass="filter-toggle" (onClick)="toggleReferenceFilter()">
                 <span>{{ getReferenceFilterLabel() }}</span>
                 <span class="dropdown-arrow" [class.open]="referenceFilterOpen">▼</span>
-            </button>
+            </p-button>
 
             <div class="filter-panel" *ngIf="referenceFilterOpen">
                 <div class="filter-list">
@@ -73,13 +73,10 @@
 
         </div>
 
-        <button type="button" class="btn-clear-filter" *ngIf="hasActiveFilters" (click)="resetFilters()">
-            ✕ Clear
-        </button>
+        <p-button type="button" styleClass="btn-clear-filter" *ngIf="hasActiveFilters" label="✕ Clear"
+            (onClick)="resetFilters()"></p-button>
 
-        <button type="button" class="btn primary" (click)="openAdd()">
-            ➕ Add Client
-        </button>
+        <p-button type="button" styleClass="btn primary" label="➕ Add Client" (onClick)="openAdd()"></p-button>
     </div>
     <!-- ================= LOADER ================= -->
     <div *ngIf="loading" class="loader-container">
@@ -90,95 +87,51 @@
     <!-- ===================================================== -->
     <div class="table-wrapper" *ngIf="clients && clients.length > 0;">
 
-    <table class="client-table">
+    <p-table [value]="filteredClients" styleClass="client-table">
 
-        <thead>
-
+        <ng-template #header>
             <tr>
-
                 <th width="60">Sr. No.</th>
-
                 <th width="110">Client Id</th>
-
                 <!-- <th>Client Name</th> -->
-
                 <th>Email</th>
-
                 <th width="130">Mobile</th>
-
                 <th width="140">Lead Status</th>
-
                 <th width="140">Reference</th>
-
                 <th width="160">Role Name</th>
-
                 <th width="110">Action</th>
-
             </tr>
+        </ng-template>
 
-        </thead>
-
-        <tbody>
-
-            <tr *ngFor="let client of filteredClients; let i=index">
-
+        <ng-template #body let-client let-i="rowIndex">
+            <tr>
                 <td width="60">{{i+1}}</td>
-
                 <td width="110">{{client.client_id}}</td>
-
                 <!-- <td>{{client.first_name}} {{client.last_name}}</td> -->
-
                 <td>{{client.email_id}}</td>
-
                 <td width="130">{{client.mobile_number}}</td>
-
                 <td width="140">{{ getLeadStatusName(client) }}</td>
-
                 <td width="140">{{ getReferenceName(client) }}</td>
-
                 <td width="160">{{client.role_name}}</td>
-
                 <td width="110">
 
                     <div class="action-group">
 
-                        <button
-                            class="icon-btn view-btn"
-                            (click)="viewClient(client)">
+                        <p-button type="button" [rounded]="true" [text]="true" severity="info" size="small"
+                            icon="pi pi-eye" pTooltip="View Client" tooltipPosition="top"
+                            (onClick)="viewClient(client)"></p-button>
 
-                            👁
-
-                            <span class="tooltip-text">
-
-                                View Client
-
-                            </span>
-
-                        </button>
-
-                        <button
-                            class="icon-btn edit-btn"
-                            (click)="editClient(client)">
-
-                            ✏️
-
-                            <span class="tooltip-text">
-
-                                Edit Client
-
-                            </span>
-
-                        </button>
+                        <p-button type="button" [rounded]="true" [text]="true" severity="success" size="small"
+                            icon="pi pi-pencil" pTooltip="Edit Client" tooltipPosition="top"
+                            (onClick)="editClient(client)"></p-button>
 
                     </div>
 
                 </td>
-
             </tr>
+        </ng-template>
 
-        </tbody>
-
-    </table>
+    </p-table>
 
 </div>
     <!-- ================= EMPTY ================= -->
@@ -195,9 +148,7 @@
 
     <!-- ================= HEADER ================= -->
     <div class="page-header-bar">
-        <button type="button" class="back-btn" (click)="closeModal()">
-            ← Back
-        </button>
+        <p-button type="button" styleClass="back-btn" label="← Back" (onClick)="closeModal()"></p-button>
         <h2 class="page-title">
             {{ showAdd ? 'Add Client' : 'Edit Client' }}
         </h2>
@@ -265,12 +216,9 @@
                         Lead Status
                         <span class="required">*</span>
                     </label>
-                    <select [(ngModel)]="form.lead_status_id" [ngModelOptions]="{standalone:true}">
-                        <option [ngValue]="null">Select Lead Status</option>
-                        <option *ngFor="let item of leadStatusList" [ngValue]="item.id">
-                            {{ item.lead_status || item.name || item.status_name }}
-                        </option>
-                    </select>
+                    <p-select [options]="leadStatusSelectOptions" optionLabel="label" optionValue="value"
+                        [(ngModel)]="form.lead_status_id" [ngModelOptions]="{standalone:true}"
+                        placeholder="Select Lead Status"></p-select>
                     <div class="error-msg" *ngIf="submitted && (form.lead_status_id === null || form.lead_status_id === undefined)">
                         Lead Status is required.
                     </div>
@@ -282,12 +230,9 @@
                         Reference
                         <span class="required">*</span>
                     </label>
-                    <select [(ngModel)]="form.reference_id" [ngModelOptions]="{standalone:true}">
-                        <option [ngValue]="null">Select Reference</option>
-                        <option *ngFor="let item of referenceList" [ngValue]="item.id">
-                            {{ item.lead_reference || item.name }}
-                        </option>
-                    </select>
+                    <p-select [options]="referenceSelectOptions" optionLabel="label" optionValue="value"
+                        [(ngModel)]="form.reference_id" [ngModelOptions]="{standalone:true}"
+                        placeholder="Select Reference"></p-select>
                     <div class="error-msg" *ngIf="submitted && (form.reference_id === null || form.reference_id === undefined)">
                         Reference is required.
                     </div>
@@ -415,12 +360,9 @@
     </div>
     <!-- ================= FOOTER ================= -->
     <div class="page-footer">
-        <button type="button" class="btn-cancel" (click)="closeModal()">
-            Cancel
-        </button>
-        <button type="button" [ngClass]="showAdd ? 'btn-submit' : 'btn-update'" (click)="saveClient()">
-            {{ showAdd ? 'Save Client' : 'Update Client' }}
-        </button>
+        <p-button type="button" styleClass="btn-cancel" label="Cancel" (onClick)="closeModal()"></p-button>
+        <p-button type="button" [styleClass]="showAdd ? 'btn-submit' : 'btn-update'"
+            [label]="showAdd ? 'Save Client' : 'Update Client'" (onClick)="saveClient()"></p-button>
     </div>
 </div>
 
@@ -430,9 +372,7 @@
 <div class="page-box" *ngIf="showView">
     <!-- ================= HEADER ================= -->
     <div class="page-header-bar">
-        <button type="button" class="back-btn" (click)="closeModal()">
-            ← Back
-        </button>
+        <p-button type="button" styleClass="back-btn" label="← Back" (onClick)="closeModal()"></p-button>
         <h2 class="page-title">
             Client Details
         </h2>
@@ -569,8 +509,6 @@
     </div>
     <!-- ================= FOOTER ================= -->
     <div class="page-footer">
-        <button type="button" class="btn-cancel" (click)="closeModal()">
-            Back to List
-        </button>
+        <p-button type="button" styleClass="btn-cancel" label="Back to List" (onClick)="closeModal()"></p-button>
     </div>
 </div>

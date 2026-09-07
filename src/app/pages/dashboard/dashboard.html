@@ -43,18 +43,12 @@
       <div class="chart-header">
         <h3>Proposal Graph</h3>
 
-        <select [(ngModel)]="graphType" (change)="onGraphChange()" class="graph-select">
-          <option value="day">Day</option>
-          <option value="week">Week</option>
-          <option value="month">Month</option>
-          <option value="year">Year</option>
-        </select>
+        <p-select [options]="graphTypeOptions" optionLabel="label" optionValue="value" [(ngModel)]="graphType"
+          (onChange)="onGraphChange()"></p-select>
       </div>
 
       <div class="chart-container">
-        <canvas baseChart #proposalChartRef="base-chart" [data]="barChartData" [options]="barChartOptions"
-          [type]="'bar'">
-        </canvas>
+        <p-chart type="bar" [data]="barChartData" [options]="barChartOptions" height="100%"></p-chart>
       </div>
     </div>
 
@@ -62,29 +56,31 @@
     <div class="table-card">
       <h3>Role Wise Users</h3>
 
-      <table>
-        <thead>
+      <p-table [value]="roleWiseUsers">
+        <ng-template #header>
           <tr>
             <th>Role</th>
             <th>Total Users</th>
             <th>Approved</th>
             <th>Pending</th>
           </tr>
-        </thead>
+        </ng-template>
 
-        <tbody>
-          <tr *ngFor="let role of roleWiseUsers">
+        <ng-template #body let-role>
+          <tr>
             <td>{{ role.role_name }}</td>
             <td>{{ role.total_users }}</td>
             <td class="approved">{{ role.approved_users }}</td>
             <td class="pending">{{ role.pending_users }}</td>
           </tr>
+        </ng-template>
 
-          <tr *ngIf="roleWiseUsers.length === 0">
+        <ng-template #emptymessage>
+          <tr>
             <td colspan="4" class="no-data">No data available</td>
           </tr>
-        </tbody>
-      </table>
+        </ng-template>
+      </p-table>
     </div>
 
     <!-- Product Usage Graph -->
@@ -94,33 +90,15 @@
 
         <div class="filter-group">
 
-          <div class="custom-dropdown">
-            <button type="button" class="dropdown-toggle" (click)="toggleProductDropdown()">
-              <span>{{ selectedProductName }}</span>
-              <i class="arrow" [class.open]="isProductDropdownOpen"></i>
-            </button>
+          <p-select [options]="productSelectOptions" optionLabel="product_name" optionValue="id"
+            [(ngModel)]="selectedProductId" (onChange)="onProductSelectChange()"></p-select>
 
-            <ul class="dropdown-menu" *ngIf="isProductDropdownOpen">
-              <li [class.active]="!selectedProductId" (click)="selectProduct(null)">
-                All Products
-              </li>
-              <li *ngFor="let p of productsList" [class.active]="selectedProductId === p.id" (click)="selectProduct(p)">
-                {{ p.product_name }}
-              </li>
-            </ul>
-          </div>
+          <p-select [options]="usagePeriodOptions" optionLabel="label" optionValue="value" [(ngModel)]="usagePeriod"
+            (onChange)="onUsagePeriodChange()"></p-select>
 
-          <select [(ngModel)]="usagePeriod" (ngModelChange)="onUsagePeriodChange()" class="graph-select">
-            <option value="">All time</option>
-            <option value="day">Day</option>
-            <option value="week">Week</option>
-            <option value="month">Month</option>
-            <option value="year">Year</option>
-          </select>
-
-          <button type="button" class="toggle-btn" *ngIf="rawUsageLabels.length > usageTopN" (click)="toggleShowAll()">
-            {{ showAllUsage ? 'Show Top ' + usageTopN : 'Show All (' + rawUsageLabels.length + ')' }}
-          </button>
+          <p-button *ngIf="rawUsageLabels.length > usageTopN" size="small" severity="secondary"
+            [label]="showAllUsage ? 'Show Top ' + usageTopN : 'Show All (' + rawUsageLabels.length + ')'"
+            (onClick)="toggleShowAll()"></p-button>
         </div>
       </div>
 
@@ -130,9 +108,7 @@
 
       <div class="chart-scroll-wrapper" *ngIf="usageChartLabels.length > 0">
         <div class="chart-inner" [style.min-width.px]="usageChartLabels.length * 55">
-          <canvas baseChart #usageChartRef="base-chart" [data]="usageChartData" [options]="usageChartOptions"
-            [type]="'bar'">
-          </canvas>
+          <p-chart type="bar" [data]="usageChartData" [options]="usageChartOptions" height="100%"></p-chart>
         </div>
       </div>
     </div>

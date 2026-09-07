@@ -7,15 +7,15 @@
   </div>
   <!-- ================= SEARCH ================= -->
   <div class="search-box">
-    <input type="text" class="search-input" placeholder="🔍 Search User..." [(ngModel)]="searchText"
+    <input pInputText type="text" placeholder="🔍 Search User..." [(ngModel)]="searchText"
       (input)="filterUsers()">
   </div>
   <!-- ===================================================== -->
   <!-- USERS TABLE -->
   <!-- ===================================================== -->
   <div class="table-container table-scroll">
-    <table class="table">
-      <thead>
+    <p-table [value]="filteredUsers">
+      <ng-template #header>
         <tr>
           <th>Name</th>
           <th>Email</th>
@@ -23,12 +23,11 @@
           <th>Status</th>
           <th class="action-column">
             Action
-
           </th>
         </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let u of filteredUsers">
+      </ng-template>
+      <ng-template #body let-u>
+        <tr>
           <td>
             {{u.user_name}}
           </td>
@@ -45,316 +44,241 @@
           <td class="action-column">
             <div class="action-group">
               <!-- VIEW -->
-              <button type="button" class="icon-btn view-btn" (click)="viewUser(u)">
-                👁
-
-                <span class="tooltip-text">
-                  View
-
-                </span>
-              </button>
+              <p-button type="button" [rounded]="true" [text]="true" severity="info" size="small"
+                icon="pi pi-eye" pTooltip="View" tooltipPosition="top"
+                (onClick)="viewUser(u)"></p-button>
               <!-- PERMISSION -->
-              <button type="button" class="icon-btn permission-btn" (click)="openPermission(u)">
-                🔑
-
-                <span class="tooltip-text">
-                  Manage Permission
-
-                </span>
-              </button>
+              <p-button type="button" [rounded]="true" [text]="true" severity="warn" size="small"
+                icon="pi pi-key" pTooltip="Manage Permission" tooltipPosition="top"
+                (onClick)="openPermission(u)"></p-button>
               <!-- DELETE -->
-              <button type="button" class="icon-btn delete-btn" (click)="openDeleteConfirm(u)">
-                🗑️
-
-                <span class="tooltip-text">
-                  Delete
-
-                </span>
-              </button>
+              <p-button type="button" [rounded]="true" [text]="true" severity="danger" size="small"
+                icon="pi pi-trash" pTooltip="Delete" tooltipPosition="top"
+                (onClick)="openDeleteConfirm(u)"></p-button>
             </div>
           </td>
         </tr>
-        <!-- Empty Record -->
-        <tr *ngIf="filteredUsers.length === 0">
+      </ng-template>
+      <ng-template #emptymessage>
+        <tr>
           <td colspan="5" class="no-data">
             No Users Found
-
           </td>
         </tr>
-      </tbody>
-    </table>
+      </ng-template>
+    </p-table>
   </div>
 </div>
 <!-- ===================================================== -->
 <!-- VIEW USER MODAL -->
 <!-- ===================================================== -->
-<div class="modal" *ngIf="showView">
-  <div class="modal-box large">
-    <!-- ================= HEADER ================= -->
-    <div class="modal-header">
-      <h2 class="modal-title">
-        User Details
-
-      </h2>
+<p-dialog [modal]="true" [visible]="showView" (onHide)="close()" [dismissableMask]="false"
+  [style]="{width: '900px'}" header="User Details" *ngIf="selectedUser">
+  <div class="form-grid">
+    <!-- User Name -->
+    <div class="form-field">
+      <label>User Name</label>
+      <input pInputText [value]="selectedUser.user_name" disabled>
     </div>
-    <!-- ================= BODY ================= -->
-    <div class="modal-body">
-      <div class="form-grid">
-        <!-- User Name -->
-        <div class="form-field">
-          <label>User Name</label>
-          <input [value]="selectedUser.user_name" disabled>
-        </div>
-        <!-- First Name -->
-        <div class="form-field">
-          <label>First Name</label>
-          <input [value]="selectedUser.first_name" disabled>
-        </div>
-        <!-- Last Name -->
-        <div class="form-field">
-          <label>Last Name</label>
-          <input [value]="selectedUser.last_name" disabled>
-        </div>
-        <!-- Email -->
-        <div class="form-field">
-          <label>Email Address</label>
-          <input [value]="selectedUser.email_id" disabled>
-        </div>
-        <!-- Mobile -->
-        <div class="form-field">
-          <label>Mobile Number</label>
-          <input [value]="selectedUser.mobile_number" disabled>
-        </div>
-        <!-- Status -->
-        <div class="form-field">
-          <label>Status</label>
-          <input [value]="selectedUser.is_admin_approve" disabled>
-        </div>
-        <!-- Address -->
-        <div class="form-field full-width">
-          <label>Address</label>
-          <textarea rows="3" [value]="selectedUser.address" disabled>
-                            </textarea>
-        </div>
-        <!-- Pincode -->
-        <div class="form-field">
-          <label>Pin Code</label>
-          <input [value]="selectedUser.pin_code" disabled>
-        </div>
-        <!-- Country -->
-        <div class="form-field">
-          <label>Country</label>
-          <input [value]="selectedUser.country" disabled>
-        </div>
-        <!-- State -->
-        <div class="form-field">
-          <label>State</label>
-          <input [value]="selectedUser.state" disabled>
-        </div>
-        <!-- District -->
-        <div class="form-field">
-          <label>District</label>
-          <input [value]="selectedUser.district" disabled>
-        </div>
-        <!-- Taluk -->
-        <div class="form-field">
-          <label>Taluk</label>
-          <input [value]="selectedUser.taluk" disabled>
-        </div>
-        <!-- Division -->
-        <div class="form-field">
-          <label>Division</label>
-          <input [value]="selectedUser.division" disabled>
-        </div>
-        <!-- Region -->
-        <div class="form-field">
-          <label>Region</label>
-          <input [value]="selectedUser.region" disabled>
-        </div>
-        <!-- Company Name -->
-        <div class="form-field">
-          <label>Company Name</label>
-          <input [value]="selectedUser.company_name" disabled>
-        </div>
-        <!-- Company Address -->
-        <div class="form-field full-width">
-          <label>Company Address</label>
-          <textarea rows="3" [value]="selectedUser.company_address" disabled>
-                            </textarea>
-        </div>
-        <!-- GST Name -->
-        <div class="form-field">
-          <label>GST Name</label>
-          <input [value]="selectedUser.gst_name" disabled>
-        </div>
-        <!-- Role -->
-        <div class="form-field">
-          <label>Role Name</label>
-          <input [value]="selectedUser.role_name" disabled>
-        </div>
-        <!-- Registered -->
-        <div class="form-field">
-          <label>Registered Date & Time</label>
-          <input [value]="selectedUser?.registed_at | date:'dd-MM-yyyy HH:mm:ss'" disabled>
-        </div>
-        <!-- Approved -->
-        <div class="form-field">
-          <label>Approved Date & Time</label>
-          <input [value]="selectedUser?.approved_at | date:'dd-MM-yyyy HH:mm:ss'" disabled>
-        </div>
-      </div>
+    <!-- First Name -->
+    <div class="form-field">
+      <label>First Name</label>
+      <input pInputText [value]="selectedUser.first_name" disabled>
     </div>
-    <!-- ================= FOOTER ================= -->
-    <div class="modal-footer">
-      <button type="button" class="btn-cancel" (click)="close()">
-        Close
-
-      </button>
+    <!-- Last Name -->
+    <div class="form-field">
+      <label>Last Name</label>
+      <input pInputText [value]="selectedUser.last_name" disabled>
+    </div>
+    <!-- Email -->
+    <div class="form-field">
+      <label>Email Address</label>
+      <input pInputText [value]="selectedUser.email_id" disabled>
+    </div>
+    <!-- Mobile -->
+    <div class="form-field">
+      <label>Mobile Number</label>
+      <input pInputText [value]="selectedUser.mobile_number" disabled>
+    </div>
+    <!-- Status -->
+    <div class="form-field">
+      <label>Status</label>
+      <input pInputText [value]="selectedUser.is_admin_approve" disabled>
+    </div>
+    <!-- Address -->
+    <div class="form-field full-width">
+      <label>Address</label>
+      <textarea rows="3" [value]="selectedUser.address" disabled>
+                        </textarea>
+    </div>
+    <!-- Pincode -->
+    <div class="form-field">
+      <label>Pin Code</label>
+      <input pInputText [value]="selectedUser.pin_code" disabled>
+    </div>
+    <!-- Country -->
+    <div class="form-field">
+      <label>Country</label>
+      <input pInputText [value]="selectedUser.country" disabled>
+    </div>
+    <!-- State -->
+    <div class="form-field">
+      <label>State</label>
+      <input pInputText [value]="selectedUser.state" disabled>
+    </div>
+    <!-- District -->
+    <div class="form-field">
+      <label>District</label>
+      <input pInputText [value]="selectedUser.district" disabled>
+    </div>
+    <!-- Taluk -->
+    <div class="form-field">
+      <label>Taluk</label>
+      <input pInputText [value]="selectedUser.taluk" disabled>
+    </div>
+    <!-- Division -->
+    <div class="form-field">
+      <label>Division</label>
+      <input pInputText [value]="selectedUser.division" disabled>
+    </div>
+    <!-- Region -->
+    <div class="form-field">
+      <label>Region</label>
+      <input pInputText [value]="selectedUser.region" disabled>
+    </div>
+    <!-- Company Name -->
+    <div class="form-field">
+      <label>Company Name</label>
+      <input pInputText [value]="selectedUser.company_name" disabled>
+    </div>
+    <!-- Company Address -->
+    <div class="form-field full-width">
+      <label>Company Address</label>
+      <textarea rows="3" [value]="selectedUser.company_address" disabled>
+                        </textarea>
+    </div>
+    <!-- GST Name -->
+    <div class="form-field">
+      <label>GST Name</label>
+      <input pInputText [value]="selectedUser.gst_name" disabled>
+    </div>
+    <!-- Role -->
+    <div class="form-field">
+      <label>Role Name</label>
+      <input pInputText [value]="selectedUser.role_name" disabled>
+    </div>
+    <!-- Registered -->
+    <div class="form-field">
+      <label>Registered Date & Time</label>
+      <input pInputText [value]="selectedUser?.registed_at | date:'dd-MM-yyyy HH:mm:ss'" disabled>
+    </div>
+    <!-- Approved -->
+    <div class="form-field">
+      <label>Approved Date & Time</label>
+      <input pInputText [value]="selectedUser?.approved_at | date:'dd-MM-yyyy HH:mm:ss'" disabled>
     </div>
   </div>
-</div>
+  <!-- ================= FOOTER ================= -->
+  <div class="modal-footer">
+    <p-button type="button" label="Close" severity="secondary" (onClick)="close()"></p-button>
+  </div>
+</p-dialog>
 <!-- ===================================================== -->
 <!-- PERMISSION MODAL -->
 <!-- ===================================================== -->
-<div class="modal" *ngIf="showPermission">
-  <div class="modal-box xlarge">
-    <!-- ================= HEADER ================= -->
-    <div class="modal-header">
-      <h2 class="modal-title">
-        Manage User Permissions
-
-      </h2>
-      <!-- User Information -->
-      <div class="user-info-card">
-        <div class="info-item">
-          <span class="title">
-            User Name
-
-          </span>
-          <span class="value">
-            {{ selectedUser.user_name }}
-          </span>
-        </div>
-        <div class="info-item">
-          <span class="title">
-            Email
-
-          </span>
-          <span class="value">
-            {{ selectedUser.email_id }}
-          </span>
-        </div>
-        <div class="info-item">
-          <span class="title">
-            Requested Role
-
-          </span>
-          <span class="value">
-            {{ selectedUser.role_name }}
-          </span>
-        </div>
-      </div>
+<p-dialog [modal]="true" [visible]="showPermission" (onHide)="close()" [dismissableMask]="false"
+  [style]="{width: '1150px'}" header="Manage User Permissions" *ngIf="selectedUser">
+  <!-- User Information -->
+  <div class="user-info-card">
+    <div class="info-item">
+      <span class="title">
+        User Name
+      </span>
+      <span class="value">
+        {{ selectedUser.user_name }}
+      </span>
     </div>
-    <!-- ================= BODY ================= -->
-    <div class="modal-body">
-      <!-- Role Selection -->
-      <div class="role-section">
-        <label>
-          Assign Role
-
-        </label>
-        <select [(ngModel)]="selectedRoleId">
-          <option [ngValue]="null">
-            Select Role
-
-          </option>
-          <option *ngFor="let role of roles" [ngValue]="role.id">
-            {{ role.role_name }}
-          </option>
-        </select>
-      </div>
-      <!-- Permission Cards -->
-      <div class="permission-grid">
-        <div class="permission-card" *ngFor="let module of modules">
-          <!-- Card Header -->
-          <div class="card-header">
-            {{ module.module_name | titlecase }}
-          </div>
-          <!-- Card Body -->
-          <div class="checkbox-group">
-            <label>
-              <input type="checkbox" [(ngModel)]="permissionsMap[module.id].can_create" (change)="onPermissionChange()">
-              Create
-
-            </label>
-            <label>
-              <input type="checkbox" [(ngModel)]="permissionsMap[module.id].can_view" (change)="onPermissionChange()">
-              View
-
-            </label>
-            <label>
-              <input type="checkbox" [(ngModel)]="permissionsMap[module.id].can_update" (change)="onPermissionChange()">
-              Update
-
-            </label>
-            <label>
-              <input type="checkbox" [(ngModel)]="permissionsMap[module.id].can_delete" (change)="onPermissionChange()">
-              Delete
-
-            </label>
-          </div>
-        </div>
-      </div>
+    <div class="info-item">
+      <span class="title">
+        Email
+      </span>
+      <span class="value">
+        {{ selectedUser.email_id }}
+      </span>
     </div>
-    <!-- ================= FOOTER ================= -->
-    <div class="modal-footer">
-      <button type="button" class="btn-cancel" (click)="close()">
-        Cancel
-
-      </button>
-      <button type="button" class="btn-submit" [disabled]="!hasPermissionSelected" (click)="saveAllPermissions()">
-        Save Permissions
-
-      </button>
+    <div class="info-item">
+      <span class="title">
+        Requested Role
+      </span>
+      <span class="value">
+        {{ selectedUser.role_name }}
+      </span>
     </div>
   </div>
-</div>
+  <!-- Role Selection -->
+  <div class="role-section">
+    <label>
+      Assign Role
+    </label>
+    <p-select [options]="roles" optionLabel="role_name" optionValue="id" placeholder="Select Role"
+      [(ngModel)]="selectedRoleId"></p-select>
+  </div>
+  <!-- Permission Cards -->
+  <div class="permission-grid">
+    <div class="permission-card" *ngFor="let module of modules">
+      <!-- Card Header -->
+      <div class="card-header">
+        {{ module.module_name | titlecase }}
+      </div>
+      <!-- Card Body -->
+      <div class="checkbox-group">
+        <label>
+          <input type="checkbox" [(ngModel)]="permissionsMap[module.id].can_create" (change)="onPermissionChange()">
+          Create
+        </label>
+        <label>
+          <input type="checkbox" [(ngModel)]="permissionsMap[module.id].can_view" (change)="onPermissionChange()">
+          View
+        </label>
+        <label>
+          <input type="checkbox" [(ngModel)]="permissionsMap[module.id].can_update" (change)="onPermissionChange()">
+          Update
+        </label>
+        <label>
+          <input type="checkbox" [(ngModel)]="permissionsMap[module.id].can_delete" (change)="onPermissionChange()">
+          Delete
+        </label>
+      </div>
+    </div>
+  </div>
+  <!-- ================= FOOTER ================= -->
+  <div class="modal-footer">
+    <p-button type="button" label="Cancel" severity="secondary" (onClick)="close()"></p-button>
+    <p-button type="button" label="Save Permissions" severity="success" [disabled]="!hasPermissionSelected"
+      (onClick)="saveAllPermissions()"></p-button>
+  </div>
+</p-dialog>
 <!-- ===================================================== -->
 <!-- DELETE USER CONFIRMATION MODAL -->
 <!-- ===================================================== -->
-<div class="modal" *ngIf="showDeleteConfirm">
-  <div class="modal-box small">
-    <!-- ================= ICON ================= -->
-    <div class="confirm-icon">
-      🗑️
-
-    </div>
-    <!-- ================= TITLE ================= -->
-    <h2 class="confirm-title">
-      Delete User
-
-    </h2>
-    <!-- ================= MESSAGE ================= -->
-    <p class="confirm-message">
-      Are you sure you want to delete
-
-      <strong>
-        {{ selectedUser?.user_name }}
-      </strong>
-      ?
-      <br><br>
-      This action cannot be undone.
-    </p>
-    <!-- ================= FOOTER ================= -->
-    <div class="modal-footer">
-      <button type="button" class="btn-no" (click)="cancelDelete()">
-        Cancel
-
-      </button>
-      <button type="button" class="btn-yes" (click)="deleteUser()">
-        Delete
-
-      </button>
-    </div>
+<p-dialog [modal]="true" [visible]="showDeleteConfirm" (onHide)="cancelDelete()" [dismissableMask]="false"
+  [style]="{width: '420px'}" header="Delete User">
+  <div class="confirm-icon">
+    <i class="pi pi-trash"></i>
   </div>
-</div>
+  <!-- ================= MESSAGE ================= -->
+  <p class="confirm-message">
+    Are you sure you want to delete
+    <strong>
+      {{ selectedUser?.user_name }}
+    </strong>
+    ?
+    <br><br>
+    This action cannot be undone.
+  </p>
+  <!-- ================= FOOTER ================= -->
+  <div class="modal-footer">
+    <p-button type="button" label="Cancel" severity="secondary" (onClick)="cancelDelete()"></p-button>
+    <p-button type="button" label="Delete" severity="danger" (onClick)="deleteUser()"></p-button>
+  </div>
+</p-dialog>

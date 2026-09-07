@@ -1,8 +1,12 @@
-import { Component, OnInit, ViewChild, HostListener } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AdminService } from '../../core/services/admin.service';
 import { LoaderService } from '../../core/services/loader.service';
-import { BaseChartDirective } from 'ng2-charts';
+import { ToastService } from '../../core/services/toast.service';
+import { ChartModule } from 'primeng/chart';
+import { SelectModule } from 'primeng/select';
+import { ButtonModule } from 'primeng/button';
+import { TableModule } from 'primeng/table';
 import {
   ChartConfiguration,
   ChartOptions,
@@ -16,9 +20,10 @@ Chart.register(...registerables);
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, BaseChartDirective, FormsModule],
+  imports: [CommonModule, ChartModule, FormsModule, SelectModule, ButtonModule, TableModule],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Dashboard implements OnInit {
 
@@ -31,7 +36,20 @@ export class Dashboard implements OnInit {
   // ===== Proposal graph =====
   graphType = "day";
 
-  @ViewChild('proposalChartRef') proposalChart?: BaseChartDirective;
+  graphTypeOptions = [
+    { label: 'Day', value: 'day' },
+    { label: 'Week', value: 'week' },
+    { label: 'Month', value: 'month' },
+    { label: 'Year', value: 'year' }
+  ];
+
+  usagePeriodOptions = [
+    { label: 'All time', value: '' },
+    { label: 'Day', value: 'day' },
+    { label: 'Week', value: 'week' },
+    { label: 'Month', value: 'month' },
+    { label: 'Year', value: 'year' }
+  ];
 
   public barChartData: ChartConfiguration<'bar'>['data'] = {
     labels: [],
@@ -58,7 +76,6 @@ export class Dashboard implements OnInit {
   // ===== Combined product usage =====
   productsList: any[] = [];
   selectedProductId: string = "";
-  selectedProductName: string = "All Products";
   usagePeriod: string = "";
 
   rawUsageLabels: string[] = [];
@@ -67,9 +84,11 @@ export class Dashboard implements OnInit {
   showAllUsage = false;
   usageTopN = 15;
 
-  isProductDropdownOpen = false;
+  get productSelectOptions() {
+    return [{ id: '', product_name: 'All Products' }, ...this.productsList];
+  }
 
-  @ViewChild('usageChartRef') usageChart?: BaseChartDirective;
+  private cachedGradient: { gradient: CanvasGradient; top: number; bottom: number } | null = null;
 
   public usageChartData: ChartConfiguration<'bar'>['data'] = {
     labels: [],
@@ -91,7 +110,7 @@ export class Dashboard implements OnInit {
   public usageChartOptions: ChartOptions<'bar'> = {
     responsive: true,
     maintainAspectRatio: false,
-    resizeDelay: 0,          // <-- important: resize turant apply ho, delay nahi
+    resizeDelay: 0,
     animation: { duration: 400 },
     layout: {
       padding: { top: 10, right: 10, left: 0, bottom: 0 }
@@ -132,7 +151,9 @@ export class Dashboard implements OnInit {
 
   constructor(
     private admin: AdminService,
-    private loader: LoaderService
+    private loader: LoaderService,
+    private toast: ToastService,
+    private cdr: ChangeDetectorRef
   ) { }
 
   ngOnInit(): void {
@@ -147,10 +168,20 @@ export class Dashboard implements OnInit {
     const { ctx: canvasCtx, chartArea } = chart;
     if (!chartArea) return '#3092f4';
 
+    if (
+      this.cachedGradient &&
+      this.cachedGradient.top === chartArea.top &&
+      this.cachedGradient.bottom === chartArea.bottom
+    ) {
+      return this.cachedGradient.gradient;
+    }
+
     const gradient = canvasCtx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
     gradient.addColorStop(0, '#5aa4ff');
     gradient.addColorStop(1, '#2f7ff0');
-    return gradient;
+
+    this.cachedGradient = { gradient, top: chartArea.top, bottom: chartArea.bottom };
+    return this.cachedGradient.gradient;
   }
 
   fetchDashboard() {
@@ -163,10 +194,13 @@ export class Dashboard implements OnInit {
         this.roleWiseUsers = res.data.roleWiseUsers;
         this.isLoading = false;
         this.loader.hide();
+        this.cdr.markForCheck();
       },
       error: () => {
         this.isLoading = false;
         this.loader.hide();
+        this.toast.show('Failed to load dashboard summary', 'error');
+        this.cdr.markForCheck();
       }
     });
   }
@@ -177,7 +211,10 @@ export class Dashboard implements OnInit {
         this.proposalGraph = res.data.proposalGraph;
         this.loadChart();
       },
-      error: (err) => console.log(err)
+      error: () => {
+        this.toast.show('Failed to load proposal graph', 'error');
+        this.cdr.markForCheck();
+      }
     });
   }
 
@@ -186,54 +223,32 @@ export class Dashboard implements OnInit {
   }
 
   loadChart() {
-    this.barChartData.labels = this.proposalGraph.map((x: any) => x.label);
-    this.barChartData.datasets[0].data =
-      this.proposalGraph.map((x: any) => Number(x.proposal_count));
-
-    this.proposalChart?.update();
-
-    // ensure correct size even if canvas rendered with 0 width on first paint
-    setTimeout(() => this.proposalChart?.chart?.resize(), 0);
+    this.barChartData = {
+      ...this.barChartData,
+      labels: this.proposalGraph.map((x: any) => x.label),
+      datasets: [
+        {
+          ...this.barChartData.datasets[0],
+          data: this.proposalGraph.map((x: any) => Number(x.proposal_count))
+        }
+      ]
+    };
+    this.cdr.markForCheck();
   }
 
   fetchProductsList() {
     this.admin.getProductsList().subscribe({
       next: (res: any) => {
         this.productsList = res.data || [];
+        this.cdr.markForCheck();
       },
-      error: (err) => console.log(err)
+      error: () => {
+        this.toast.show('Failed to load products list', 'error');
+        this.cdr.markForCheck();
+      }
     });
   }
 
-  toggleProductDropdown() {
-    this.isProductDropdownOpen = !this.isProductDropdownOpen;
-  }
-
-  selectProduct(product: any | null) {
-    if (product) {
-      this.selectedProductId = product.id;
-      this.selectedProductName = product.product_name;
-    } else {
-      this.selectedProductId = "";
-      this.selectedProductName = "All Products";
-    }
-    this.isProductDropdownOpen = false;
-    this.onProductSelectChange();
-  }
-
-  @HostListener('document:click', ['$event'])
-  onDocumentClick(event: MouseEvent) {
-    const target = event.target as HTMLElement;
-    if (!target.closest('.custom-dropdown')) {
-      this.isProductDropdownOpen = false;
-    }
-  }
-
-  @HostListener('window:resize')
-  onWindowResize() {
-    this.usageChart?.chart?.resize();
-    this.proposalChart?.chart?.resize();
-  }
 
   onProductSelectChange() {
     if (this.selectedProductId) {
@@ -266,17 +281,17 @@ export class Dashboard implements OnInit {
       : this.rawUsageData.slice(0, this.usageTopN);
 
     this.usageChartLabels = labels;
-    this.usageChartData.labels = labels;
-    this.usageChartData.datasets[0].data = data;
-
-    this.usageChart?.update();
-
-    // KEY FIX: force a resize on next tick so canvas picks up
-    // its real container width (fixes blank chart on first page load)
-    setTimeout(() => {
-      this.usageChart?.chart?.resize();
-      this.usageChart?.update();
-    }, 0);
+    this.usageChartData = {
+      ...this.usageChartData,
+      labels,
+      datasets: [
+        {
+          ...this.usageChartData.datasets[0],
+          data
+        }
+      ]
+    };
+    this.cdr.markForCheck();
   }
 
   fetchRankedUsage() {
@@ -290,8 +305,8 @@ export class Dashboard implements OnInit {
 
         this.applyUsageView();
       },
-      error: (err) => {
-        console.log(err);
+      error: () => {
+        this.toast.show('Failed to load product usage stats', 'error');
         this.rawUsageLabels = [];
         this.rawUsageData = [];
         this.applyUsageView();
@@ -313,8 +328,8 @@ export class Dashboard implements OnInit {
         this.showAllUsage = true;
         this.applyUsageView();
       },
-      error: (err) => {
-        console.log(err);
+      error: () => {
+        this.toast.show('Failed to load product usage trend', 'error');
         this.rawUsageLabels = [];
         this.rawUsageData = [];
         this.applyUsageView();

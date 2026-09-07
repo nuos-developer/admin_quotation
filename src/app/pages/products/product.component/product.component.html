@@ -5,41 +5,31 @@
     </div>
     <!-- ================= TABS ================= -->
     <div class="tabs">
-        <button type="button" class="tab" [class.active]="activeTab === 'ACTIVE'" (click)="switchTab('ACTIVE')">
-            Active Products
-
-        </button>
-        <button type="button" class="tab" [class.active]="activeTab === 'INACTIVE'" (click)="switchTab('INACTIVE')">
-            Inactive Products
-
-        </button>
+        <p-button type="button" label="Active Products"
+            [severity]="activeTab === 'ACTIVE' ? 'primary' : 'secondary'"
+            [outlined]="activeTab !== 'ACTIVE'" (onClick)="switchTab('ACTIVE')"></p-button>
+        <p-button type="button" label="Inactive Products"
+            [severity]="activeTab === 'INACTIVE' ? 'primary' : 'secondary'"
+            [outlined]="activeTab !== 'INACTIVE'" (onClick)="switchTab('INACTIVE')"></p-button>
     </div>
     <!-- ================= SEARCH ================= -->
     <div class="search-box">
         <div class="search-filter-group">
-            <input type="text" placeholder="🔍 Search Product..." [(ngModel)]="searchText" (input)="filterProducts()">
-            <select class="category-filter" [(ngModel)]="selectedCategoryId" (change)="filterCategory()">
-                <option [ngValue]="null">
-                    Select Product Category
-                </option>
-                <option *ngFor="let c of categories" [ngValue]="c.id">
-                    {{ c.category_type }}
-                </option>
-            </select>
+            <input pInputText type="text" placeholder="🔍 Search Product..." [(ngModel)]="searchText"
+                (input)="filterProducts()">
+            <p-select [options]="categoryFilterOptions" optionLabel="category_type" optionValue="id"
+                [(ngModel)]="selectedCategoryId" (onChange)="filterCategory()"></p-select>
         </div>
-        <button *ngIf="activeTab === 'ACTIVE'" type="button" class="btn primary" (click)="openAdd()">
-            ➕ Add Product
-
-        </button>
+        <p-button *ngIf="activeTab === 'ACTIVE'" type="button" label="Add Product" icon="pi pi-plus"
+            (onClick)="openAdd()"></p-button>
     </div>
     <!-- ===================================================== -->
     <!-- ACTIVE PRODUCTS -->
     <!-- ===================================================== -->
     <div *ngIf="activeTab === 'ACTIVE'" class="table-wrapper">
 
-        <table class="table">
-
-            <thead>
+        <p-table [value]="filteredActiveProducts" [scrollable]="true" scrollHeight="550px">
+            <ng-template #header>
                 <tr>
                     <th style="width:70px">Sr. No.</th>
                     <th>Name</th>
@@ -53,15 +43,16 @@
 
                     <th style="width:140px">Price</th>
 
+                    <!-- <th style="width:140px">Price Editable</th> -->
+
                     <th style="width:180px" class="action-column">
                         Action
                     </th>
                 </tr>
-            </thead>
+            </ng-template>
 
-            <tbody>
-
-                <tr *ngFor="let p of filteredActiveProducts; let i=index">
+            <ng-template #body let-p let-i="rowIndex">
+                <tr>
 
                     <td style="width:70px">{{i+1}}</td>
 
@@ -75,57 +66,47 @@
                         {{ p.price | currency:'INR':'symbol':'1.0-0':'en-IN' }}
                     </td>
 
+                    <!-- <td style="width:140px">
+                        <p-toggleswitch [ngModel]="p.is_price_editable" [disabled]="true"></p-toggleswitch>
+                    </td> -->
+
                     <td style="width:180px" class="action-column">
 
                         <div class="action-group">
 
-                            <button type="button" class="icon-btn view-btn" (click)="viewProduct(p)">
+                            <p-button type="button" [rounded]="true" [text]="true" severity="info" size="small"
+                                icon="pi pi-eye" pTooltip="View" tooltipPosition="top"
+                                (onClick)="viewProduct(p)"></p-button>
 
-                                👁
+                            <p-button type="button" [rounded]="true" [text]="true" severity="success" size="small"
+                                icon="pi pi-pencil" pTooltip="Edit" tooltipPosition="top"
+                                (onClick)="editProduct(p)"></p-button>
 
-                                <span class="tooltip-text">
-                                    View
-                                </span>
-
-                            </button>
-
-                            <button type="button" class="icon-btn edit-btn" (click)="editProduct(p)">
-
-                                ✏️
-
-                                <span class="tooltip-text">
-                                    Edit
-                                </span>
-
-                            </button>
-
-                            <button type="button" class="icon-btn delete-btn" (click)="openConfirm('DEACTIVATE',p.id)">
-
-                                🚫
-
-                                <span class="tooltip-text">
-                                    Deactivate
-                                </span>
-
-                            </button>
+                            <p-button type="button" [rounded]="true" [text]="true" severity="danger" size="small"
+                                icon="pi pi-ban" pTooltip="Deactivate" tooltipPosition="top"
+                                (onClick)="openConfirm('DEACTIVATE',p.id)"></p-button>
 
                         </div>
 
                     </td>
 
                 </tr>
+            </ng-template>
 
-            </tbody>
-
-        </table>
+            <ng-template #emptymessage>
+                <tr>
+                    <td colspan="7" class="no-data">No data available</td>
+                </tr>
+            </ng-template>
+        </p-table>
 
     </div>
     <!-- ===================================================== -->
     <!-- INACTIVE PRODUCTS -->
     <!-- ===================================================== -->
     <div *ngIf="activeTab==='INACTIVE'">
-        <table class="table inactive">
-            <thead>
+        <p-table [value]="filteredInactiveProducts" [scrollable]="true" scrollHeight="550px">
+            <ng-template #header>
                 <tr>
                     <th style="width:70px">Sr. No.</th>
                     <th>
@@ -143,11 +124,12 @@
                         </span>
                     </th>
                     <th style="width:140px">Price</th>
+                    <!-- <th style="width:140px">Price Editable</th> -->
                     <th style="width:180px">Action</th>
                 </tr>
-            </thead>
-            <tbody>
-                <tr *ngFor="let p of filteredInactiveProducts; let i=index">
+            </ng-template>
+            <ng-template #body let-p let-i="rowIndex">
+                <tr>
                     <td style="width:70px">{{i+1}}</td>
                     <td>{{p.product_name}}</td>
                     <td style="width:220px">{{p.category_type}}</td>
@@ -157,316 +139,271 @@
                     <td style="width:140px">
                         {{ p.price | currency:'INR':'symbol':'1.0-0':'en-IN' }}
                     </td>
+                    <!-- <td style="width:140px">
+                        <p-toggleswitch [ngModel]="p.is_price_editable" [disabled]="true"></p-toggleswitch>
+                    </td> -->
                     <td style="width:180px" class="action-column">
                         <div class="action-group">
                             <!-- VIEW -->
-                            <button type="button" class="icon-btn view-btn" (click)="viewProduct(p)">
-                                👁
-
-                                <span class="tooltip-text">
-                                    View
-
-                                </span>
-                            </button>
+                            <p-button type="button" [rounded]="true" [text]="true" severity="info" size="small"
+                                icon="pi pi-eye" pTooltip="View" tooltipPosition="top"
+                                (onClick)="viewProduct(p)"></p-button>
                             <!-- ACTIVATE -->
-                            <button type="button" class="icon-btn success-btn" (click)="openConfirm('ACTIVATE',p.id)">
-                                ✅
-
-                                <span class="tooltip-text">
-                                    Activate
-
-                                </span>
-                            </button>
+                            <p-button type="button" [rounded]="true" [text]="true" severity="success" size="small"
+                                icon="pi pi-check" pTooltip="Activate" tooltipPosition="top"
+                                (onClick)="openConfirm('ACTIVATE',p.id)"></p-button>
                         </div>
                     </td>
                 </tr>
-            </tbody>
-        </table>
+            </ng-template>
+
+            <ng-template #emptymessage>
+                <tr>
+                    <td colspan="7" class="no-data">No data available</td>
+                </tr>
+            </ng-template>
+        </p-table>
     </div>
 </div>
 <!-- ===================================================== -->
 <!-- CONFIRM MODAL -->
 <!-- ===================================================== -->
-<div class="modal" *ngIf="showConfirm">
-    <div class="modal-box small">
-        <h3>Confirm Action</h3>
-        <p>{{ confirmMessage }}</p>
-        <div class="modal-footer">
-            <button type="button" class="btn-no" (click)="confirmNo()">
-                No
-
-            </button>
-            <button type="button" class="btn-yes" (click)="confirmYes()">
-                Yes
-
-            </button>
-        </div>
+<p-dialog [modal]="true" [visible]="showConfirm" (onHide)="confirmNo()" [dismissableMask]="false"
+    [style]="{width: '400px'}" header="Confirm Action">
+    <p>{{ confirmMessage }}</p>
+    <div class="modal-footer">
+        <p-button type="button" label="No" severity="secondary" (onClick)="confirmNo()"></p-button>
+        <p-button type="button" label="Yes" severity="success" (onClick)="confirmYes()"></p-button>
     </div>
-</div>
+</p-dialog>
 <!-- ===================================================== -->
 <!-- VIEW PRODUCT MODAL -->
 <!-- ===================================================== -->
-<div class="modal" *ngIf="showView">
-    <div class="modal-box large">
-        <h2 class="modal-title">
-            Product Details
-
-        </h2>
-        <div class="form-grid">
-            <div class="form-field">
-                <label>Product Name</label>
-                <input [value]="selectedProduct.product_name" disabled>
-            </div>
-            <div class="form-field">
-                <label>Product Type</label>
-                <input [value]="selectedProduct.category" disabled>
-            </div>
-            <div class="form-field">
-                <label>Category</label>
-                <input [value]="selectedProduct.category_type" disabled>
-            </div>
-            <div class="form-field">
-                <label>Mod Size</label>
-                <input [value]="selectedProduct.mod_size" disabled>
-            </div>
-            <div class="form-field">
-                <label>MRP Price</label>
-                <input [value]="'₹ ' + (selectedProduct.mrp_price | number:'1.0-0':'en-IN')" disabled>
-            </div>
-
-            <div class="form-field">
-                <label>Markup(%)</label>
-                <input [value]="selectedProduct.discount_percentage + ' %'" disabled>
-            </div>
-
-            <div class="form-field">
-                <label>Price</label>
-                <input [value]="'₹ ' + (selectedProduct.price | number:'1.0-0':'en-IN')" disabled>
-            </div>
-            <div class="form-field">
-                <label>Wiring Type</label>
-                <input [value]="getWiringName(selectedProduct.wiring_type_id)" disabled>
-            </div>
-            <div class="form-field">
-                <label>Zigbee Type</label>
-                <input [value]="selectedProduct.zigbee_type || '-'" disabled>
-            </div>
-            <div class="form-field">
-                <label>Switch Load</label>
-                <input [value]="selectedProduct.switch_load_count || '-'" disabled>
-            </div>
-            <div class="form-field full-width">
-                <label>Description</label>
-                <textarea rows="4" [value]="selectedProduct.description || '-'" disabled>
-                                </textarea>
-            </div>
+<p-dialog [modal]="true" [visible]="showView" (onHide)="close()" [dismissableMask]="false"
+    [style]="{width: '850px'}" header="Product Details" *ngIf="selectedProduct">
+    <div class="form-grid">
+        <div class="form-field">
+            <label>Product Name</label>
+            <input pInputText [value]="selectedProduct.product_name" disabled>
         </div>
-        <!-- ================= PRODUCT IMAGES ================= -->
-        <div class="image-section" *ngIf="selectedProduct.image_urls?.length">
-            <h3>
-                Product Images
-
-            </h3>
-            <div class="image-grid">
-                <img *ngFor="let img of selectedProduct.image_urls" [src]="img" alt="Product Image"
-                    (click)="openImagePreview(img)">
-            </div>
+        <div class="form-field">
+            <label>Product Type</label>
+            <input pInputText [value]="selectedProduct.category" disabled>
         </div>
-        <!-- ================= FOOTER ================= -->
-        <div class="modal-footer">
-            <button type="button" class="btn-cancel" (click)="close()">
-                Close
+        <div class="form-field">
+            <label>Category</label>
+            <input pInputText [value]="selectedProduct.category_type" disabled>
+        </div>
+        <div class="form-field">
+            <label>Mod Size</label>
+            <input pInputText [value]="selectedProduct.mod_size" disabled>
+        </div>
+        <div class="form-field">
+            <label>MRP Price</label>
+            <input pInputText [value]="'₹ ' + (selectedProduct.mrp_price | number:'1.0-0':'en-IN')" disabled>
+        </div>
 
-            </button>
+        <div class="form-field">
+            <label>Markup(%)</label>
+            <input pInputText [value]="selectedProduct.discount_percentage + ' %'" disabled>
+        </div>
+
+        <div class="form-field">
+            <label>Price</label>
+            <input pInputText [value]="'₹ ' + (selectedProduct.price | number:'1.0-0':'en-IN')" disabled>
+        </div>
+        <div class="form-field">
+            <label>Wiring Type</label>
+            <input pInputText [value]="getWiringName(selectedProduct.wiring_type_id)" disabled>
+        </div>
+        <div class="form-field">
+            <label>Zigbee Type</label>
+            <input pInputText [value]="selectedProduct.zigbee_type || '-'" disabled>
+        </div>
+        <div class="form-field">
+            <label>Switch Load</label>
+            <input pInputText [value]="selectedProduct.switch_load_count || '-'" disabled>
+        </div>
+        <div class="form-field form-field-inline">
+            <label>Price Editable</label>
+            <p-toggleswitch [ngModel]="selectedProduct.is_price_editable" [disabled]="true"></p-toggleswitch>
+        </div>
+        <div class="form-field full-width">
+            <label>Description</label>
+            <textarea rows="4" [value]="selectedProduct.description || '-'" disabled>
+                            </textarea>
         </div>
     </div>
-</div>
+    <!-- ================= PRODUCT IMAGES ================= -->
+    <div class="image-section" *ngIf="selectedProduct.image_urls?.length">
+        <h3>
+            Product Images
+
+        </h3>
+        <div class="image-grid">
+            <img *ngFor="let img of selectedProduct.image_urls" [src]="img" alt="Product Image"
+                (click)="openImagePreview(img)">
+        </div>
+    </div>
+    <!-- ================= FOOTER ================= -->
+    <div class="modal-footer">
+        <p-button type="button" label="Close" severity="secondary" (onClick)="close()"></p-button>
+    </div>
+</p-dialog>
 <!-- ===================================================== -->
 <!-- ADD / EDIT PRODUCT MODAL -->
 <!-- ===================================================== -->
-<div class="modal" *ngIf="showAdd || showEdit">
-    <div class="modal-box large">
-        <h2 class="modal-title">
-            {{ showAdd ? 'Add Product' : 'Edit Product' }}
-        </h2>
-        <div class="form-grid">
-            <!-- Product Name -->
-            <div class="form-field">
-                <label>
-                    Product Name
-                    <span class="required">*</span>
-                </label>
-                <input type="text" [(ngModel)]="productForm.product_name" placeholder="Enter Product Name">
-                <div class="error-msg" *ngIf="submitted && !productForm.product_name?.trim()">
-                    Product Name is required.
-                </div>
-            </div>
-            <!-- Product Type -->
-            <div class="form-field">
-                <label>
-                    Product Type
-                    <span class="required">*</span>
-                </label>
-                <select [(ngModel)]="productForm.category">
-                    <option value="">
-                        Select Product Type
-                    </option>
-                    <option value="NUOS Products">
-                        NUOS Products
-                    </option>
-                    <option value="Non-NUOS Products">
-                        Non-NUOS Products
-                    </option>
-                </select>
-                <div class="error-msg" *ngIf="submitted && !productForm.category">
-                    Product Type is required.
-                </div>
-            </div>
-            <!-- Category -->
-            <div class="form-field">
-                <label>
-                    Category
-                    <span class="required">*</span>
-                </label>
-                <select [(ngModel)]="productForm.category_id">
-                    <option [ngValue]="null">
-                        Select Category
-                    </option>
-                    <option *ngFor="let c of categories" [ngValue]="c.id">
-                        {{ c.category_type }}
-                    </option>
-                </select>
-                <div class="error-msg" *ngIf="submitted && !productForm.category_id">
-                    Category is required.
-                </div>
-            </div>
-            <!-- Mod Size -->
-            <div class="form-field">
-                <label>
-                    Mod Size
-
-                </label>
-                <select [(ngModel)]="productForm.mod_size">
-                    <option [ngValue]="null">
-                        Select Mod Size
-
-                    </option>
-                    <option [ngValue]="1">1</option>
-                    <option [ngValue]="2">2</option>
-                </select>
-            </div>
-            <!-- Price -->
-            <!-- MRP Price -->
-            <div class="form-field">
-                <label>
-                    MRP Price
-                    <span class="required">*</span>
-                </label>
-
-                <input type="number" [(ngModel)]="productForm.mrp_price" (input)="calculatePrice()"
-                    placeholder="Enter MRP Price">
-            </div>
-
-            <!-- Discount -->
-            <div class="form-field">
-                <label>Markup (%)</label>
-
-                <input type="number" min="0" max="100" [(ngModel)]="productForm.discount_percentage"
-                    (input)="calculatePrice()" placeholder="Enter Discount">
-            </div>
-
-            <!-- Final Price -->
-            <div class="form-field">
-                <label>
-                    Price
-                    <span class="required">*</span>
-                </label>
-
-                <input type="number" [(ngModel)]="productForm.price" readonly>
-            </div>
-            <!-- Wiring Type -->
-            <div class="form-field">
-                <label>
-                    Wiring Type
-
-                    <span class="required">*</span>
-                </label>
-                <select [(ngModel)]="productForm.wiring_type_id">
-                    <option [ngValue]="null">
-                        Select Wiring Type
-
-                    </option>
-                    <option *ngFor="let w of wiringTypes" [ngValue]="w.id">
-                        {{ w.wiring_name }}
-                    </option>
-                </select>
-                <div class="error-msg" *ngIf="submitted && !productForm.wiring_type_id">
-                    Wiring Type is required.
-                </div>
-            </div>
-            <!-- Zigbee -->
-            <div class="form-field">
-                <label>
-                    Zigbee Type
-
-                </label>
-                <input type="text" [(ngModel)]="productForm.zigbee_type" placeholder="Enter Zigbee Type">
-            </div>
-            <!-- Switch Load -->
-            <div class="form-field">
-                <label>
-                    Switch Load
-                      <span class="required">*</span>
-                </label>
-                <select [(ngModel)]="productForm.switch_load_count">
-                    <option [ngValue]="1">1</option>
-                    <option [ngValue]="2">2</option>
-                    <option [ngValue]="3">3</option>
-                    <option [ngValue]="4">4</option>
-                </select>
-            </div>
-            <!-- Description -->
-            <div class="form-field full-width">
-                <label>
-                    Description
-
-                </label>
-                <textarea rows="4" [(ngModel)]="productForm.description" placeholder="Enter Product Description">
-                                </textarea>
-            </div>
-            <!-- Upload Images -->
-            <div class="form-field full-width">
-                <label>
-                    Product Images
-
-                </label>
-                <input type="file" multiple (change)="onFileChange($event)">
-            </div>
-            <!-- Existing Images -->
-            <div class="form-field full-width" *ngIf="showEdit && productForm.image_urls?.length">
-                <label>
-                    Existing Images
-
-                </label>
-                <div class="image-grid">
-                    <img *ngFor="let img of productForm.image_urls" [src]="img" alt="Product Image"
-                        (click)="openImagePreview(img)">
-                </div>
+<p-dialog [modal]="true" [visible]="showAdd || showEdit" (onHide)="close()" [dismissableMask]="false"
+    [style]="{width: '850px'}" [header]="showAdd ? 'Add Product' : 'Edit Product'">
+    <div class="form-grid">
+        <!-- Product Name -->
+        <div class="form-field">
+            <label>
+                Product Name
+                <span class="required">*</span>
+            </label>
+            <input pInputText type="text" [(ngModel)]="productForm.product_name" placeholder="Enter Product Name">
+            <div class="error-msg" *ngIf="submitted && !productForm.product_name?.trim()">
+                Product Name is required.
             </div>
         </div>
-        <!-- Footer -->
-        <div class="modal-footer">
-            <button type="button" class="btn-cancel" (click)="close()">
-                Close
+        <!-- Product Type -->
+        <div class="form-field">
+            <label>
+                Product Type
+                <span class="required">*</span>
+            </label>
+            <p-select [options]="productTypeOptions" optionLabel="label" optionValue="value"
+                placeholder="Select Product Type" [(ngModel)]="productForm.category"></p-select>
+            <div class="error-msg" *ngIf="submitted && !productForm.category">
+                Product Type is required.
+            </div>
+        </div>
+        <!-- Category -->
+        <div class="form-field">
+            <label>
+                Category
+                <span class="required">*</span>
+            </label>
+            <p-select [options]="categories" optionLabel="category_type" optionValue="id"
+                placeholder="Select Category" [(ngModel)]="productForm.category_id"></p-select>
+            <div class="error-msg" *ngIf="submitted && !productForm.category_id">
+                Category is required.
+            </div>
+        </div>
+        <!-- Mod Size -->
+        <div class="form-field">
+            <label>
+                Mod Size
 
-            </button>
-            <button type="button" [ngClass]="showAdd ? 'btn-submit' : 'btn-update'"
-                (click)="showAdd ? addProduct() : updateProduct()">
-                {{ showAdd ? 'Save Product' : 'Update Product' }}
-            </button>
+            </label>
+            <p-select [options]="modSizeOptions" optionLabel="label" optionValue="value"
+                placeholder="Select Mod Size" [(ngModel)]="productForm.mod_size"></p-select>
+        </div>
+        <!-- Price -->
+        <!-- MRP Price -->
+        <div class="form-field">
+            <label>
+                MRP Price
+                <span class="required">*</span>
+            </label>
+
+            <input pInputText type="number" [(ngModel)]="productForm.mrp_price" (input)="calculatePrice()"
+                placeholder="Enter MRP Price">
+        </div>
+
+        <!-- Discount -->
+        <div class="form-field">
+            <label>Markup (%)</label>
+
+            <input pInputText type="number" min="0" max="100" [(ngModel)]="productForm.discount_percentage"
+                (input)="calculatePrice()" placeholder="Enter Discount">
+        </div>
+
+        <!-- Final Price -->
+        <div class="form-field">
+            <label>
+                Price
+                <span class="required">*</span>
+            </label>
+
+            <input pInputText type="number" [(ngModel)]="productForm.price" readonly>
+        </div>
+        <!-- Wiring Type -->
+        <div class="form-field">
+            <label>
+                Wiring Type
+
+                <span class="required">*</span>
+            </label>
+            <p-select [options]="wiringTypes" optionLabel="wiring_name" optionValue="id"
+                placeholder="Select Wiring Type" [(ngModel)]="productForm.wiring_type_id"></p-select>
+            <div class="error-msg" *ngIf="submitted && !productForm.wiring_type_id">
+                Wiring Type is required.
+            </div>
+        </div>
+        <!-- Zigbee -->
+        <div class="form-field">
+            <label>
+                Zigbee Type
+
+            </label>
+            <input pInputText type="text" [(ngModel)]="productForm.zigbee_type" placeholder="Enter Zigbee Type">
+        </div>
+        <!-- Switch Load -->
+        <div class="form-field">
+            <label>
+                Switch Load
+                  <span class="required">*</span>
+            </label>
+            <p-select [options]="switchLoadOptions" optionLabel="label" optionValue="value"
+                [(ngModel)]="productForm.switch_load_count"></p-select>
+        </div>
+        <!-- Price Editable -->
+        <div class="form-field form-field-inline">
+            <label>
+                Price Editable
+                <span class="required">*</span>
+            </label>
+            <p-toggleswitch [(ngModel)]="productForm.is_price_editable"></p-toggleswitch>
+        </div>
+        <!-- Description -->
+        <div class="form-field full-width">
+            <label>
+                Description
+
+            </label>
+            <textarea rows="4" [(ngModel)]="productForm.description" placeholder="Enter Product Description">
+                            </textarea>
+        </div>
+        <!-- Upload Images -->
+        <div class="form-field full-width">
+            <label>
+                Product Images
+
+            </label>
+            <input type="file" multiple (change)="onFileChange($event)">
+        </div>
+        <!-- Existing Images -->
+        <div class="form-field full-width" *ngIf="showEdit && productForm.image_urls?.length">
+            <label>
+                Existing Images
+
+            </label>
+            <div class="image-grid">
+                <img *ngFor="let img of productForm.image_urls" [src]="img" alt="Product Image"
+                    (click)="openImagePreview(img)">
+            </div>
         </div>
     </div>
-</div>
+    <!-- Footer -->
+    <div class="modal-footer">
+        <p-button type="button" label="Close" severity="secondary" (onClick)="close()"></p-button>
+        <p-button type="button" [label]="showAdd ? 'Save Product' : 'Update Product'"
+            [severity]="showAdd ? 'success' : 'info'"
+            (onClick)="showAdd ? addProduct() : updateProduct()"></p-button>
+    </div>
+</p-dialog>
 <!-- ===================================================== -->
 <!-- IMAGE PREVIEW MODAL -->
 <!-- ===================================================== -->

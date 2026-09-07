@@ -2,15 +2,20 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AdminService } from '../../../core/services/admin.service';
 import { LoaderService } from '../../../core/services/loader.service';
+import { ToastService } from '../../../core/services/toast.service';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import html2canvas from 'html2canvas';
 import { FormsModule } from '@angular/forms';
+import { ButtonModule } from 'primeng/button';
+import { TableModule } from 'primeng/table';
+import { InputTextModule } from 'primeng/inputtext';
+import { DialogModule } from 'primeng/dialog';
 
 @Component({
   selector: 'app-proposal',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ButtonModule, TableModule, InputTextModule, DialogModule],
   templateUrl: './proposal.component.html',
   styleUrls: ['./proposal.component.scss']
 })
@@ -30,7 +35,8 @@ export class ProposalComponent implements OnInit {
 
   constructor(
     private adminService: AdminService,
-    private loader: LoaderService
+    private loader: LoaderService,
+    private toast: ToastService
   ) { }
 
   ngOnInit(): void {
@@ -43,15 +49,13 @@ export class ProposalComponent implements OnInit {
 
     this.adminService.getProposals().subscribe({
       next: (res: any) => {
-        console.log(res?.data);
         this.proposals = this.toArray(res?.data?.data);
-
-
         this.filteredProposals = [...this.proposals];
         setTimeout(() => this.loader.hide());
       },
       error: () => {
         setTimeout(() => this.loader.hide());
+        this.toast.show('Failed to load proposals', 'error');
       }
     });
   }
@@ -201,13 +205,14 @@ export class ProposalComponent implements OnInit {
         }
 
         this.loader.hide();
+        this.toast.show('Proposal status updated', 'success');
 
       },
 
-      error: (err) => {
+      error: () => {
 
         this.loader.hide();
-        console.error(err);
+        this.toast.show('Failed to update proposal status', 'error');
 
       }
 
@@ -295,9 +300,10 @@ export class ProposalComponent implements OnInit {
       }
 
       pdf.save(`proposal-${this.selectedProposal.proposal_id}.pdf`);
+      this.toast.show('PDF downloaded', 'success');
 
     } catch (err) {
-      console.error(err);
+      this.toast.show('Failed to generate PDF', 'error');
     }
 
     setTimeout(() => this.loader.hide());

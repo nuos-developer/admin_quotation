@@ -6,6 +6,12 @@ import { forkJoin } from 'rxjs';
 import { AdminService } from '../../../core/services/admin.service';
 import { LoaderService } from '../../../core/services/loader.service';
 import { ToastService } from '../../../core/services/toast.service';
+import { TableModule } from 'primeng/table';
+import { ButtonModule } from 'primeng/button';
+import { TooltipModule } from 'primeng/tooltip';
+import { InputTextModule } from 'primeng/inputtext';
+import { DialogModule } from 'primeng/dialog';
+import { SelectModule } from 'primeng/select';
 
 interface PermissionFlags {
   can_create: boolean;
@@ -17,7 +23,7 @@ interface PermissionFlags {
 @Component({
   selector: 'app-users',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TableModule, ButtonModule, TooltipModule, InputTextModule, DialogModule, SelectModule],
   templateUrl: './users.component.html',
   styleUrls: ['./users.component.scss']
 })
