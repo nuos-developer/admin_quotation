@@ -8,27 +8,29 @@
     </div>
 
     <h2>Admin Login</h2>
+    <p class="subtitle">Sign in to manage your NUOS workspace</p>
 
-    <!-- EMAIL -->
-    <div class="form-group">
-      <label>Email ID</label>
-      <input type="email" placeholder="Enter email" [(ngModel)]="email_id" />
-    </div>
+    <form class="login-form" (ngSubmit)="login()">
 
-    <!-- PASSWORD -->
-    <div class="form-group password-group">
-      <label>Password</label>
-
-      <div class="password-wrapper">
-        <input [type]="showPassword ? 'text' : 'password'" placeholder="Enter password" [(ngModel)]="password" />
-
-        <span class="eye-icon" (click)="togglePassword()">
-         {{ showPassword ? '👁️‍🗨️' : '👁️' }}
-        </span>
+      <!-- EMAIL -->
+      <div class="form-group">
+        <label for="email_id">Email ID</label>
+        <input pInputText id="email_id" type="email" placeholder="Enter email" name="email_id"
+          [(ngModel)]="email_id" />
+        <small class="error-msg" *ngIf="submitted && !email_id.trim()">Email is required.</small>
       </div>
-    </div>
 
-    <button (click)="login()">Login</button>
+      <!-- PASSWORD -->
+      <div class="form-group">
+        <label for="password">Password</label>
+        <p-password id="password" name="password" placeholder="Enter password" [(ngModel)]="password"
+          [toggleMask]="true" [feedback]="false" styleClass="password-field"></p-password>
+        <small class="error-msg" *ngIf="submitted && !password">Password is required.</small>
+      </div>
+
+      <p-button type="submit" label="Login" styleClass="login-btn" [loading]="isSubmitting"></p-button>
+
+    </form>
 
   </div>
 

@@ -3,6 +3,25 @@
   padding: 10px;
 }
 
+/* List view card — matches Products/Client/Users */
+.sticky-bar {
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, .08);
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+
+  h2 {
+    margin: 0;
+  }
+}
+
 .proposal-view {
   padding: 20px;
   background: #f4f6f9;
@@ -194,9 +213,22 @@
 
 .search-box {
   display: flex;
-  justify-content: flex-start;   /* align left */
+  justify-content: space-between;
   align-items: center;
+  gap: 12px;
   margin: 15px 0;
+  flex-wrap: wrap;
+}
+
+.search-filter-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+
+  ::ng-deep .p-datepicker input {
+    width: 230px;
+  }
 }
 
 .search-box input {
@@ -243,7 +275,9 @@
   object-fit: contain;
   background: transparent;
 
-  /* 🔥 MAKE IMAGE WHITE */
+  /* NUOS category icons render as a white silhouette so they stay visible
+     against whatever tile color the switchboard/room/floor is set to.
+     Cancelled below for Non-NUOS products, which show the real photo. */
   filter: brightness(0) invert(1);
 }
 
@@ -425,104 +459,6 @@ ACTION
 
 }
 
-.icon-btn{
-
-    position:relative;
-
-    width:38px;
-
-    height:38px;
-
-    border:none;
-
-    border-radius:50%;
-
-    background:#f3f4f6;
-
-    cursor:pointer;
-
-    transition:.25s;
-
-}
-
-.icon-btn:hover{
-
-    transform:translateY(-2px);
-
-}
-
-.view-btn{
-
-    color:#2563eb;
-
-}
-
-.view-btn:hover{
-
-    background:#dbeafe;
-
-}
-
-/*=========================================
-TOOLTIP
-=========================================*/
-
-.tooltip-text{
-
-    position:absolute;
-
-    left:50%;
-
-    bottom:130%;
-
-    transform:translateX(-50%);
-
-    background:#222;
-
-    color:#fff;
-
-    padding:6px 10px;
-
-    border-radius:6px;
-
-    font-size:12px;
-
-    white-space:nowrap;
-
-    opacity:0;
-
-    visibility:hidden;
-
-    transition:.25s;
-
-}
-
-.tooltip-text::after{
-
-    content:"";
-
-    position:absolute;
-
-    top:100%;
-
-    left:50%;
-
-    transform:translateX(-50%);
-
-    border:5px solid transparent;
-
-    border-top-color:#222;
-
-}
-
-.icon-btn:hover .tooltip-text{
-
-    opacity:1;
-
-    visibility:visible;
-
-}
-
 /*=========================================
 NO DATA
 =========================================*/
@@ -560,7 +496,7 @@ SCROLLBAR
 }
 
 .img-box.original-image img {
-  filter: none !important; /* cancels the global brightness(0) invert(1) */
+  filter: none !important; /* Non-NUOS products show the real photo, not the white-silhouette icon style */
 }
 
 /* ================= STATUS DROPDOWN ================= */
@@ -645,4 +581,281 @@ SCROLLBAR
 
 .modal-yes-mail:hover {
   background: #15803d;
+}
+
+/* ================= ADD / EDIT PROPOSAL FORM ================= */
+
+.proposal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.proposal-form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.proposal-form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #374151;
+  }
+
+  &.full-width {
+    grid-column: 1 / -1;
+  }
+
+  &.proposal-form-field-inline {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+
+    label {
+      margin-bottom: 0;
+    }
+  }
+
+  textarea {
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid #d9d9d9;
+    font-size: 14px;
+    resize: vertical;
+  }
+}
+
+.required {
+  color: #dc2626;
+}
+
+.error-msg {
+  color: #dc2626;
+  font-size: 12px;
+}
+
+.readonly-value {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: #f7f9fc;
+  border: 1px solid #eef0f4;
+  font-size: 14px;
+  color: #374151;
+}
+
+.proposal-section {
+  border-top: 1px solid #eef0f4;
+  padding-top: 18px;
+
+  h3 {
+    margin: 0 0 12px;
+    font-size: 15px;
+    font-weight: 700;
+    color: #1f2937;
+  }
+}
+
+.proposal-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.proposal-line-item-wrapper {
+  margin-bottom: 14px;
+}
+
+.proposal-line-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  .qty-input {
+    width: 90px;
+  }
+
+  .price-input {
+    width: 130px;
+  }
+}
+
+.product-entry {
+  margin-bottom: 8px;
+}
+
+/* ===== full product detail chips (category, price, wiring type, mod, zigbee) ===== */
+.product-details-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 4px 0 0 50px;
+  flex-wrap: wrap;
+
+  span {
+    font-size: 12px;
+    color: #6b7280;
+    background: #f7f9fc;
+    border: 1px solid #eef0f4;
+    border-radius: 999px;
+    padding: 2px 10px;
+  }
+}
+
+.floor-card,
+.home-card,
+.room-card,
+.sb-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 14px;
+  margin-bottom: 14px;
+  background: #fafbfc;
+}
+
+.home-card {
+  background: #fff;
+}
+
+.room-card {
+  background: #f7f9fc;
+}
+
+.sb-card {
+  background: #fff;
+}
+
+.hint-text {
+  display: block;
+  color: #6b7280;
+  font-size: 12px;
+  margin: -4px 0 10px;
+}
+
+.section-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.capacity-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #6b7280;
+  background: #f7f9fc;
+  border-radius: 999px;
+  padding: 3px 10px;
+}
+
+.level-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+.sb-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+
+  .badge {
+    background: #eef2ff;
+    color: #4338ca;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 2px 10px;
+    border-radius: 999px;
+  }
+}
+
+.product-load-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+
+  .product-load-name {
+    min-width: 140px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #374151;
+  }
+
+  .load-input {
+    width: 110px;
+  }
+
+  .price-input {
+    width: 110px;
+  }
+}
+
+/* ===== product thumbnail (line items + product rows) ===== */
+.product-thumb {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  background: #f7f9fc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  i {
+    color: #b0b7c3;
+    font-size: 16px;
+  }
+}
+
+/* ===== product picker dropdown option with thumbnail ===== */
+.select-option-with-image {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  img {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    object-fit: cover;
+    flex-shrink: 0;
+  }
+
+  i {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    background: #f7f9fc;
+    color: #b0b7c3;
+    flex-shrink: 0;
+  }
+
+  span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
 }

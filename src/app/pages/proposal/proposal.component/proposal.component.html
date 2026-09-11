@@ -1,16 +1,24 @@
 <div class="container">
 
   <!-- ================= LIST VIEW ================= -->
-  <div *ngIf="!selectedProposal">
+  <div class="sticky-bar" *ngIf="!selectedProposal">
 
-    <div class="header">
-      <h2>📋 Proposals</h2>
+    <div class="page-header">
+      <h2>Proposals</h2>
     </div>
 
     <!-- SEARCH -->
     <div class="search-box">
-      <input type="text" pInputText placeholder="Search by client name..." [(ngModel)]="searchText"
-        (ngModelChange)="filterProposals()" />
+      <div class="search-filter-group">
+        <input type="text" pInputText placeholder="🔍 Search by client name..." [(ngModel)]="searchText"
+          (ngModelChange)="filterProposals()" />
+
+        <p-datePicker selectionMode="range" [(ngModel)]="proposalDateRange"
+          (ngModelChange)="onProposalDateRangeChange($event)" [showIcon]="true" [showClear]="true"
+          [readonlyInput]="true" dateFormat="d M yy" placeholder="Filter by created date range"></p-datePicker>
+      </div>
+
+      <p-button label="Add Proposal" icon="pi pi-plus" (onClick)="openAddProposal()"></p-button>
     </div>
 
     <!-- TABLE -->
@@ -25,6 +33,8 @@
               <th>Proposal type</th>
               <th>Created By</th>
               <th>Status</th>
+              <th>Created Date</th>
+              <th>Updated Date</th>
               <th class="action-column">Action</th>
             </tr>
           </ng-template>
@@ -50,16 +60,21 @@
                 </span>
               </td>
 
+              <td>{{ p.created_at ? (p.created_at | date:'dd-MM-yyyy HH:mm') : '-' }}</td>
+
+              <td>{{ p.updated_at ? (p.updated_at | date:'dd-MM-yyyy HH:mm') : '-' }}</td>
+
               <td class="action-column">
                 <div class="action-group">
-                  <p-button styleClass="icon-btn view-btn" [text]="true" (onClick)="viewProposal(p)">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
-                      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                      <circle cx="12" cy="12" r="3"></circle>
-                    </svg>
-                    <span class="tooltip-text">View Proposal</span>
-                  </p-button>
+                  <p-button type="button" [rounded]="true" [text]="true" severity="info" size="small"
+                    icon="pi pi-eye" pTooltip="View" tooltipPosition="top" (onClick)="viewProposal(p)"></p-button>
+
+                  <p-button type="button" [rounded]="true" [text]="true" severity="success" size="small"
+                    icon="pi pi-pencil" pTooltip="Edit" tooltipPosition="top" (onClick)="editProposal(p)"></p-button>
+
+                  <p-button type="button" [rounded]="true" [text]="true" severity="danger" size="small"
+                    icon="pi pi-trash" pTooltip="Delete" tooltipPosition="top"
+                    (onClick)="openDeleteConfirm(p)"></p-button>
                 </div>
               </td>
             </tr>
@@ -67,7 +82,7 @@
 
           <ng-template #emptymessage>
             <tr>
-              <td colspan="7" class="no-data">No proposals found</td>
+              <td colspan="9" class="no-data">No proposals found</td>
             </tr>
           </ng-template>
         </p-table>
@@ -582,6 +597,393 @@
         <p-button styleClass="modal-no" label="No" (onClick)="cancelStatusChange()"></p-button>
         <p-button styleClass="modal-yes" label="Yes" (onClick)="confirmStatusChange(false)"></p-button>
         <p-button styleClass="modal-yes-mail" label="Yes, Send Mail" (onClick)="confirmStatusChange(true)"></p-button>
+      </div>
+    </ng-template>
+  </p-dialog>
+
+  <!-- ================= DELETE PROPOSAL CONFIRMATION ================= -->
+  <p-dialog header="Delete Proposal" [(visible)]="showDeleteConfirm" [modal]="true" [closable]="false"
+    [dismissableMask]="false" [style]="{ width: '360px' }" styleClass="modal-box">
+
+    <p>Are you sure you want to delete this proposal? This action cannot be undone.</p>
+
+    <ng-template #footer>
+      <div class="modal-actions">
+        <p-button styleClass="modal-no" label="Cancel" (onClick)="cancelDeleteProposal()"></p-button>
+        <p-button severity="danger" label="Delete" (onClick)="confirmDeleteProposal()"></p-button>
+      </div>
+    </ng-template>
+  </p-dialog>
+
+  <!-- ================= ADD / EDIT PROPOSAL ================= -->
+  <p-dialog [(visible)]="showAddEditProposal" [modal]="true" [dismissableMask]="false"
+    [style]="{ width: '960px', maxWidth: '95vw' }" styleClass="proposal-form-dialog"
+    [header]="proposalForm.id ? 'Edit Proposal' : 'Add Proposal'" (onHide)="closeProposalForm()">
+
+    <div class="proposal-form">
+
+      <!-- ===== BASIC INFO ===== -->
+      <div class="proposal-form-grid">
+        <div class="proposal-form-field">
+          <label>Proposal Title</label>
+          <input pInputText type="text" [(ngModel)]="proposalForm.proposal_title" placeholder="Enter proposal title (optional)" />
+        </div>
+
+        <div class="proposal-form-field">
+          <label>Client <span class="required">*</span></label>
+          <p-select [options]="clientSelectOptions" optionLabel="label" optionValue="id"
+            placeholder="Select client" [(ngModel)]="proposalForm.client_id" [disabled]="!!proposalForm.id"></p-select>
+          <small class="error-msg" *ngIf="proposalSubmitted && !proposalForm.client_id">
+            Client is required.
+          </small>
+        </div>
+
+        <div class="proposal-form-field">
+          <label>Proposal Type <span class="required">*</span></label>
+          <p-select [options]="proposalTypeOptions" optionLabel="label" optionValue="value"
+            [(ngModel)]="proposalForm.proposal_type"></p-select>
+        </div>
+      </div>
+
+      <!-- ===== CLIENT ADDRESS (read-only, shown once a client is selected) ===== -->
+      <div class="proposal-section" *ngIf="selectedClient">
+        <h3>Address Information</h3>
+
+        <div class="proposal-form-grid">
+          <div class="proposal-form-field">
+            <label>Address Line 1</label>
+            <p class="readonly-value">{{ selectedClient.address_line_one || '-' }}</p>
+          </div>
+          <div class="proposal-form-field">
+            <label>District</label>
+            <p class="readonly-value">{{ selectedClient.district || '-' }}</p>
+          </div>
+          <div class="proposal-form-field">
+            <label>State</label>
+            <p class="readonly-value">{{ selectedClient.state || '-' }}</p>
+          </div>
+          <div class="proposal-form-field">
+            <label>Country</label>
+            <p class="readonly-value">{{ selectedClient.country || '-' }}</p>
+          </div>
+          <div class="proposal-form-field">
+            <label>Pin Code</label>
+            <p class="readonly-value">{{ selectedClient.pin_code || '-' }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== DELIVERY ===== -->
+      <div class="proposal-form-grid">
+        <div class="proposal-form-field proposal-form-field-inline">
+          <label>Same recipient as client</label>
+          <p-toggleswitch [(ngModel)]="proposalForm.use_same_recipient"></p-toggleswitch>
+        </div>
+
+        <div class="proposal-form-field" *ngIf="!proposalForm.use_same_recipient">
+          <label>Recipient Name</label>
+          <input pInputText type="text" [(ngModel)]="proposalForm.recipient_name" placeholder="Enter recipient name" />
+        </div>
+
+        <div class="proposal-form-field proposal-form-field-inline">
+          <label>Same address as client</label>
+          <p-toggleswitch [(ngModel)]="proposalForm.use_same_address"></p-toggleswitch>
+        </div>
+
+        <div class="proposal-form-field full-width" *ngIf="!proposalForm.use_same_address">
+          <label>Shipping Address</label>
+          <textarea rows="2" [(ngModel)]="proposalForm.ship_to_address" placeholder="Enter shipping address"></textarea>
+        </div>
+      </div>
+
+      <!-- ===== DISCOUNT & CHARGES ===== -->
+      <div class="proposal-section">
+        <h3>Discount &amp; Charges</h3>
+
+        <div class="proposal-form-grid">
+          <div class="proposal-form-field">
+            <label>Discount (%)</label>
+            <input pInputText type="number" min="0" max="100" [(ngModel)]="proposalForm.discount_percentage" />
+          </div>
+
+          <div class="proposal-form-field">
+            <label>Installation (%)</label>
+            <input pInputText type="number" min="0" [(ngModel)]="proposalForm.installation_percentage" />
+          </div>
+
+          <div class="proposal-form-field">
+            <label>Commissioning (%)</label>
+            <input pInputText type="number" min="0" [(ngModel)]="proposalForm.commissioning_percentage" />
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== PRODUCTS WISE ===== -->
+      <div *ngIf="proposalForm.proposal_type === 'productsWise'" class="proposal-section">
+        <div class="proposal-section-header">
+          <h3>Products</h3>
+          <p-button size="small" label="Add Product" icon="pi pi-plus" (onClick)="addProductWiseItem()"></p-button>
+        </div>
+
+        <div class="proposal-line-item-wrapper" *ngFor="let item of proposalForm.products_wise_items; let i = index">
+          <div class="proposal-line-item">
+            <div class="product-thumb">
+              <img *ngIf="getProductImage(item.id) as img" [src]="img" alt="" />
+              <i *ngIf="!getProductImage(item.id)" class="pi pi-image"></i>
+            </div>
+
+            <p-select [options]="productWiseSelectOptions" optionLabel="label" optionValue="id"
+              placeholder="Select product" [(ngModel)]="item.id">
+              <ng-template #item let-option>
+                <div class="select-option-with-image">
+                  <img *ngIf="option.image" [src]="option.image" alt="" />
+                  <i *ngIf="!option.image" class="pi pi-image"></i>
+                  <span>{{ option.label }}</span>
+                </div>
+              </ng-template>
+            </p-select>
+
+            <input pInputText type="number" min="1" [(ngModel)]="item.quantity" placeholder="Qty" class="qty-input" />
+
+            <input *ngIf="isPriceEditable(item.id)" pInputText type="number" min="0" [(ngModel)]="item.new_price"
+              placeholder="Price override" class="price-input" />
+
+            <p-button [rounded]="true" [text]="true" severity="danger" size="small" icon="pi pi-trash"
+              (onClick)="removeProductWiseItem(i)"></p-button>
+          </div>
+
+          <div class="product-details-line" *ngIf="getProductInfo(item.id) as info">
+            <span *ngIf="info.category_type">{{ info.category_type }}</span>
+            <span>{{ info.price | currency:'INR':'symbol':'1.0-0':'en-IN' }}</span>
+            <span *ngIf="info.wiring_type">{{ info.wiring_type }}</span>
+            <span *ngIf="info.mod_size">Mod {{ info.mod_size }}</span>
+            <span *ngIf="info.zigbee_type">{{ info.zigbee_type }}</span>
+          </div>
+        </div>
+
+        <p class="no-data" *ngIf="!proposalForm.products_wise_items.length">No products added yet.</p>
+        <small class="error-msg" *ngIf="proposalSubmitted && !proposalForm.products_wise_items.length">
+          At least one product is required.
+        </small>
+      </div>
+
+      <!-- ===== STRUCTURE WISE ===== -->
+      <div *ngIf="proposalForm.proposal_type === 'structureWise'" class="proposal-section">
+        <div class="proposal-section-header">
+          <h3>Floors</h3>
+          <p-button size="small" label="Add Floor" icon="pi pi-plus" (onClick)="addFloor()"></p-button>
+        </div>
+
+        <div class="floor-card" *ngFor="let floor of proposalForm.floor; let fi = index">
+          <div class="level-row">
+            <input pInputText type="text" [(ngModel)]="floor.name" placeholder="Floor name" />
+            <p-button [rounded]="true" [text]="true" severity="danger" size="small" icon="pi pi-trash"
+              pTooltip="Remove Floor" (onClick)="removeFloor(fi)"></p-button>
+          </div>
+
+          <div class="level-row">
+            <p-button size="small" severity="secondary" label="Add Home" icon="pi pi-plus"
+              (onClick)="addHome(fi)"></p-button>
+          </div>
+
+          <div class="home-card" *ngFor="let home of floor.homes; let hi = index">
+            <div class="level-row">
+              <input pInputText type="text" [(ngModel)]="home.name" placeholder="Home name" />
+              <p-button [rounded]="true" [text]="true" severity="danger" size="small" icon="pi pi-trash"
+                pTooltip="Remove Home" (onClick)="removeHome(fi, hi)"></p-button>
+            </div>
+
+            <div class="level-row">
+              <p-button size="small" severity="secondary" label="Add Room" icon="pi pi-plus"
+                (onClick)="addRoom(fi, hi)"></p-button>
+            </div>
+
+            <div class="room-card" *ngFor="let room of home.rooms; let ri = index">
+              <div class="level-row">
+                <input pInputText type="text" [(ngModel)]="room.name" placeholder="Room name" />
+
+                <p-button [rounded]="true" [text]="true" severity="danger" size="small" icon="pi pi-trash"
+                  pTooltip="Remove Room" (onClick)="removeRoom(fi, hi, ri)"></p-button>
+              </div>
+
+              <!-- ADD PACKAGE (optional) -->
+              <div class="level-row">
+                <span class="section-label">Package</span>
+
+                <p-select [options]="roomPackageSelectOptions" optionLabel="label" optionValue="id"
+                  placeholder="Add Package (optional)" [showClear]="true" [(ngModel)]="room.pkgId"
+                  (onChange)="onRoomPackageChange(fi, hi, ri)"></p-select>
+              </div>
+              <small class="hint-text">No package? Add products and switchboards manually below.</small>
+
+              <!-- ROOM PRODUCTS -->
+              <div class="level-row">
+                <span class="section-label">Room Products</span>
+                <p-button size="small" severity="secondary" label="Add Product" icon="pi pi-plus"
+                  (onClick)="addRoomProduct(fi, hi, ri)"></p-button>
+              </div>
+
+              <div class="product-entry" *ngFor="let p of room.products; let pi = index">
+                <div class="product-load-row">
+                  <div class="product-thumb">
+                    <img *ngIf="getProductImage(p.id) as img" [src]="img" alt="" />
+                    <i *ngIf="!getProductImage(p.id)" class="pi pi-image"></i>
+                  </div>
+
+                  <p-select [options]="roomProductSelectOptions" optionLabel="label" optionValue="id"
+                    placeholder="Select product" [(ngModel)]="p.id">
+                    <ng-template #item let-option>
+                      <div class="select-option-with-image">
+                        <img *ngIf="option.image" [src]="option.image" alt="" />
+                        <i *ngIf="!option.image" class="pi pi-image"></i>
+                        <span>{{ option.label }}</span>
+                      </div>
+                    </ng-template>
+                  </p-select>
+
+                  <input pInputText type="text" [(ngModel)]="p.firstLoad" placeholder="Load 1" class="load-input" />
+                  <input pInputText type="text" [(ngModel)]="p.secondLoad" placeholder="Load 2" class="load-input" />
+                  <input pInputText type="text" [(ngModel)]="p.thirdLoad" placeholder="Load 3" class="load-input" />
+                  <input pInputText type="text" [(ngModel)]="p.forthLoad" placeholder="Load 4" class="load-input" />
+
+                  <input *ngIf="isPriceEditable(p.id)" pInputText type="number" min="0" [(ngModel)]="p.new_price"
+                    placeholder="Price" class="price-input" />
+
+                  <p-button [rounded]="true" [text]="true" severity="danger" size="small" icon="pi pi-times"
+                    (onClick)="removeRoomProduct(fi, hi, ri, pi)"></p-button>
+                </div>
+
+                <div class="product-details-line" *ngIf="getProductInfo(p.id) as info">
+                  <span *ngIf="info.category_type">{{ info.category_type }}</span>
+                  <span>{{ info.price | currency:'INR':'symbol':'1.0-0':'en-IN' }}</span>
+                  <span *ngIf="info.wiring_type">{{ info.wiring_type }}</span>
+                  <span *ngIf="info.mod_size">Mod {{ info.mod_size }}</span>
+                  <span *ngIf="info.zigbee_type">{{ info.zigbee_type }}</span>
+                </div>
+              </div>
+
+              <!-- SWITCHBOARDS -->
+              <div class="level-row">
+                <span class="section-label">Switchboards</span>
+                <p-button size="small" severity="secondary" label="Add Switchboard" icon="pi pi-plus"
+                  (onClick)="addSwitchboard(fi, hi, ri)"></p-button>
+              </div>
+
+              <div class="sb-card" *ngFor="let sb of room.switchboards; let si = index">
+                <div class="sb-header">
+                  <input pInputText type="text" [(ngModel)]="sb.name" placeholder="Switchboard name" />
+
+                  <p-select [options]="panelModOptions" placeholder="Mod" [(ngModel)]="sb.mod"
+                    (onChange)="onSwitchboardModChange(fi, hi, ri, si)"></p-select>
+
+                  <span class="capacity-label" *ngIf="sb.mod">{{ sb.products.length }}/{{ maxSwitchboardProducts(sb.mod) }} products</span>
+
+                  <p-button size="small" severity="secondary" label="Add Product" icon="pi pi-plus"
+                    [disabled]="!sb.mod || sb.products.length >= maxSwitchboardProducts(sb.mod)"
+                    (onClick)="addSwitchboardProduct(fi, hi, ri, si)"></p-button>
+
+                  <p-button [rounded]="true" [text]="true" severity="danger" size="small" icon="pi pi-trash"
+                    pTooltip="Remove Switchboard" (onClick)="removeSwitchboard(fi, hi, ri, si)"></p-button>
+                </div>
+
+                <div class="product-entry" *ngFor="let p of sb.products; let pi = index">
+                  <div class="product-load-row">
+                    <div class="product-thumb">
+                      <img *ngIf="getProductImage(p.id) as img" [src]="img" alt="" />
+                      <i *ngIf="!getProductImage(p.id)" class="pi pi-image"></i>
+                    </div>
+
+                    <p-select [options]="switchboardProductSelectOptions" optionLabel="label" optionValue="id"
+                      placeholder="Select product" [(ngModel)]="p.id">
+                      <ng-template #item let-option>
+                        <div class="select-option-with-image">
+                          <img *ngIf="option.image" [src]="option.image" alt="" />
+                          <i *ngIf="!option.image" class="pi pi-image"></i>
+                          <span>{{ option.label }}</span>
+                        </div>
+                      </ng-template>
+                    </p-select>
+
+                    <input pInputText type="text" [(ngModel)]="p.firstLoad" placeholder="Load 1" class="load-input" />
+                    <input pInputText type="text" [(ngModel)]="p.secondLoad" placeholder="Load 2" class="load-input" />
+                    <input pInputText type="text" [(ngModel)]="p.thirdLoad" placeholder="Load 3" class="load-input" />
+                    <input pInputText type="text" [(ngModel)]="p.forthLoad" placeholder="Load 4" class="load-input" />
+
+                    <input *ngIf="isPriceEditable(p.id)" pInputText type="number" min="0" [(ngModel)]="p.new_price"
+                      placeholder="Price" class="price-input" />
+
+                    <p-button [rounded]="true" [text]="true" severity="danger" size="small" icon="pi pi-times"
+                      (onClick)="removeSwitchboardProduct(fi, hi, ri, si, pi)"></p-button>
+                  </div>
+
+                  <div class="product-details-line" *ngIf="getProductInfo(p.id) as info">
+                    <span *ngIf="info.category_type">{{ info.category_type }}</span>
+                    <span>{{ info.price | currency:'INR':'symbol':'1.0-0':'en-IN' }}</span>
+                    <span *ngIf="info.wiring_type">{{ info.wiring_type }}</span>
+                    <span *ngIf="info.mod_size">Mod {{ info.mod_size }}</span>
+                    <span *ngIf="info.zigbee_type">{{ info.zigbee_type }}</span>
+                  </div>
+                </div>
+
+                <p class="no-data" *ngIf="!sb.products.length">No products added yet.</p>
+              </div>
+
+              <p class="no-data" *ngIf="!room.switchboards.length">No switchboards added yet.</p>
+
+            </div>
+          </div>
+        </div>
+
+        <p class="no-data" *ngIf="!proposalForm.floor.length">No floors added yet.</p>
+        <small class="error-msg" *ngIf="proposalSubmitted && !proposalForm.floor.length">
+          At least one floor is required.
+        </small>
+      </div>
+
+      <!-- ===== FINANCIAL PREVIEW ===== -->
+      <div class="proposal-section">
+        <h3>Financial Breakdown (preview)</h3>
+
+        <table class="financial-table">
+          <tbody>
+            <tr>
+              <td>Grand Products Total</td>
+              <td>{{ financialPreview.grandProductsTotal | currency:'INR':'symbol':'1.0-0':'en-IN' }}</td>
+            </tr>
+            <tr>
+              <td>Non-NUOS Products Total</td>
+              <td>{{ financialPreview.nonNuosProductsTotal | currency:'INR':'symbol':'1.0-0':'en-IN' }}</td>
+            </tr>
+            <tr>
+              <td>Discount Amount</td>
+              <td>{{ financialPreview.discountAmount | currency:'INR':'symbol':'1.0-0':'en-IN' }}</td>
+            </tr>
+            <tr>
+              <td>After Discount</td>
+              <td>{{ financialPreview.afterDiscount | currency:'INR':'symbol':'1.0-0':'en-IN' }}</td>
+            </tr>
+            <tr>
+              <td>Installation Amount</td>
+              <td>{{ financialPreview.installationAmount | currency:'INR':'symbol':'1.0-0':'en-IN' }}</td>
+            </tr>
+            <tr>
+              <td>Commissioning Amount</td>
+              <td>{{ financialPreview.commissioningAmount | currency:'INR':'symbol':'1.0-0':'en-IN' }}</td>
+            </tr>
+            <tr class="grand-total-row">
+              <td><strong>Final Total</strong></td>
+              <td><strong>{{ financialPreview.finalTotal | currency:'INR':'symbol':'1.0-0':'en-IN' }}</strong></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+
+    <ng-template #footer>
+      <div class="modal-actions">
+        <p-button styleClass="modal-no" label="Cancel" (onClick)="closeProposalForm()"></p-button>
+        <p-button [label]="proposalForm.id ? 'Update Proposal' : 'Create Proposal'" (onClick)="saveProposal()"></p-button>
       </div>
     </ng-template>
   </p-dialog>

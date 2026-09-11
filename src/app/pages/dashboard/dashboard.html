@@ -8,109 +8,143 @@
   <!-- CONTENT -->
   <div *ngIf="!isLoading">
 
-    <h2 class="page-title">Admin Dashboard</h2>
+    <div class="page-header-row">
+      <h2 class="page-title">Admin Dashboard</h2>
 
-    <!-- Summary Cards -->
-    <div class="summary-cards">
-      <div class="card">
-        <h4>Total Products</h4>
-        <p>{{ summary.total_products }}</p>
-      </div>
-
-      <div class="card success">
-        <h4>Active Products</h4>
-        <p>{{ summary.active_products }}</p>
-      </div>
-
-      <div class="card danger">
-        <h4>Inactive Products</h4>
-        <p>{{ summary.inactive_products }}</p>
-      </div>
-
-      <div class="card info">
-        <h4>Total Proposals</h4>
-        <p>{{ summary.total_proposals }}</p>
-      </div>
-
-      <div class="card warning">
-        <h4>Total Clients</h4>
-        <p>{{ summary.total_clients }}</p>
-      </div>
+      <p-splitButton *ngIf="isAdmin" label="Share Report" icon="pi pi-share-alt" [model]="reportMenuItems"
+        (onClick)="shareReport()"></p-splitButton>
     </div>
 
-    <!-- Proposal Graph -->
-    <div class="chart-card">
-      <div class="chart-header">
-        <h3>Proposal Graph</h3>
+    <div>
 
-        <p-select [options]="graphTypeOptions" optionLabel="label" optionValue="value" [(ngModel)]="graphType"
-          (onChange)="onGraphChange()"></p-select>
-      </div>
+      <!-- Summary Cards -->
+      <div class="summary-cards">
+        <div class="stat-card stat-primary">
+          <div class="stat-icon"><i class="pi pi-box"></i></div>
+          <div class="stat-body">
+            <h4>Total Products</h4>
+            <p>{{ summary.total_products }}</p>
+          </div>
+        </div>
 
-      <div class="chart-container">
-        <p-chart type="bar" [data]="barChartData" [options]="barChartOptions" height="100%"></p-chart>
-      </div>
-    </div>
+        <div class="stat-card stat-success">
+          <div class="stat-icon"><i class="pi pi-check-circle"></i></div>
+          <div class="stat-body">
+            <h4>Active Products</h4>
+            <p>{{ summary.active_products }}</p>
+          </div>
+        </div>
 
-    <!-- Role Wise Users -->
-    <div class="table-card">
-      <h3>Role Wise Users</h3>
+        <div class="stat-card stat-danger">
+          <div class="stat-icon"><i class="pi pi-times-circle"></i></div>
+          <div class="stat-body">
+            <h4>Inactive Products</h4>
+            <p>{{ summary.inactive_products }}</p>
+          </div>
+        </div>
 
-      <p-table [value]="roleWiseUsers">
-        <ng-template #header>
-          <tr>
-            <th>Role</th>
-            <th>Total Users</th>
-            <th>Approved</th>
-            <th>Pending</th>
-          </tr>
-        </ng-template>
+        <div class="stat-card stat-info">
+          <div class="stat-icon"><i class="pi pi-file"></i></div>
+          <div class="stat-body">
+            <h4>Total Proposals</h4>
+            <p>{{ summary.total_proposals }}</p>
+          </div>
+        </div>
 
-        <ng-template #body let-role>
-          <tr>
-            <td>{{ role.role_name }}</td>
-            <td>{{ role.total_users }}</td>
-            <td class="approved">{{ role.approved_users }}</td>
-            <td class="pending">{{ role.pending_users }}</td>
-          </tr>
-        </ng-template>
-
-        <ng-template #emptymessage>
-          <tr>
-            <td colspan="4" class="no-data">No data available</td>
-          </tr>
-        </ng-template>
-      </p-table>
-    </div>
-
-    <!-- Product Usage Graph -->
-    <div class="chart-card">
-      <div class="chart-header">
-        <h3>Product Usage</h3>
-
-        <div class="filter-group">
-
-          <p-select [options]="productSelectOptions" optionLabel="product_name" optionValue="id"
-            [(ngModel)]="selectedProductId" (onChange)="onProductSelectChange()"></p-select>
-
-          <p-select [options]="usagePeriodOptions" optionLabel="label" optionValue="value" [(ngModel)]="usagePeriod"
-            (onChange)="onUsagePeriodChange()"></p-select>
-
-          <p-button *ngIf="rawUsageLabels.length > usageTopN" size="small" severity="secondary"
-            [label]="showAllUsage ? 'Show Top ' + usageTopN : 'Show All (' + rawUsageLabels.length + ')'"
-            (onClick)="toggleShowAll()"></p-button>
+        <div class="stat-card stat-warning">
+          <div class="stat-icon"><i class="pi pi-users"></i></div>
+          <div class="stat-body">
+            <h4>Total Clients</h4>
+            <p>{{ summary.total_clients }}</p>
+          </div>
         </div>
       </div>
 
-      <!-- <p *ngIf="usageChartLabels.length === 0" class="no-data">
-    No product usage data available
-  </p> -->
+      <!-- Proposal Graph -->
+      <div class="chart-card">
+        <div class="chart-header">
+          <h3><i class="pi pi-chart-bar"></i> Proposal Graph</h3>
 
-      <div class="chart-scroll-wrapper" *ngIf="usageChartLabels.length > 0">
-        <div class="chart-inner" [style.min-width.px]="usageChartLabels.length * 55">
-          <p-chart type="bar" [data]="usageChartData" [options]="usageChartOptions" height="100%"></p-chart>
+          <div class="filter-group">
+            <p-datePicker selectionMode="range" [(ngModel)]="proposalDateRange"
+              (ngModelChange)="onProposalDateRangeChange($event)" [showIcon]="true" [showClear]="true"
+              [readonlyInput]="true" dateFormat="d M yy" placeholder="Custom date range"></p-datePicker>
+
+            <p-select [options]="graphTypeOptions" optionLabel="label" optionValue="value" [(ngModel)]="graphType"
+              (onChange)="onGraphChange()"></p-select>
+          </div>
+        </div>
+
+        <div class="chart-container">
+          <p-chart type="bar" [data]="barChartData" [options]="barChartOptions" height="100%"></p-chart>
         </div>
       </div>
+
+      <!-- Role Wise Users -->
+      <div class="table-card">
+        <h3><i class="pi pi-users"></i> Role Wise Users</h3>
+
+        <p-table [value]="roleWiseUsers">
+          <ng-template #header>
+            <tr>
+              <th>Role</th>
+              <th>Total Users</th>
+              <th>Approved</th>
+              <th>Pending</th>
+            </tr>
+          </ng-template>
+
+          <ng-template #body let-role>
+            <tr>
+              <td>{{ role.role_name }}</td>
+              <td>{{ role.total_users }}</td>
+              <td class="approved">{{ role.approved_users }}</td>
+              <td class="pending">{{ role.pending_users }}</td>
+            </tr>
+          </ng-template>
+
+          <ng-template #emptymessage>
+            <tr>
+              <td colspan="4" class="no-data">No data available</td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+
+      <!-- Product Usage Graph -->
+      <div class="chart-card">
+        <div class="chart-header">
+          <h3><i class="pi pi-chart-line"></i> Product Usage</h3>
+
+          <div class="filter-group">
+
+            <p-select [options]="productSelectOptions" optionLabel="product_name" optionValue="id"
+              [(ngModel)]="selectedProductId" (onChange)="onProductSelectChange()"></p-select>
+
+            <p-datePicker selectionMode="range" [(ngModel)]="usageDateRange"
+              (ngModelChange)="onUsageDateRangeChange($event)" [showIcon]="true" [showClear]="true"
+              [readonlyInput]="true" dateFormat="d M yy" placeholder="Custom date range"></p-datePicker>
+
+            <p-select [options]="usagePeriodOptions" optionLabel="label" optionValue="value" [(ngModel)]="usagePeriod"
+              (onChange)="onUsagePeriodChange()"></p-select>
+
+            <p-button *ngIf="rawUsageLabels.length > usageTopN" size="small" severity="secondary"
+              [label]="showAllUsage ? 'Show Top ' + usageTopN : 'Show All (' + rawUsageLabels.length + ')'"
+              (onClick)="toggleShowAll()"></p-button>
+          </div>
+        </div>
+
+        <!-- <p *ngIf="usageChartLabels.length === 0" class="no-data">
+      No product usage data available
+    </p> -->
+
+        <div class="chart-scroll-wrapper" *ngIf="usageChartLabels.length > 0">
+          <div class="chart-inner" [style.min-width.px]="usageChartLabels.length * 55">
+            <p-chart type="bar" [data]="usageChartData" [options]="usageChartOptions" height="100%"></p-chart>
+          </div>
+        </div>
+      </div>
+
     </div>
 
   </div>

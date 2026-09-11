@@ -7,6 +7,21 @@ describe('Dashboard', () => {
   let component: Dashboard;
   let fixture: ComponentFixture<Dashboard>;
 
+  beforeAll(() => {
+    if (!window.matchMedia) {
+      (window as any).matchMedia = (query: string) => ({
+        matches: false,
+        media: query,
+        onchange: null,
+        addListener: () => {},
+        removeListener: () => {},
+        addEventListener: () => {},
+        removeEventListener: () => {},
+        dispatchEvent: () => false
+      });
+    }
+  });
+
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [Dashboard],

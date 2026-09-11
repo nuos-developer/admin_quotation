@@ -4,6 +4,12 @@ import { Router } from '@angular/router';
 import { environment } from '../../../environments/environment';
 import { jwtDecode } from 'jwt-decode';
 
+export interface AuthUser {
+  role_id: number;
+  role_name: string;
+  email: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -33,6 +39,30 @@ export class AuthService {
 
   getToken(): string | null {
     return localStorage.getItem('token');
+  }
+
+  /* ================= USER ================= */
+
+  setUser(user: AuthUser) {
+    localStorage.setItem('user', JSON.stringify(user));
+  }
+
+  getUser(): AuthUser | null {
+    const raw = localStorage.getItem('user');
+    if (!raw) return null;
+
+    try {
+      return JSON.parse(raw);
+    } catch {
+      return null;
+    }
+  }
+
+  isAdmin(): boolean {
+    const user = this.getUser();
+    if (!user) return false;
+
+    return Number(user.role_id) === 1 || (user.role_name || '').toLowerCase() === 'admin';
   }
 
   /* ================= CHECK LOGIN ================= */

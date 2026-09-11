@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import { Observable } from 'rxjs';
@@ -13,9 +13,16 @@ export class AdminService {
         return this.http.get(`${environment.apiUrl}/admin/dashboard`);
     }
 
-    dashboardGraph(graph: string) {
+    dashboardGraph(graph: string, fromDate?: string, toDate?: string) {
+        let params = new HttpParams().set('graph', graph);
+
+        if (fromDate && toDate) {
+            params = params.set('fromDate', fromDate).set('toDate', toDate);
+        }
+
         return this.http.get(
-            `${environment.apiUrl}/admin/dashboard/graph?graph=${graph}`
+            `${environment.apiUrl}/admin/dashboard/graph`,
+            { params }
         );
     }
 
@@ -24,18 +31,34 @@ export class AdminService {
         return this.http.get(`${environment.apiUrl}/admin/dashboard/list`);
     }
 
-    getProductUsageTrend(productId: string | number, period: string) {
+    getProductUsageTrend(productId: string | number, period: string, fromDate?: string, toDate?: string) {
+        let params = new HttpParams()
+            .set('product_id', productId)
+            .set('period', period);
+
+        if (fromDate && toDate) {
+            params = params.set('from', fromDate).set('to', toDate);
+        }
+
         return this.http.get(
-            `${environment.apiUrl}/admin/dashboard/usage-trend?product_id=${productId}&period=${period}`
+            `${environment.apiUrl}/admin/dashboard/usage-trend`,
+            { params }
         );
     }
 
-    productUsageStats(period?: string) {
-        let url = `${environment.apiUrl}/admin/dashboard/usage-stats`;
-        if (period) {
-            url += `?period=${period}`;
+    productUsageStats(period?: string, fromDate?: string, toDate?: string) {
+        let params = new HttpParams();
+
+        if (fromDate && toDate) {
+            params = params.set('from', fromDate).set('to', toDate);
+        } else if (period) {
+            params = params.set('period', period);
         }
-        return this.http.get(url);
+
+        return this.http.get(
+            `${environment.apiUrl}/admin/dashboard/usage-stats`,
+            { params }
+        );
     }
 
     getUsers() {
@@ -177,6 +200,18 @@ export class AdminService {
     deleteProposal(productId: number) {
         return this.http.delete<ApiResponse<any[]>>(
             `${environment.apiUrl}/admin/product/delete_proposal/${productId}`
+        );
+    }
+    insertProposal(data: any) {
+        return this.http.post<any>(
+            `${environment.apiUrl}/admin/product/insertProposal`,
+            data
+        );
+    }
+    updateProposal(id: number, data: any) {
+        return this.http.put<any>(
+            `${environment.apiUrl}/admin/product/proposal/${id}`,
+            data
         );
     }
 
