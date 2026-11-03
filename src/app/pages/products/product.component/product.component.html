@@ -199,7 +199,7 @@
             <input pInputText [value]="selectedProduct.mod_size" disabled>
         </div>
         <div class="form-field">
-            <label>MRP Price</label>
+            <label>Rate</label>
             <input pInputText [value]="'₹ ' + (selectedProduct.mrp_price | number:'1.0-0':'en-IN')" disabled>
         </div>
 
@@ -209,7 +209,7 @@
         </div>
 
         <div class="form-field">
-            <label>Price</label>
+            <label>List Price</label>
             <input pInputText [value]="'₹ ' + (selectedProduct.price | number:'1.0-0':'en-IN')" disabled>
         </div>
         <div class="form-field">
@@ -304,12 +304,12 @@
         <!-- MRP Price -->
         <div class="form-field">
             <label>
-                MRP Price
+                Rate
                 <span class="required">*</span>
             </label>
 
             <input pInputText type="number" [(ngModel)]="productForm.mrp_price" (input)="calculatePrice()"
-                placeholder="Enter MRP Price">
+                placeholder="Enter Rate">
         </div>
 
         <!-- Discount -->
@@ -317,13 +317,13 @@
             <label>Markup (%)</label>
 
             <input pInputText type="number" min="0" max="100" [(ngModel)]="productForm.discount_percentage"
-                (input)="calculatePrice()" placeholder="Enter Discount">
+                (input)="calculatePrice()" placeholder="Enter Percentage">
         </div>
 
         <!-- Final Price -->
         <div class="form-field">
             <label>
-                Price
+                List Price
                 <span class="required">*</span>
             </label>
 
